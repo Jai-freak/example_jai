@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreatAggr — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background: #000;
+            /* pure black background */
+            font-family: 'DM Sans', sans-serif;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        .auth-card {
+            background: #fff;
+            /* white card */
+            color: #000;
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .6);
+        }
+        
+        .auth-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-logo img {
+            width: 80px;
+            /* adjust size as needed */
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .auth-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+        }
+        
+        .auth-sub {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+        
+        .auth-input-group label {
+            font-size: 11px;
+            font-family: 'DM Mono', monospace;
+            color: #333;
+        }
+        
+        .auth-input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 9px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            color: #000;
+            font-size: 14px;
+        }
+        
+        .auth-forgot {
+            text-align: right;
+            margin-top: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-forgot a {
+            font-size: 12px;
+            color: #f04040;
+            text-decoration: none;
+            font-family: 'DM Mono', monospace;
+        }
+        
+        .auth-forgot a:hover {
+            text-decoration: underline;
+        }
+        
+        .auth-btn-full {
+            width: 100%;
+            padding: 13px;
+            border-radius: 9px;
+            background: #000;
+            color: #fff;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-btn-full:hover {
+            background: #333;
+        }
+        
+        .auth-switch {
+            font-size: 13px;
+            color: #555;
+            margin-top: 1rem;
+        }
+        
+        .auth-switch a {
+            color: #f04040;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        image . .auth-switch a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="auth-logo">
+            <!-- Replace the src with your uploaded logo path -->
+            <img src="WhatsApp Image 2026-04-07 at 1.08.02 PM.jpeg" alt="ThreatAggr Logo"> ThreatAggr
+        </div>
+        <h2 class="auth-title">Sign in</h2>
+        <p class="auth-sub">Access your dashboard and threat feed</p>
+
+        <!-- Email -->
+        <div class="auth-input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+
+        <!-- Password -->
+        <div class="auth-input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+
+        <!-- Forgot password link -->
+        <div class="auth-forgot">
+            <a href="#">Forgot password?</a>
+        </div>
+
+        <!-- Main login button -->
+        <button class="auth-btn-full">Sign in</button>
+
+        <!-- Switch -->
+        <div class="auth-switch">
+            Don’t have an account? <a href="#">Register</a>
+        </div>
+    </div>
+</body>
+
+</html>
