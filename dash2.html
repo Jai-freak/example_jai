@@ -1,0 +1,3290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThreatPulse — Intelligence Feed Aggregator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+         :root {
+            --white: #ffffff;
+            --off-white: #f7f7f5;
+            --light-gray: #ebebeb;
+            --mid-gray: #c8c8c8;
+            --dark-gray: #555555;
+            --near-black: #1a1a1a;
+            --black: #0d0d0d;
+            --accent: #c0392b;
+            --accent-dim: rgba(192, 57, 43, 0.08);
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Outfit', sans-serif;
+            --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.07);
+            --shadow-md: 0 8px 40px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.18);
+            --radius: 3px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background: var(--white);
+            color: var(--near-black);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1;
+        }
+        
+         ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: var(--white);
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: var(--near-black);
+            border-radius: 2px;
+        }
+        /* NAV */
+        
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            background: var(--white);
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            height: 68px;
+            transition: box-shadow var(--transition);
+        }
+        
+        nav.scrolled {
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--black);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.3)
+            }
+        }
+        
+        .nav-logo span {
+            color: var(--dark-gray);
+            font-weight: 400;
+        }
+        
+        .nav-center {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+        }
+        
+        .nav-center a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            transition: color var(--transition);
+            position: relative;
+        }
+        
+        .nav-center a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--black);
+            transition: width var(--transition);
+        }
+        
+        .nav-center a:hover {
+            color: var(--black);
+        }
+        
+        .nav-center a:hover::after {
+            width: 100%;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .btn-login {
+            background: none;
+            border: 1px solid var(--mid-gray);
+            color: var(--near-black);
+            padding: 9px 22px;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: border-color var(--transition), color var(--transition), background var(--transition);
+            letter-spacing: 0.02em;
+        }
+        
+        .btn-login:hover {
+            border-color: var(--near-black);
+            background: var(--near-black);
+            color: var(--white);
+        }
+        
+        .btn-signup {
+            background: var(--black);
+            border: 1px solid var(--black);
+            color: var(--white);
+            padding: 9px 22px;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background var(--transition), transform var(--transition);
+            letter-spacing: 0.02em;
+        }
+        
+        .btn-signup:hover {
+            background: var(--near-black);
+            transform: translateY(-1px);
+        }
+        
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            gap: 5px;
+            flex-direction: column;
+        }
+        
+        .nav-toggle span {
+            display: block;
+            width: 22px;
+            height: 1.5px;
+            background: var(--black);
+            transition: all 0.3s;
+        }
+        /* HERO */
+        
+        #hero {
+            min-height: 100vh;
+            background: var(--off-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 60px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--light-gray) 1px, transparent 1px), linear-gradient(90deg, var(--light-gray) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.5;
+        }
+        
+        #hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--mid-gray) 40%, var(--mid-gray) 60%, transparent);
+            opacity: 0.4;
+        }
+        
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 820px;
+        }
+        
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--mid-gray);
+            background: var(--white);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--dark-gray);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.2s;
+        }
+        
+        .hero-tag::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+        
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 6.5vw, 6rem);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--black);
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.4s;
+        }
+        
+        .hero-title em {
+            font-style: italic;
+            color: var(--dark-gray);
+        }
+        
+        .hero-sub {
+            font-size: 1.05rem;
+            font-weight: 300;
+            line-height: 1.75;
+            color: var(--dark-gray);
+            max-width: 540px;
+            margin: 0 auto 48px;
+            opacity: 0;
+            animation: fadeUp 0.7s ease forwards 0.6s;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 0.7s ease forwards 0.8s;
+        }
+        
+        .hero-btn-primary {
+            background: var(--black);
+            color: var(--white);
+            padding: 14px 36px;
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            border: 1px solid var(--black);
+            cursor: pointer;
+            transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+        }
+        
+        .hero-btn-primary:hover {
+            background: var(--near-black);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+        }
+        
+        .hero-btn-secondary {
+            background: var(--white);
+            color: var(--near-black);
+            padding: 14px 36px;
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            border: 1px solid var(--mid-gray);
+            cursor: pointer;
+            transition: border-color var(--transition), transform var(--transition);
+        }
+        
+        .hero-btn-secondary:hover {
+            border-color: var(--near-black);
+            transform: translateY(-2px);
+        }
+        
+        .hero-dashboard-key {
+            margin-top: 56px;
+            opacity: 0;
+            animation: fadeUp 0.7s ease forwards 1.0s;
+        }
+        
+        .dashboard-key-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            padding: 18px 28px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+            text-decoration: none;
+        }
+        
+        .dashboard-key-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+            border-color: var(--near-black);
+        }
+        
+        .dashboard-key-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--black);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .dashboard-key-text {
+            text-align: left;
+        }
+        
+        .dashboard-key-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--mid-gray);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .dashboard-key-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--near-black);
+            letter-spacing: -0.01em;
+        }
+        
+        .dashboard-key-arrow {
+            font-size: 1rem;
+            color: var(--mid-gray);
+            margin-left: 8px;
+            transition: transform var(--transition), color var(--transition);
+        }
+        
+        .dashboard-key-card:hover .dashboard-key-arrow {
+            transform: translateX(4px);
+            color: var(--near-black);
+        }
+        
+        .hero-scroll-hint {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--mid-gray);
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1.3s;
+        }
+        
+        .scroll-dot {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--mid-gray), transparent);
+            animation: scrollPulse 1.8s ease infinite;
+        }
+        
+        @keyframes scrollPulse {
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: scaleY(1)
+            }
+            50% {
+                opacity: 1;
+                transform: scaleY(1.2)
+            }
+        }
+        
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+        /* MARQUEE */
+        
+        .marquee-strip {
+            border-top: 1px solid var(--light-gray);
+            border-bottom: 1px solid var(--light-gray);
+            overflow: hidden;
+            padding: 16px 0;
+            background: var(--white);
+        }
+        
+        .marquee-track {
+            display: flex;
+            white-space: nowrap;
+            animation: marquee 28s linear infinite;
+        }
+        
+        .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 28px;
+            padding: 0 28px;
+            font-size: 0.72rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--mid-gray);
+            font-weight: 500;
+        }
+        
+        .marquee-sep {
+            width: 3px;
+            height: 3px;
+            background: var(--mid-gray);
+            border-radius: 50%;
+        }
+        
+        @keyframes marquee {
+            from {
+                transform: translateX(0)
+            }
+            to {
+                transform: translateX(-50%)
+            }
+        }
+        /* FEATURES */
+        
+        #features {
+            padding: 120px 60px;
+            background: var(--white);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 64px;
+        }
+        
+        .section-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mid-gray);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        
+        .section-sub {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            max-width: 280px;
+            text-align: right;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid var(--light-gray);
+        }
+        
+        .feature-card {
+            padding: 48px 40px;
+            border-right: 1px solid var(--light-gray);
+            border-bottom: 1px solid var(--light-gray);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease, background 0.25s;
+        }
+        
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .feature-card:nth-child(3n) {
+            border-right: none;
+        }
+        
+        .feature-card:nth-last-child(-n+3) {
+            border-bottom: none;
+        }
+        
+        .feature-card:hover {
+            background: var(--off-white);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.4s ease;
+        }
+        
+        .feature-card:hover::before {
+            width: 100%;
+        }
+        
+        .feature-num {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--light-gray);
+            line-height: 1;
+            margin-bottom: 28px;
+        }
+        
+        .feature-icon {
+            font-size: 1.6rem;
+            margin-bottom: 18px;
+        }
+        
+        .feature-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 12px;
+        }
+        
+        .feature-desc {
+            font-size: 0.875rem;
+            color: var(--dark-gray);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+        /* STATS */
+        
+        #stats {
+            background: var(--black);
+            color: var(--white);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .stat-cell {
+            padding: 64px 48px;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+        
+        .stat-cell:last-child {
+            border-right: none;
+        }
+        
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 4vw, 3.8rem);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: -0.03em;
+        }
+        
+        .stat-lbl {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            font-weight: 400;
+        }
+        /* CTA */
+        
+        #cta {
+            padding: 120px 60px;
+            background: var(--off-white);
+            border-top: 1px solid var(--light-gray);
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 24px;
+        }
+        
+        .cta-sub {
+            color: var(--dark-gray);
+            font-size: 1rem;
+            font-weight: 300;
+            line-height: 1.7;
+            max-width: 420px;
+            margin: 0 auto 44px;
+        }
+        
+        .cta-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        /* FOOTER */
+        
+        footer {
+            background: var(--black);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 48px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-logo-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        
+        .footer-logo span {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 400;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.45);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.07em;
+            transition: color var(--transition);
+        }
+        
+        .footer-links a:hover {
+            color: var(--white);
+        }
+        
+        .footer-copy {
+            font-size: 0.78rem;
+        }
+        /* MODAL */
+        
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-backdrop.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal {
+            background: var(--white);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 6px;
+            border: 1px solid var(--light-gray);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            transform: translateY(24px) scale(0.97);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .modal-backdrop.open .modal {
+            transform: translateY(0) scale(1);
+        }
+        
+        .modal-header {
+            padding: 36px 40px 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        
+        .modal-subtitle {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+            font-weight: 300;
+            margin-top: 6px;
+            line-height: 1.6;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: background var(--transition), color var(--transition);
+        }
+        
+        .modal-close:hover {
+            background: var(--off-white);
+            color: var(--black);
+        }
+        
+        .modal-body {
+            padding: 32px 40px 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--near-black);
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--near-black);
+            background: var(--white);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        
+        .form-input:focus {
+            border-color: var(--near-black);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+        }
+        
+        .form-input.error {
+            border-color: #c0392b;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        
+        .form-error {
+            font-size: 0.75rem;
+            color: #c0392b;
+            margin-top: 5px;
+            display: none;
+            font-weight: 400;
+        }
+        
+        .form-error.show {
+            display: block;
+        }
+        
+        .input-wrap {
+            position: relative;
+        }
+        
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 0.78rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 500;
+        }
+        
+        .pw-toggle:hover {
+            color: var(--black);
+        }
+        
+        .strength-bar {
+            display: flex;
+            gap: 4px;
+            margin-top: 10px;
+        }
+        
+        .strength-seg {
+            flex: 1;
+            height: 3px;
+            background: var(--light-gray);
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+        
+        .strength-label {
+            font-size: 0.72rem;
+            color: var(--mid-gray);
+            margin-top: 6px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .form-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 0.82rem;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .form-checkbox input {
+            margin-top: 3px;
+            flex-shrink: 0;
+            accent-color: var(--black);
+        }
+        
+        .form-checkbox a {
+            color: var(--near-black);
+        }
+        
+        .btn-form {
+            width: 100%;
+            padding: 13px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background var(--transition), transform var(--transition);
+        }
+        
+        .btn-form:hover:not(:disabled) {
+            background: var(--near-black);
+            transform: translateY(-1px);
+        }
+        
+        .btn-form:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        
+        .btn-form.loading .btn-spinner {
+            display: block;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+        
+        .modal-switch {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--dark-gray);
+            margin-top: 20px;
+        }
+        
+        .modal-switch a {
+            color: var(--near-black);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .modal-switch a:hover {
+            text-decoration: underline;
+        }
+        
+        .modal-success {
+            display: none;
+            padding: 64px 40px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 2.4rem;
+            margin-bottom: 16px;
+        }
+        
+        .success-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+        
+        .success-msg {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            font-weight: 300;
+            line-height: 1.7;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 9999;
+            background: var(--black);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s, transform 0.35s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* RESPONSIVE */
+        
+        @media (max-width:880px) {
+            nav {
+                padding: 0 24px;
+            }
+            .nav-center {
+                display: none;
+            }
+            .nav-toggle {
+                display: flex;
+            }
+            .nav-center.open {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                inset: 0;
+                top: 68px;
+                background: var(--white);
+                padding: 40px 24px;
+                gap: 20px;
+                z-index: 199;
+                border-top: 1px solid var(--light-gray);
+            }
+            .nav-center.open a {
+                font-size: 1.1rem;
+            }
+            #hero,
+            #features,
+            #cta {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .feature-card {
+                border-right: none;
+            }
+            .feature-card:nth-last-child(-n+3) {
+                border-bottom: 1px solid var(--light-gray);
+            }
+            .feature-card:last-child {
+                border-bottom: none;
+            }
+            #stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stat-cell:nth-child(2) {
+                border-right: none;
+            }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .section-sub {
+                text-align: left;
+            }
+            footer {
+                flex-direction: column;
+                gap: 20px;
+                padding: 32px 24px;
+                text-align: center;
+            }
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .modal-header {
+                padding: 28px 24px 0;
+            }
+            .modal-body {
+                padding: 24px 24px 32px;
+            }
+            .modal-success {
+                padding: 48px 24px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-key-card {
+                padding: 14px 20px;
+            }
+        }
+        /* ═══════════════════════════════════════════
+       THREAT DASHBOARD OVERLAY
+    ═══════════════════════════════════════════ */
+        
+        #dashboardOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #0d0020;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        #dashboardOverlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        /* SIDEBAR */
+        
+        .db-sidebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100%;
+            background: #120028;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 24px 0;
+            transform: translateX(-100%);
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+            z-index: 10;
+        }
+        
+        #dashboardOverlay.active .db-sidebar {
+            transform: translateX(0);
+        }
+        
+        .db-sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 12px;
+        }
+        
+        .db-sidebar-logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #c0392b;
+            animation: pulse 2s ease infinite;
+        }
+        
+        .db-sidebar-logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+        
+        .db-sidebar-logo-text span {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+        }
+        
+        .db-nav-section {
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .db-nav-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.25);
+            font-weight: 500;
+            padding: 8px 8px 6px;
+        }
+        
+        .db-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.82rem;
+            font-weight: 400;
+            transition: all 0.2s;
+            position: relative;
+            margin-bottom: 2px;
+            text-decoration: none;
+            letter-spacing: 0.01em;
+        }
+        
+        .db-nav-item:hover {
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .db-nav-item.active {
+            color: #0cf;
+            background: rgba(0, 204, 255, 0.1);
+            font-weight: 500;
+        }
+        
+        .db-nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: #0cf;
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .db-nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        
+        .db-nav-arrow {
+            margin-left: auto;
+            font-size: 0.6rem;
+            opacity: 0.4;
+        }
+        
+        .db-nav-badge {
+            margin-left: auto;
+            background: #c0392b;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        /* MAIN AREA */
+        
+        .db-main {
+            position: absolute;
+            top: 0;
+            left: 220px;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.45s ease 0.25s, transform 0.45s ease 0.25s;
+        }
+        
+        #dashboardOverlay.active .db-main {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* TOPBAR */
+        
+        .db-topbar {
+            height: 64px;
+            flex-shrink: 0;
+            background: #120028;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            gap: 16px;
+        }
+        
+        .db-menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            padding: 6px;
+        }
+        
+        .db-topbar-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0cf;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-right: 8px;
+        }
+        
+        .db-breadcrumb {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        
+        .db-search {
+            flex: 1;
+            max-width: 320px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 8px 14px;
+        }
+        
+        .db-search input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+        
+        .db-search input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+        
+        .db-search-icon {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+        }
+        
+        .db-topbar-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        
+        .db-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .db-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .db-icon-btn .badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background: #c0392b;
+            border-radius: 50%;
+            border: 2px solid #120028;
+        }
+        
+        .db-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0cf, #b44fff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            border: 2px solid rgba(0, 204, 255, 0.3);
+        }
+        
+        .db-close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+        
+        .db-close-btn:hover {
+            background: rgba(192, 57, 43, 0.3);
+            border-color: rgba(192, 57, 43, 0.5);
+            color: #ff6b6b;
+        }
+        /* CONTENT */
+        
+        .db-content {
+            padding: 24px 28px;
+            flex: 1;
+        }
+        
+        .db-path {
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .db-path span {
+            color: rgba(255, 255, 255, 0.18);
+            margin: 0 6px;
+        }
+        /* STAT CARDS ROW */
+        
+        .db-cards-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .db-stat-card {
+            background: #1a0038;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 20px 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .db-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        /* RING STAT */
+        
+        .db-ring-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .db-ring-wrap {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+        
+        .db-ring-svg {
+            width: 90px;
+            height: 90px;
+            transform: rotate(-90deg);
+        }
+        
+        .db-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 6;
+        }
+        
+        .db-ring-val {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        
+        .db-ring-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .db-ring-num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
+            display: block;
+        }
+        
+        .db-ring-sub {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        
+        .db-card-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #0cf;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+        
+        .db-card-desc {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+            text-align: center;
+            margin-top: 2px;
+        }
+        /* PROGRESS CARD */
+        
+        .db-progress-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .db-progress-header {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .db-progress-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #0cf;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .db-progress-subtitle {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        
+        .db-progress-big {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+        
+        .db-progress-big span {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 300;
+        }
+        
+        .db-pbar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .db-pbar-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .db-pbar-name {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .db-pbar-val {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.35);
+        }
+        
+        .db-pbar-track {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .db-pbar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* MIDDLE ROW */
+        
+        .db-mid-row {
+            display: grid;
+            grid-template-columns: 1fr 0.85fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        /* CHART CARD */
+        
+        .db-chart-card {
+            background: #1a0038;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        
+        .db-chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .db-chart-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .db-chart-legend {
+            display: flex;
+            gap: 14px;
+        }
+        
+        .db-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+        
+        .db-legend-dot {
+            width: 8px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        
+        .db-chart-canvas {
+            width: 100%;
+            height: 160px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* BAR CHART CARD */
+        
+        .db-bar-card {
+            background: #1a0038;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .db-bar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #0cf;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+        
+        .db-bar-sub {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .db-bars-wrap {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+            align-items: flex-end;
+            height: 110px;
+        }
+        
+        .db-bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .db-bar-fill {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .db-bar-tick {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+        }
+        /* BOTTOM ROW */
+        
+        .db-bot-row {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr 1.2fr;
+            gap: 14px;
+        }
+        /* ACTIVITIES */
+        
+        .db-activity-card {
+            background: #1a0038;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        
+        .db-activity-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #0cf;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+        
+        .db-activity-subtitle {
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 14px;
+        }
+        
+        .db-activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .db-activity-item {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .db-activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+        
+        .db-activity-text {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.55;
+        }
+        
+        .db-activity-text strong {
+            color: rgba(255, 255, 255, 0.85);
+            display: block;
+            font-size: 0.72rem;
+            margin-bottom: 1px;
+        }
+        
+        .db-activity-time {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 2px;
+            display: block;
+        }
+        /* CALENDAR */
+        
+        .db-cal-card {
+            background: #1a0038;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        
+        .db-cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        
+        .db-cal-month {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        
+        .db-cal-nav {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: color 0.2s;
+        }
+        
+        .db-cal-nav:hover {
+            color: #0cf;
+        }
+        
+        .db-cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        
+        .db-cal-day-label {
+            font-size: 0.58rem;
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+            padding: 4px 0;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .db-cal-day {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.45);
+            text-align: center;
+            padding: 5px 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .db-cal-day:hover {
+            background: rgba(0, 204, 255, 0.1);
+            color: #0cf;
+        }
+        
+        .db-cal-day.today {
+            background: rgba(0, 204, 255, 0.15);
+            color: #0cf;
+            font-weight: 700;
+        }
+        
+        .db-cal-day.alert {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        
+        .db-cal-day.empty {
+            cursor: default;
+        }
+        /* GAUGES */
+        
+        .db-gauge-card {
+            background: #1a0038;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        
+        .db-gauge-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+        
+        .db-gauges-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 14px;
+        }
+        
+        .db-gauge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .db-gauge-ring {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+        
+        .db-gauge-svg {
+            width: 50px;
+            height: 50px;
+            transform: rotate(-90deg);
+        }
+        
+        .db-gauge-label {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: center;
+            letter-spacing: 0.04em;
+            max-width: 52px;
+            line-height: 1.4;
+        }
+        
+        .db-gauge-pct {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+        
+        .db-gauge-track-line {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 4px 0;
+        }
+        
+        .db-gauge-dots-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .db-gauge-dot-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .db-gauge-dot-circle {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .db-gauge-dot-label {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        /* SVG CHART */
+        
+        .db-chart-svg {
+            width: 100%;
+            height: 160px;
+        }
+        /* Scrollbar for dashboard */
+        
+        .db-main::-webkit-scrollbar {
+            width: 3px;
+        }
+        
+        .db-main::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .db-main::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        
+        @media (max-width:1100px) {
+            .db-cards-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .db-cards-row .db-progress-card {
+                grid-column: span 1;
+            }
+        }
+        
+        @media (max-width:768px) {
+            .db-sidebar {
+                width: 64px;
+            }
+            .db-sidebar-logo-text,
+            .db-nav-item span:not(.db-nav-icon),
+            .db-nav-label,
+            .db-nav-arrow,
+            .db-nav-badge {
+                display: none;
+            }
+            .db-main {
+                left: 64px;
+            }
+            .db-cards-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .db-mid-row,
+            .db-bot-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav id="navbar">
+        <a href="#" class="nav-logo">
+            <span class="nav-logo-dot"></span>ThreatPulse<span>.</span>
+        </a>
+        <ul class="nav-center" id="navLinks">
+            <li><a href="#features">Capabilities</a></li>
+            <li><a href="#stats">Intelligence</a></li>
+            <li><a href="#cta">Pricing</a></li>
+            <li><a href="#">Docs</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="btn-login" id="navLoginBtn">Log In</button>
+            <button class="btn-signup" id="navSignupBtn">Get Started</button>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+        <div class="hero-inner">
+            <div class="hero-tag">Live threat feeds — updated every 60 seconds</div>
+            <h1 class="hero-title">Unified threat<br><em>intelligence.</em></h1>
+            <p class="hero-sub">Aggregate, correlate, and act on threat data from hundreds of global feeds — all in one place. Built for security teams who need signal, not noise.</p>
+            <div class="hero-buttons">
+                <button class="hero-btn-primary" id="heroSignupBtn">Start Free Trial</button>
+                <button class="hero-btn-secondary" id="heroLoginBtn">Sign In</button>
+            </div>
+            <div class="hero-dashboard-key">
+                <button class="dashboard-key-card" id="dashboardKeyBtn" onclick="openDashboard()">
+        <div class="dashboard-key-icon">⚡</div>
+        <div class="dashboard-key-text">
+          <div class="dashboard-key-label">Quick Access</div>
+          <div class="dashboard-key-title">Open Threat Dashboard</div>
+        </div>
+        <span class="dashboard-key-arrow">→</span>
+      </button>
+            </div>
+        </div>
+        <div class="hero-scroll-hint">
+            <div class="scroll-dot"></div>
+            Scroll
+        </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-strip">
+        <div class="marquee-track" id="marqueeTrack"></div>
+    </div>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <div class="section-header reveal">
+            <div>
+                <p class="section-label">Capabilities</p>
+                <h2 class="section-title">Everything your<br>team needs.</h2>
+            </div>
+            <p class="section-sub">From raw IOC ingestion to executive-ready reports — all automated, all real-time.</p>
+        </div>
+        <div class="features-grid" id="featuresGrid"></div>
+    </section>
+
+    <!-- STATS -->
+    <section id="stats"></section>
+
+    <!-- CTA -->
+    <section id="cta">
+        <div class="reveal">
+            <p class="section-label" style="text-align:center;">Defend proactively</p>
+            <h2 class="cta-title">Stay ahead of the threat.</h2>
+            <p class="cta-sub">Join security teams worldwide who rely on ThreatPulse to detect, analyse, and respond faster.</p>
+            <div class="cta-actions">
+                <button class="hero-btn-primary" id="ctaSignupBtn">Create Free Account</button>
+                <button class="hero-btn-secondary" id="ctaLoginBtn">Log In</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <a href="#" class="footer-logo">
+            <span class="footer-logo-dot"></span>ThreatPulse<span>.</span>
+        </a>
+        <ul class="footer-links" id="footerLinks"></ul>
+        <p class="footer-copy">© 2026 ThreatPulse. All rights reserved.</p>
+    </footer>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal-backdrop" id="loginModal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="loginTitle">Welcome back.</h2>
+                    <p class="modal-subtitle">Sign in to your threat intelligence portal.</p>
+                </div>
+                <button class="modal-close" id="loginClose" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body" id="loginBody">
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail">Email</label>
+                        <input class="form-input" type="email" id="loginEmail" placeholder="analyst@org.com" autocomplete="email" />
+                        <p class="form-error" id="loginEmailErr">Please enter a valid email address.</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">Password</label>
+                        <div class="input-wrap">
+                            <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+                            <button type="button" class="pw-toggle" data-target="loginPassword">Show</button>
+                        </div>
+                        <p class="form-error" id="loginPasswordErr">Password must be at least 8 characters.</p>
+                    </div>
+                    <button type="submit" class="btn-form" id="loginSubmit">
+          <div class="btn-spinner"></div>
+          <span class="btn-text">Sign In</span>
+        </button>
+                </form>
+                <div class="modal-switch">Don't have an account? <a id="switchToSignup">Create one</a></div>
+            </div>
+            <div class="modal-success" id="loginSuccess">
+                <div class="success-icon">✓</div>
+                <h3 class="success-title">Access granted.</h3>
+                <p class="success-msg">Identity verified. Opening your threat dashboard…</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNUP MODAL -->
+    <div class="modal-backdrop" id="signupModal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="signupTitle">Create account.</h2>
+                    <p class="modal-subtitle">Free 14-day trial. No credit card needed.</p>
+                </div>
+                <button class="modal-close" id="signupClose" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body" id="signupBody">
+                <form id="signupForm" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="signupFirst">First Name</label>
+                            <input class="form-input" type="text" id="signupFirst" placeholder="Jane" autocomplete="given-name" />
+                            <p class="form-error" id="signupFirstErr">First name is required.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="signupLast">Last Name</label>
+                            <input class="form-input" type="text" id="signupLast" placeholder="Smith" autocomplete="family-name" />
+                            <p class="form-error" id="signupLastErr">Last name is required.</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupEmail">Work Email</label>
+                        <input class="form-input" type="email" id="signupEmail" placeholder="analyst@org.com" autocomplete="email" />
+                        <p class="form-error" id="signupEmailErr">Please enter a valid email address.</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupPassword">Password</label>
+                        <div class="input-wrap">
+                            <input class="form-input" type="password" id="signupPassword" placeholder="Min. 8 characters" autocomplete="new-password" />
+                            <button type="button" class="pw-toggle" data-target="signupPassword">Show</button>
+                        </div>
+                        <div class="strength-bar">
+                            <div class="strength-seg" id="seg1"></div>
+                            <div class="strength-seg" id="seg2"></div>
+                            <div class="strength-seg" id="seg3"></div>
+                            <div class="strength-seg" id="seg4"></div>
+                        </div>
+                        <span class="strength-label" id="strengthLabel"></span>
+                        <p class="form-error" id="signupPasswordErr">Password must be at least 8 characters.</p>
+                    </div>
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="signupTerms" />
+                        <label for="signupTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</label>
+                    </div>
+                    <p class="form-error" id="signupTermsErr" style="margin-top:-16px;margin-bottom:16px;">You must accept the terms to continue.</p>
+                    <button type="submit" class="btn-form" id="signupSubmit">
+          <div class="btn-spinner"></div>
+          <span class="btn-text">Create Account</span>
+        </button>
+                </form>
+                <div class="modal-switch">Already have an account? <a id="switchToLogin">Sign in</a></div>
+            </div>
+            <div class="modal-success" id="signupSuccess">
+                <div class="success-icon">🛡️</div>
+                <h3 class="success-title">You're protected.</h3>
+                <p class="success-msg">Welcome to ThreatPulse. Check your inbox to verify and activate your intelligence feeds.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ═══════════════════════════════════════════
+     THREAT DASHBOARD OVERLAY
+═══════════════════════════════════════════ -->
+    <div id="dashboardOverlay">
+        <!-- SIDEBAR -->
+        <div class="db-sidebar">
+            <div class="db-sidebar-logo">
+                <span class="db-sidebar-logo-dot"></span>
+                <span class="db-sidebar-logo-text">ThreatPulse<span>.</span></span>
+            </div>
+            <div class="db-nav-section">
+                <div class="db-nav-item active">
+                    <span class="db-nav-icon">⬡</span>
+                    <span>Dashboard</span>
+                    <span class="db-nav-arrow">▸</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">◈</span>
+                    <span>Threat Map</span>
+                    <span class="db-nav-arrow">▸</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">✦</span>
+                    <span>IOC Feeds</span>
+                    <span class="db-nav-badge">12</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">◉</span>
+                    <span>Incidents</span>
+                    <span class="db-nav-badge">3</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">✉</span>
+                    <span>Alerts</span>
+                    <span class="db-nav-arrow">▸</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">⚙</span>
+                    <span>Settings</span>
+                    <span class="db-nav-arrow">▸</span>
+                </div>
+            </div>
+            <div class="db-nav-section" style="margin-top:auto;">
+                <div class="db-nav-label">Workspaces</div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">◧</span>
+                    <span>SOC Team</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">◦</span>
+                    <span>Red Team</span>
+                </div>
+                <div class="db-nav-item">
+                    <span class="db-nav-icon">◌</span>
+                    <span>Executive</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN -->
+        <div class="db-main">
+            <!-- TOPBAR -->
+            <div class="db-topbar">
+                <button class="db-menu-btn">☰</button>
+                <span class="db-topbar-title">Dashboard</span>
+                <span class="db-breadcrumb">/ Home</span>
+                <div class="db-search">
+                    <span class="db-search-icon">🔍</span>
+                    <input type="text" placeholder="Search IOCs, threats, feeds…" />
+                </div>
+                <div class="db-topbar-icons">
+                    <div class="db-icon-btn">🔔<span class="badge"></span></div>
+                    <div class="db-icon-btn">⚙</div>
+                    <div class="db-icon-btn">✉<span class="badge"></span></div>
+                    <div class="db-avatar">AN</div>
+                    <button class="db-close-btn" onclick="closeDashboard()" title="Close Dashboard">✕</button>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="db-content">
+                <div class="db-path">Dashboard <span>/</span> Home</div>
+
+                <!-- CARDS ROW -->
+                <div class="db-cards-row">
+
+                    <!-- Ring card 1 -->
+                    <div class="db-stat-card db-ring-card">
+                        <div class="db-ring-wrap">
+                            <svg class="db-ring-svg" viewBox="0 0 90 90">
+              <circle class="db-ring-bg" cx="45" cy="45" r="38"/>
+              <circle class="db-ring-val" cx="45" cy="45" r="38"
+                stroke="url(#ring1grad)" stroke-dasharray="238.76" stroke-dashoffset="60"
+                id="ring1"/>
+            </svg>
+                            <defs>
+                                <linearGradient id="ring1grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ff3cac" />
+                                    <stop offset="30%" stop-color="#ff9a3c" />
+                                    <stop offset="60%" stop-color="#f9f871" />
+                                    <stop offset="80%" stop-color="#0cf" />
+                                    <stop offset="100%" stop-color="#b44fff" />
+                                </linearGradient>
+                                <linearGradient id="ring2grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#0cf" />
+                                    <stop offset="30%" stop-color="#0ff" />
+                                    <stop offset="60%" stop-color="#b4ff6b" />
+                                    <stop offset="80%" stop-color="#f9f871" />
+                                    <stop offset="100%" stop-color="#0cf" />
+                                </linearGradient>
+                                <linearGradient id="ring3grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#b44fff" />
+                                    <stop offset="30%" stop-color="#ff3cac" />
+                                    <stop offset="60%" stop-color="#0cf" />
+                                    <stop offset="80%" stop-color="#b4ff6b" />
+                                    <stop offset="100%" stop-color="#f9f871" />
+                                </linearGradient>
+                            </defs>
+                            <div class="db-ring-center">
+                                <span class="db-ring-num" id="rn1">0</span>
+                                <span class="db-ring-sub">Active</span>
+                            </div>
+                        </div>
+                        <div class="db-card-label">Active Threats</div>
+                        <div class="db-card-desc">Live IOCs across all monitored networks and feeds</div>
+                    </div>
+
+                    <!-- Ring card 2 -->
+                    <div class="db-stat-card db-ring-card">
+                        <div class="db-ring-wrap">
+                            <svg class="db-ring-svg" viewBox="0 0 90 90">
+              <circle class="db-ring-bg" cx="45" cy="45" r="38"/>
+              <circle class="db-ring-val" cx="45" cy="45" r="38"
+                stroke="url(#ring2grad)" stroke-dasharray="238.76" stroke-dashoffset="30"
+                id="ring2"/>
+            </svg>
+                            <div class="db-ring-center">
+                                <span class="db-ring-num" id="rn2">0</span>
+                                <span class="db-ring-sub">Today</span>
+                            </div>
+                        </div>
+                        <div class="db-card-label">IOCs Ingested</div>
+                        <div class="db-card-desc">Indicators processed and enriched in last 24h</div>
+                    </div>
+
+                    <!-- Ring card 3 -->
+                    <div class="db-stat-card db-ring-card">
+                        <div class="db-ring-wrap">
+                            <svg class="db-ring-svg" viewBox="0 0 90 90">
+              <circle class="db-ring-bg" cx="45" cy="45" r="38"/>
+              <circle class="db-ring-val" cx="45" cy="45" r="38"
+                stroke="url(#ring3grad)" stroke-dasharray="238.76" stroke-dashoffset="80"
+                id="ring3"/>
+            </svg>
+                            <div class="db-ring-center">
+                                <span class="db-ring-num" id="rn3">0</span>
+                                <span class="db-ring-sub">Open</span>
+                            </div>
+                        </div>
+                        <div class="db-card-label">Incidents</div>
+                        <div class="db-card-desc">Open security incidents awaiting investigation</div>
+                    </div>
+
+                    <!-- Progress card 1 -->
+                    <div class="db-stat-card db-progress-card">
+                        <div class="db-progress-header">
+                            <div class="db-progress-title">Risk Score</div>
+                            <div class="db-progress-subtitle">Global threat index</div>
+                        </div>
+                        <div class="db-progress-big" id="riskScore">0<span>%</span></div>
+                        <div class="db-pbar-row" id="pbar1">
+                            <div class="db-pbar-label"><span class="db-pbar-name">Malware</span><span class="db-pbar-val">78%</span></div>
+                            <div class="db-pbar-track">
+                                <div class="db-pbar-fill" style="width:0%;background:linear-gradient(90deg,#ff3cac,#ff9a3c)"></div>
+                            </div>
+                            <div class="db-pbar-label"><span class="db-pbar-name">Phishing</span><span class="db-pbar-val">62%</span></div>
+                            <div class="db-pbar-track">
+                                <div class="db-pbar-fill" style="width:0%;background:linear-gradient(90deg,#0cf,#b44fff)"></div>
+                            </div>
+                            <div class="db-pbar-label"><span class="db-pbar-name">Ransomware</span><span class="db-pbar-val">45%</span></div>
+                            <div class="db-pbar-track">
+                                <div class="db-pbar-fill" style="width:0%;background:linear-gradient(90deg,#b4ff6b,#0cf)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress card 2 -->
+                    <div class="db-stat-card db-progress-card">
+                        <div class="db-progress-header">
+                            <div class="db-progress-title">Feed Health</div>
+                            <div class="db-progress-subtitle">Source reliability</div>
+                        </div>
+                        <div class="db-progress-big" id="feedHealth">0<span>%</span></div>
+                        <div class="db-pbar-row" id="pbar2">
+                            <div class="db-pbar-label"><span class="db-pbar-name">MISP</span><span class="db-pbar-val">99%</span></div>
+                            <div class="db-pbar-track">
+                                <div class="db-pbar-fill" style="width:0%;background:linear-gradient(90deg,#b4ff6b,#0cf)"></div>
+                            </div>
+                            <div class="db-pbar-label"><span class="db-pbar-name">AlienVault OTX</span><span class="db-pbar-val">91%</span></div>
+                            <div class="db-pbar-track">
+                                <div class="db-pbar-fill" style="width:0%;background:linear-gradient(90deg,#0cf,#b44fff)"></div>
+                            </div>
+                            <div class="db-pbar-label"><span class="db-pbar-name">Shodan</span><span class="db-pbar-val">87%</span></div>
+                            <div class="db-pbar-track">
+                                <div class="db-pbar-fill" style="width:0%;background:linear-gradient(90deg,#f9f871,#ff9a3c)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /cards row -->
+
+                <!-- MIDDLE ROW -->
+                <div class="db-mid-row">
+
+                    <!-- Line chart -->
+                    <div class="db-chart-card">
+                        <div class="db-chart-header">
+                            <span class="db-chart-title">Threat Activity — 7 Days</span>
+                            <div class="db-chart-legend">
+                                <div class="db-legend-item">
+                                    <div class="db-legend-dot" style="background:#ff3cac"></div>Malware</div>
+                                <div class="db-legend-item">
+                                    <div class="db-legend-dot" style="background:#0cf"></div>Phishing</div>
+                                <div class="db-legend-item">
+                                    <div class="db-legend-dot" style="background:#b44fff"></div>DDoS</div>
+                            </div>
+                        </div>
+                        <div class="db-chart-canvas">
+                            <svg class="db-chart-svg" viewBox="0 0 500 160" preserveAspectRatio="none">
+              <!-- Grid lines -->
+              <line x1="0" y1="32" x2="500" y2="32" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="64" x2="500" y2="64" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="96" x2="500" y2="96" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="0" y1="128" x2="500" y2="128" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <!-- Area fill 1 (malware) -->
+              <defs>
+                <linearGradient id="areaGrad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ff3cac" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#ff3cac" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0cf" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#0cf" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="areaGrad3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#b44fff" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#b44fff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Area 1 -->
+              <path d="M0,120 C40,100 80,70 130,80 C180,90 220,40 260,50 C300,60 340,90 380,70 C420,50 460,60 500,55 L500,160 L0,160 Z" fill="url(#areaGrad1)"/>
+              <path d="M0,120 C40,100 80,70 130,80 C180,90 220,40 260,50 C300,60 340,90 380,70 C420,50 460,60 500,55" fill="none" stroke="#ff3cac" stroke-width="2.5" stroke-linejoin="round"/>
+              <!-- Area 2 -->
+              <path d="M0,140 C40,120 80,110 130,100 C180,88 220,95 260,85 C300,74 340,80 380,65 C420,50 460,70 500,75 L500,160 L0,160 Z" fill="url(#areaGrad2)"/>
+              <path d="M0,140 C40,120 80,110 130,100 C180,88 220,95 260,85 C300,74 340,80 380,65 C420,50 460,70 500,75" fill="none" stroke="#0cf" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Area 3 -->
+              <path d="M0,150 C40,140 80,130 130,125 C180,118 220,112 260,105 C300,98 340,110 380,100 C420,88 460,92 500,88 L500,160 L0,160 Z" fill="url(#areaGrad3)"/>
+              <path d="M0,150 C40,140 80,130 130,125 C180,118 220,112 260,105 C300,98 340,110 380,100 C420,88 460,92 500,88" fill="none" stroke="#b44fff" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Data point labels -->
+              <text x="130" y="72" font-family="Space Grotesk" font-size="8" fill="rgba(255,255,255,0.4)">Peak</text>
+              <text x="258" y="42" font-family="Space Grotesk" font-size="8" fill="rgba(255,255,255,0.4)">Spike</text>
+              <text x="378" y="62" font-family="Space Grotesk" font-size="8" fill="rgba(255,255,255,0.4)">Drop</text>
+              <!-- Vertical markers -->
+              <line x1="130" y1="20" x2="130" y2="155" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="260" y1="20" x2="260" y2="155" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>
+              <line x1="380" y1="20" x2="380" y2="155" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y-axis labels -->
+              <text x="4" y="36" font-family="Space Grotesk" font-size="7" fill="rgba(255,255,255,0.2)">10</text>
+              <text x="4" y="68" font-family="Space Grotesk" font-size="7" fill="rgba(255,255,255,0.2)">30</text>
+              <text x="4" y="100" font-family="Space Grotesk" font-size="7" fill="rgba(255,255,255,0.2)">50</text>
+              <text x="4" y="132" font-family="Space Grotesk" font-size="7" fill="rgba(255,255,255,0.2)">70</text>
+            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Bar chart -->
+                    <div class="db-bar-card">
+                        <div class="db-bar-title">Feed Sources</div>
+                        <div class="db-bar-sub">IOC contribution by source over the last 30 days. MISP leads overall volume.</div>
+                        <div class="db-bars-wrap" id="barsWrap">
+                            <!-- JS rendered -->
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /mid row -->
+
+                <!-- BOTTOM ROW -->
+                <div class="db-bot-row">
+
+                    <!-- Activities -->
+                    <div class="db-activity-card">
+                        <div class="db-activity-title">Recent Activity</div>
+                        <div class="db-activity-subtitle">Latest threat events and feed updates</div>
+                        <div class="db-activity-list">
+                            <div class="db-activity-item">
+                                <div class="db-activity-dot" style="background:#ff3cac"></div>
+                                <div class="db-activity-text">
+                                    <strong>Cobalt Strike beacon detected</strong> C2 communication identified from IP 185.220.101.47 — flagged critical, SIEM notified.
+                                    <span class="db-activity-time">2 min ago</span>
+                                </div>
+                            </div>
+                            <div class="db-activity-item">
+                                <div class="db-activity-dot" style="background:#0cf"></div>
+                                <div class="db-activity-text">
+                                    <strong>New phishing campaign</strong> 103 new phishing domains added from AlienVault OTX feed. Auto-blocked at perimeter.
+                                    <span class="db-activity-time">18 min ago</span>
+                                </div>
+                            </div>
+                            <div class="db-activity-item">
+                                <div class="db-activity-dot" style="background:#b4ff6b"></div>
+                                <div class="db-activity-text">
+                                    <strong>MISP feed sync completed</strong> 2,487 indicators ingested and enriched. 14 new threat actors mapped to MITRE ATT&CK.
+                                    <span class="db-activity-time">41 min ago</span>
+                                </div>
+                            </div>
+                            <div class="db-activity-item">
+                                <div class="db-activity-dot" style="background:#f9f871"></div>
+                                <div class="db-activity-text">
+                                    <strong>CVE-2025-8812 published</strong> Critical RCE in Apache Tomcat. 3 assets in your environment may be affected.
+                                    <span class="db-activity-time">1h 12m ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar -->
+                    <div class="db-cal-card">
+                        <div class="db-cal-header">
+                            <button class="db-cal-nav">◀</button>
+                            <span class="db-cal-month" id="calMonth">April 2026</span>
+                            <button class="db-cal-nav">▶</button>
+                        </div>
+                        <div class="db-cal-grid" id="calGrid">
+                            <!-- JS rendered -->
+                        </div>
+                    </div>
+
+                    <!-- Gauges -->
+                    <div class="db-gauge-card">
+                        <div class="db-gauge-title" style="color:rgba(255,255,255,0.7);">Feed Uptime</div>
+                        <div class="db-gauges-row" id="gaugesRow">
+                            <!-- JS rendered -->
+                        </div>
+                        <div class="db-gauge-track-line"></div>
+                        <div class="db-gauge-dots-row" id="gaugeDots">
+                            <!-- JS rendered -->
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /bot row -->
+            </div>
+            <!-- /content -->
+        </div>
+        <!-- /main -->
+    </div>
+    <!-- /dashboardOverlay -->
+
+    <script>
+        /* ━━━━━━━ DATA ━━━━━━━ */
+        const featuresData = [{
+            num: "01",
+            icon: "⬡",
+            name: "Multi-Feed Aggregation",
+            desc: "Pull from 500+ threat intelligence sources — MISP, OpenCTI, AlienVault OTX, Shodan, and more — into a single normalised stream."
+        }, {
+            num: "02",
+            icon: "◈",
+            name: "Real-Time IOC Enrichment",
+            desc: "Every indicator automatically enriched with geo, ASN, WHOIS, VirusTotal, and historical context the moment it arrives."
+        }, {
+            num: "03",
+            icon: "✦",
+            name: "Automated Correlation",
+            desc: "Cross-feed correlation engine maps relationships between IPs, domains, hashes, and threat actors with no manual effort."
+        }, {
+            num: "04",
+            icon: "◉",
+            name: "SIEM & SOAR Integration",
+            desc: "Push curated IOCs to Splunk, Sentinel, QRadar, or any SOAR platform via webhooks and native connectors in seconds."
+        }, {
+            num: "05",
+            icon: "⟡",
+            name: "Analyst Workspace",
+            desc: "Tag, annotate, pivot, and collaborate on threats with a purpose-built workspace designed for SOC and CTI teams."
+        }, {
+            num: "06",
+            icon: "✧",
+            name: "Executive Reporting",
+            desc: "Auto-generated PDF and live dashboard reports tailored for technical leads, CISOs, and board-level stakeholders."
+        }];
+        const statsData = [{
+            target: 500,
+            suffix: "+",
+            label: "Feed Sources",
+            isFloat: false
+        }, {
+            target: 2.4,
+            suffix: "M+",
+            label: "IOCs Processed / Day",
+            isFloat: true
+        }, {
+            target: 99.98,
+            suffix: "%",
+            label: "Platform Uptime",
+            isFloat: true
+        }, {
+            target: 340,
+            suffix: "ms",
+            label: "Avg Enrichment Time",
+            isFloat: false
+        }];
+        const marqueeItems = ["Threat Feeds", "IOC Enrichment", "APT Tracking", "MITRE ATT&CK", "Dark Web Monitoring", "Malware Analysis", "Phishing Detection", "Ransomware Intel", "Vulnerability Feeds", "Zero-Day Alerts"];
+        const footerLinks = ["Platform", "Integrations", "Pricing", "Documentation", "API Reference", "Contact"];
+
+        /* ━━━━━━━ UTILS ━━━━━━━ */
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        function showToast(msg, duration = 3200) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        function isValidEmail(v) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+        }
+
+        function isValidPassword(v) {
+            return v.length >= 8;
+        }
+
+        function setFieldError(inputId, errId, show) {
+            const input = $(inputId),
+                err = $(errId);
+            if (!input || !err) return;
+            input.classList.toggle('error', show);
+            err.classList.toggle('show', show);
+        }
+
+        function clearAllErrors(pairs) {
+            pairs.forEach(([inp, err]) => setFieldError(inp, err, false));
+        }
+
+        function setLoading(btnId, on) {
+            const btn = $(btnId);
+            btn.classList.toggle('loading', on);
+            btn.disabled = on;
+        }
+
+        /* ━━━━━━━ MODAL ━━━━━━━ */
+        function openModal(id) {
+            $(id).classList.add('open');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                const first = $(id).querySelector('input');
+                if (first) first.focus();
+            }, 350);
+        }
+
+        function closeModal(id) {
+            $(id).classList.remove('open');
+            document.body.style.overflow = '';
+            setTimeout(() => resetModal(id), 400);
+        }
+
+        function resetModal(id) {
+            const modal = $(id);
+            const form = modal.querySelector('form');
+            if (form) form.reset();
+            modal.querySelectorAll('.modal-success').forEach(s => s.style.display = 'none');
+            modal.querySelectorAll('.modal-body').forEach(b => b.style.display = '');
+            modal.querySelectorAll('.modal-switch').forEach(s => s.style.display = '');
+            modal.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+            modal.querySelectorAll('.form-input').forEach(i => i.classList.remove('error'));
+            if (id === 'signupModal') resetStrength();
+        }
+
+        function showSuccessState(bodyId, successId, switchEl) {
+            $(bodyId).style.display = 'none';
+            if (switchEl) switchEl.style.display = 'none';
+            $(successId).style.display = 'block';
+        }
+
+        /* ━━━━━━━ LOGIN ━━━━━━━ */
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = $('loginEmail').value;
+            const password = $('loginPassword').value;
+            clearAllErrors([
+                ['loginEmail', 'loginEmailErr'],
+                ['loginPassword', 'loginPasswordErr']
+            ]);
+            let valid = true;
+            if (!isValidEmail(email)) {
+                setFieldError('loginEmail', 'loginEmailErr', true);
+                valid = false;
+            }
+            if (!isValidPassword(password)) {
+                setFieldError('loginPassword', 'loginPasswordErr', true);
+                valid = false;
+            }
+            if (!valid) return;
+            setLoading('loginSubmit', true);
+            setTimeout(() => {
+                setLoading('loginSubmit', false);
+                const sw = $('loginModal').querySelector('.modal-switch');
+                showSuccessState('loginBody', 'loginSuccess', sw);
+                setTimeout(() => {
+                    closeModal('loginModal');
+                    showToast('Welcome back, ' + email.split('@')[0] + '. Feeds are live.');
+                    setTimeout(() => openDashboard(), 600);
+                }, 2000);
+            }, 1800);
+        }
+
+        /* ━━━━━━━ SIGNUP ━━━━━━━ */
+        function handleSignup(e) {
+            e.preventDefault();
+            const first = $('signupFirst').value.trim();
+            const last = $('signupLast').value.trim();
+            const email = $('signupEmail').value.trim();
+            const password = $('signupPassword').value;
+            const terms = $('signupTerms').checked;
+            clearAllErrors([
+                ['signupFirst', 'signupFirstErr'],
+                ['signupLast', 'signupLastErr'],
+                ['signupEmail', 'signupEmailErr'],
+                ['signupPassword', 'signupPasswordErr']
+            ]);
+            $('signupTermsErr').classList.remove('show');
+            let valid = true;
+            if (!first) {
+                setFieldError('signupFirst', 'signupFirstErr', true);
+                valid = false;
+            }
+            if (!last) {
+                setFieldError('signupLast', 'signupLastErr', true);
+                valid = false;
+            }
+            if (!isValidEmail(email)) {
+                setFieldError('signupEmail', 'signupEmailErr', true);
+                valid = false;
+            }
+            if (!isValidPassword(password)) {
+                setFieldError('signupPassword', 'signupPasswordErr', true);
+                valid = false;
+            }
+            if (!terms) {
+                $('signupTermsErr').classList.add('show');
+                valid = false;
+            }
+            if (!valid) return;
+            setLoading('signupSubmit', true);
+            setTimeout(() => {
+                setLoading('signupSubmit', false);
+                const sw = $('signupModal').querySelector('.modal-switch');
+                showSuccessState('signupBody', 'signupSuccess', sw);
+                setTimeout(() => {
+                    closeModal('signupModal');
+                    showToast('Welcome, ' + first + '! Your intelligence feeds are activating. 🛡️');
+                }, 2500);
+            }, 1800);
+        }
+
+        /* ━━━━━━━ PW TOGGLE ━━━━━━━ */
+        function initPasswordToggles() {
+            document.querySelectorAll('.pw-toggle').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = $(btn.dataset.target);
+                    if (!input) return;
+                    const hidden = input.type === 'password';
+                    input.type = hidden ? 'text' : 'password';
+                    btn.textContent = hidden ? 'Hide' : 'Show';
+                });
+            });
+        }
+
+        /* ━━━━━━━ PW STRENGTH ━━━━━━━ */
+        function scorePassword(pw) {
+            let s = 0;
+            if (pw.length >= 8) s++;
+            if (pw.length >= 12) s++;
+            if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++;
+            if (/\d/.test(pw)) s++;
+            if (/[^A-Za-z0-9]/.test(pw)) s++;
+            if (s <= 1) return {
+                level: 1,
+                label: 'Weak',
+                color: '#c0392b'
+            };
+            if (s <= 2) return {
+                level: 2,
+                label: 'Fair',
+                color: '#d4800a'
+            };
+            if (s <= 3) return {
+                level: 3,
+                label: 'Good',
+                color: '#2980b9'
+            };
+            return {
+                level: 4,
+                label: 'Strong',
+                color: '#27ae60'
+            };
+        }
+
+        function resetStrength() {
+            ['seg1', 'seg2', 'seg3', 'seg4'].forEach(id => $(id).style.background = '');
+            $('strengthLabel').textContent = '';
+        }
+
+        function initStrengthMeter() {
+            $('signupPassword').addEventListener('input', function() {
+                if (!this.value) {
+                    resetStrength();
+                    return;
+                }
+                const {
+                    level,
+                    label,
+                    color
+                } = scorePassword(this.value);
+                ['seg1', 'seg2', 'seg3', 'seg4'].forEach((id, i) => {
+                    $(id).style.background = i < level ? color : 'var(--light-gray)';
+                });
+                $('strengthLabel').textContent = label;
+                $('strengthLabel').style.color = color;
+            });
+        }
+
+        /* ━━━━━━━ NAVBAR ━━━━━━━ */
+        function initNavbar() {
+            const nav = $('navbar');
+            const toggle = $('navToggle');
+            const links = $('navLinks');
+            window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+            toggle.addEventListener('click', () => {
+                const open = links.classList.toggle('open');
+                const spans = toggle.querySelectorAll('span');
+                spans[0].style.transform = open ? 'rotate(45deg) translate(4px,4px)' : '';
+                spans[1].style.opacity = open ? '0' : '';
+                spans[2].style.transform = open ? 'rotate(-45deg) translate(4px,-4px)' : '';
+            });
+            links.querySelectorAll('a').forEach(a => {
+                a.addEventListener('click', () => {
+                    links.classList.remove('open');
+                    toggle.querySelectorAll('span').forEach(s => {
+                        s.style.transform = '';
+                        s.style.opacity = '';
+                    });
+                });
+            });
+        }
+
+        /* ━━━━━━━ MARQUEE ━━━━━━━ */
+        function initMarquee() {
+            const doubled = [...marqueeItems, ...marqueeItems];
+            $('marqueeTrack').innerHTML = doubled.map(item => `<span class="marquee-item">${item}<span class="marquee-sep"></span></span>`).join('');
+        }
+
+        /* ━━━━━━━ FEATURES ━━━━━━━ */
+        function renderFeatures() {
+            $('featuresGrid').innerHTML = featuresData.map((f, i) => `<div class="feature-card" style="transition-delay:${i*70}ms"><div class="feature-num">${f.num}</div><div class="feature-icon">${f.icon}</div><h3 class="feature-name">${f.name}</h3><p class="feature-desc">${f.desc}</p></div>`).join('');
+        }
+
+        /* ━━━━━━━ STATS COUNTER ━━━━━━━ */
+        function animateCounter(el, target, suffix, isFloat, duration = 1600) {
+            let start = null;
+            (function step(ts) {
+                if (!start) start = ts;
+                const p = Math.min((ts - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                const val = isFloat ? (eased * target).toFixed(isFloat === 'two' ? 2 : 1) : Math.floor(eased * target).toLocaleString();
+                el.textContent = val + suffix;
+                if (p < 1) requestAnimationFrame(step);
+            })(performance.now());
+        }
+
+        function renderStats() {
+            $('stats').innerHTML = statsData.map((s, i) => `<div class="stat-cell"><span class="stat-num" id="sn${i}">0${s.suffix}</span><p class="stat-lbl">${s.label}</p></div>`).join('');
+        }
+
+        function initStatsObserver() {
+            let fired = false;
+            new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting && !fired) {
+                    fired = true;
+                    statsData.forEach((s, i) => animateCounter($(`sn${i}`), s.target, s.suffix, !!s.isFloat));
+                }
+            }, {
+                threshold: 0.4
+            }).observe($('stats'));
+        }
+
+        /* ━━━━━━━ FOOTER ━━━━━━━ */
+        function renderFooter() {
+            $('footerLinks').innerHTML = footerLinks.map(l => `<li><a href="#">${l}</a></li>`).join('');
+        }
+
+        /* ━━━━━━━ SCROLL REVEAL ━━━━━━━ */
+        function initScrollReveal() {
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            document.querySelectorAll('.reveal,.feature-card').forEach(el => obs.observe(el));
+        }
+
+        /* ━━━━━━━ SMOOTH SCROLL ━━━━━━━ */
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(a => {
+                a.addEventListener('click', e => {
+                    const t = document.querySelector(a.getAttribute('href'));
+                    if (t) {
+                        e.preventDefault();
+                        t.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        /* ━━━━━━━ BUTTONS ━━━━━━━ */
+        function wireButtons() {
+            ['navLoginBtn', 'heroLoginBtn', 'ctaLoginBtn'].forEach(id => {
+                const el = $(id);
+                if (el) el.addEventListener('click', () => openModal('loginModal'));
+            });
+            ['navSignupBtn', 'heroSignupBtn', 'ctaSignupBtn'].forEach(id => {
+                const el = $(id);
+                if (el) el.addEventListener('click', () => openModal('signupModal'));
+            });
+            $('loginClose').addEventListener('click', () => closeModal('loginModal'));
+            $('signupClose').addEventListener('click', () => closeModal('signupModal'));
+            $('loginForm').addEventListener('submit', handleLogin);
+            $('signupForm').addEventListener('submit', handleSignup);
+            $('switchToSignup').addEventListener('click', () => {
+                closeModal('loginModal');
+                setTimeout(() => openModal('signupModal'), 220);
+            });
+            $('switchToLogin').addEventListener('click', () => {
+                closeModal('signupModal');
+                setTimeout(() => openModal('loginModal'), 220);
+            });
+            ['loginModal', 'signupModal'].forEach(id => {
+                $(id).addEventListener('click', e => {
+                    if (e.target === $(id)) closeModal(id);
+                });
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    if ($('loginModal').classList.contains('open')) closeModal('loginModal');
+                    if ($('signupModal').classList.contains('open')) closeModal('signupModal');
+                    if ($('dashboardOverlay').classList.contains('active')) closeDashboard();
+                }
+            });
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━
+           DASHBOARD FUNCTIONS
+        ━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        function openDashboard() {
+            const overlay = $('dashboardOverlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => initDashboard(), 350);
+        }
+
+        function closeDashboard() {
+            $('dashboardOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        let dashInited = false;
+
+        function initDashboard() {
+            if (dashInited) return;
+            dashInited = true;
+            animateDashCounters();
+            animatePbars();
+            renderBarChart();
+            renderCalendar();
+            renderGauges();
+            initNavItems();
+        }
+
+        function animateDashCounters() {
+            const vals = [{
+                id: 'rn1',
+                target: 1544
+            }, {
+                id: 'rn2',
+                target: 2487
+            }, {
+                id: 'rn3',
+                target: 27
+            }];
+            vals.forEach(v => {
+                const el = $(v.id);
+                let start = null;
+                (function step(ts) {
+                    if (!start) start = ts;
+                    const p = Math.min((ts - start) / 1400, 1);
+                    const e = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.floor(e * v.target).toLocaleString();
+                    if (p < 1) requestAnimationFrame(step);
+                })(performance.now());
+            });
+            // Risk score
+            let rs = 0;
+            const rsEl = $('riskScore');
+            const rsInt = setInterval(() => {
+                rs += 1;
+                rsEl.innerHTML = rs + '<span>%</span>';
+                if (rs >= 64) clearInterval(rsInt);
+            }, 20);
+            // Feed health
+            let fh = 0;
+            const fhEl = $('feedHealth');
+            const fhInt = setInterval(() => {
+                fh += 2;
+                fhEl.innerHTML = fh + '<span>%</span>';
+                if (fh >= 92) clearInterval(fhInt);
+            }, 18);
+        }
+
+        function animatePbars() {
+            const bars = [{
+                selector: '#pbar1 .db-pbar-fill',
+                widths: ['78%', '62%', '45%']
+            }, {
+                selector: '#pbar2 .db-pbar-fill',
+                widths: ['99%', '91%', '87%']
+            }];
+            bars.forEach(b => {
+                const fills = document.querySelectorAll(b.selector);
+                setTimeout(() => fills.forEach((f, i) => f.style.width = b.widths[i] || '0%'), 200);
+            });
+        }
+
+        function renderBarChart() {
+            const barData = [{
+                label: 'MISP',
+                height: 92,
+                color: 'linear-gradient(180deg,#ff3cac,#b44fff)'
+            }, {
+                label: 'OTX',
+                height: 76,
+                color: 'linear-gradient(180deg,#0cf,#0ff)'
+            }, {
+                label: 'VT',
+                height: 62,
+                color: 'linear-gradient(180deg,#b4ff6b,#0cf)'
+            }, {
+                label: 'Shodan',
+                height: 54,
+                color: 'linear-gradient(180deg,#f9f871,#ff9a3c)'
+            }, {
+                label: 'CISA',
+                height: 48,
+                color: 'linear-gradient(180deg,#ff9a3c,#ff3cac)'
+            }, {
+                label: 'NVD',
+                height: 38,
+                color: 'linear-gradient(180deg,#b44fff,#0cf)'
+            }, {
+                label: 'Abuse',
+                height: 30,
+                color: 'linear-gradient(180deg,#0cf,#b44fff)'
+            }, {
+                label: 'Cisco',
+                height: 44,
+                color: 'linear-gradient(180deg,#ff3cac,#f9f871)'
+            }, ];
+            const wrap = $('barsWrap');
+            wrap.innerHTML = barData.map(b => `
+    <div class="db-bar-col">
+      <div class="db-bar-fill" style="height:0px;background:${b.color}" data-h="${b.height}"></div>
+      <div class="db-bar-tick">${b.label}</div>
+    </div>`).join('');
+            setTimeout(() => {
+                document.querySelectorAll('#barsWrap .db-bar-fill').forEach(el => {
+                    el.style.height = el.dataset.h + 'px';
+                });
+            }, 200);
+        }
+
+        function renderCalendar() {
+            const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            // April 2026 starts on Wednesday (day 3)
+            const alertDays = [7, 14, 21];
+            const today = 9;
+            const startDay = 3; // Wednesday
+            const totalDays = 30;
+            let html = days.map(d => `<div class="db-cal-day-label">${d}</div>`).join('');
+            for (let i = 0; i < startDay; i++) html += `<div class="db-cal-day empty"></div>`;
+            for (let d = 1; d <= totalDays; d++) {
+                const isToday = d === today;
+                const isAlert = alertDays.includes(d);
+                const cls = isToday ? 'today' : isAlert ? 'alert' : '';
+                html += `<div class="db-cal-day ${cls}">${d}</div>`;
+            }
+            $('calGrid').innerHTML = html;
+        }
+
+        function renderGauges() {
+            const gauges = [{
+                pct: 40,
+                color: '#ff3cac',
+                label: 'Malware'
+            }, {
+                pct: 75,
+                color: '#0cf',
+                label: 'Phishing'
+            }, {
+                pct: 20,
+                color: '#b44fff',
+                label: 'Zero-Day'
+            }, {
+                pct: 80,
+                color: '#b4ff6b',
+                label: 'Patched'
+            }, {
+                pct: 60,
+                color: '#f9f871',
+                label: 'SIEM'
+            }];
+            const r = 20;
+            const circ = 2 * Math.PI * r;
+            $('gaugesRow').innerHTML = gauges.map((g, i) => `
+    <div class="db-gauge-item">
+      <div class="db-gauge-ring">
+        <svg class="db-gauge-svg" viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4"/>
+          <circle cx="25" cy="25" r="${r}" fill="none" stroke="${g.color}" stroke-width="4"
+            stroke-linecap="round"
+            stroke-dasharray="${circ}" stroke-dashoffset="${circ-(circ*g.pct/100)}"
+            id="gc${i}"/>
+        </svg>
+        <div class="db-gauge-pct">${g.pct}%</div>
+      </div>
+      <div class="db-gauge-label">${g.label}</div>
+    </div>`).join('');
+
+            $('gaugeDots').innerHTML = gauges.map(g => `
+    <div class="db-gauge-dot-item">
+      <div class="db-gauge-dot-circle" style="border-color:${g.color};background:${g.color}22"></div>
+      <div class="db-gauge-dot-label">${g.label.substring(0,4)}</div>
+    </div>`).join('');
+
+            // Animate gauge strokes
+            setTimeout(() => {
+                gauges.forEach((g, i) => {
+                    const el = $(`gc${i}`);
+                    if (!el) return;
+                    el.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+                });
+            }, 100);
+        }
+
+        function initNavItems() {
+            document.querySelectorAll('.db-nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.db-nav-item').forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        /* ━━━━━━━ INIT ━━━━━━━ */
+        function init() {
+            initNavbar();
+            initMarquee();
+            renderFeatures();
+            renderStats();
+            renderFooter();
+            wireButtons();
+            initPasswordToggles();
+            initStrengthMeter();
+            initSmoothScroll();
+            requestAnimationFrame(() => setTimeout(initScrollReveal, 80));
+            setTimeout(initStatsObserver, 200);
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
