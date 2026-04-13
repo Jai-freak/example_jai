@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SENTINEL — Universal Vulnerability Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+        
+        body {
+            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+            background: #060d18;
+            color: #e0eaff;
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+        
+        code,
+        .mono {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: .03;
+            pointer-events: none;
+            z-index: 0;
+            background-image: linear-gradient(#00e5ff 1px, transparent 1px), linear-gradient(90deg, #00e5ff 1px, transparent 1px);
+            background-size: 40px 40px
+        }
+        
+         ::-webkit-scrollbar {
+            width: 5px
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a5f;
+            border-radius: 4px
+        }
+        
+        .header {
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0e1f38;
+            background: rgba(6, 13, 24, .95);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 1px
+        }
+        
+        .header-sub {
+            font-size: 10px;
+            color: #2a5a8a;
+            letter-spacing: 3px;
+            font-weight: 500
+        }
+        
+        .btn {
+            background: rgba(0, 229, 255, .08);
+            border: 1px solid #1e3a5f;
+            color: #00e5ff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all .2s
+        }
+        
+        .btn:hover {
+            background: rgba(0, 229, 255, .15);
+            border-color: #00e5ff
+        }
+        
+        .btn-new {
+            display: none
+        }
+        
+        .upload-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 70px);
+            padding: 40px
+        }
+        
+        .upload-zone {
+            width: 100%;
+            max-width: 620px;
+            padding: 50px 40px;
+            border: 2px dashed #1e3a5f;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(10, 22, 40, .4);
+            transition: all .3s ease
+        }
+        
+        .upload-zone.dragover {
+            border-color: #00e5ff;
+            background: rgba(0, 229, 255, .04)
+        }
+        
+        .upload-zone:hover {
+            border-color: #2a5a8a
+        }
+        
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, .06);
+            border: 1px solid #1e3a5f;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px
+        }
+        
+        .upload-sub {
+            font-size: 13px;
+            color: #4a6a8a;
+            margin-bottom: 24px
+        }
+        
+        .file-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            text-align: left;
+            margin-top: 10px
+        }
+        
+        .file-cat {
+            background: rgba(10, 22, 40, .6);
+            border: 1px solid #0e1f38;
+            border-radius: 10px;
+            padding: 10px 14px
+        }
+        
+        .file-cat-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 5px;
+            letter-spacing: .5px
+        }
+        
+        .file-cat-exts {
+            font-size: 10px;
+            color: #2a5a8a;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.6
+        }
+        
+        .scan-wrapper {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 70px);
+            padding: 40px
+        }
+        
+        .scan-box {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(10, 22, 40, .5);
+            border: 1px solid #1e3a5f;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center
+        }
+        
+        .scan-filename {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #2a5a8a;
+            letter-spacing: 1px;
+            margin-bottom: 6px
+        }
+        
+        .scan-filetype {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #4a9eff;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            background: rgba(74, 158, 255, .08);
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px
+        }
+        
+        .progress-ring {
+            margin: 0 auto 30px;
+            position: relative;
+            width: 180px;
+            height: 180px
+        }
+        
+        .progress-ring svg {
+            transform: rotate(-90deg)
+        }
+        
+        .progress-ring .bg {
+            fill: none;
+            stroke: #0a1628;
+            stroke-width: 6
+        }
+        
+        .progress-ring .fg {
+            fill: none;
+            stroke: #00e5ff;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dasharray .3s ease;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, .5))
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: 800;
+            color: #00e5ff;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .scan-phase {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #4a9eff;
+            letter-spacing: 1px;
+            animation: pulse 1.5s ease-in-out infinite
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: .5
+            }
+            50% {
+                opacity: 1
+            }
+        }
+        
+        .scan-checks {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto
+        }
+        
+        .scan-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+            font-size: 12px;
+            color: #2a5a8a;
+            font-family: 'JetBrains Mono', monospace;
+            transition: color .3s
+        }
+        
+        .scan-check.done {
+            color: #00e676
+        }
+        
+        .scan-check.active {
+            color: #4a9eff
+        }
+        
+        .check-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .dashboard {
+            display: none;
+            padding: 24px 28px;
+            position: relative;
+            z-index: 1
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px
+        }
+        
+        .stat-card {
+            background: rgba(10, 22, 40, .5);
+            border: 1px solid #1e3a5f;
+            border-radius: 12px;
+            padding: 14px 16px
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #4a6a8a;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+        
+        .stat-sub {
+            font-size: 11px;
+            color: #2a5a8a
+        }
+        
+        .filters {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap
+        }
+        
+        .filter-btn {
+            background: transparent;
+            border: 1px solid #1e3a5f;
+            color: #4a6a8a;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all .2s;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .filter-btn.active {
+            background: rgba(0, 229, 255, .1);
+            border-color: #00e5ff;
+            color: #00e5ff
+        }
+        
+        .filter-btn:hover {
+            border-color: #2a5a8a
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+            min-height: 500px
+        }
+        
+        @media(max-width:860px) {
+            .main-content {
+                grid-template-columns: 1fr
+            }
+        }
+        
+        .vuln-list {
+            overflow-y: auto;
+            max-height: calc(100vh - 340px);
+            padding-right: 6px
+        }
+        
+        .vuln-card {
+            background: rgba(10, 22, 40, .7);
+            border: 1px solid #1e3a5f;
+            border-radius: 10px;
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all .2s ease;
+            margin-bottom: 10px;
+            border-left: 3px solid
+        }
+        
+        .vuln-card:hover {
+            background: rgba(0, 229, 255, .04)
+        }
+        
+        .vuln-card.selected {
+            background: rgba(0, 229, 255, .06);
+            border-color: #00e5ff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, .1)
+        }
+        
+        .vuln-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px
+        }
+        
+        .severity-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 3px 10px;
+            border-radius: 20px
+        }
+        
+        .vuln-cvss {
+            font-size: 11px;
+            color: #4a6a8a;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .vuln-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px
+        }
+        
+        .vuln-meta {
+            font-size: 11px;
+            color: #4a6a8a;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .vuln-filetag {
+            display: inline-block;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(74, 158, 255, .1);
+            color: #4a9eff;
+            margin-left: 8px;
+            letter-spacing: .5px;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .detail-panel {
+            background: rgba(10, 22, 40, .4);
+            border: 1px solid #1e3a5f;
+            border-radius: 12px;
+            overflow-y: auto;
+            max-height: calc(100vh - 340px)
+        }
+        
+        .detail-empty {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #2a4a6a;
+            padding: 40px;
+            text-align: center;
+            min-height: 400px
+        }
+        
+        .detail-content {
+            padding: 24px 28px
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px
+        }
+        
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .detail-title {
+            font-size: 18px;
+            font-weight: 700
+        }
+        
+        .detail-id {
+            font-size: 11px;
+            color: #4a6a8a;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px
+        }
+        
+        @media(max-width:500px) {
+            .metrics-grid {
+                grid-template-columns: 1fr
+            }
+        }
+        
+        .metric-box {
+            background: rgba(10, 22, 40, .8);
+            border: 1px solid #1e3a5f;
+            border-radius: 8px;
+            padding: 12px 14px;
+            text-align: center
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            color: #4a6a8a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px
+        }
+        
+        .metric-value {
+            font-size: 14px;
+            font-weight: 700
+        }
+        
+        .section {
+            margin-bottom: 22px
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 16px;
+            height: 1px;
+            display: inline-block
+        }
+        
+        .section-text {
+            font-size: 13px;
+            color: #8aa4c0;
+            line-height: 1.7
+        }
+        
+        .location-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #00e5ff;
+            background: rgba(0, 229, 255, .08);
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block
+        }
+        
+        .remediation-step {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            background: rgba(0, 230, 118, .04);
+            border: 1px solid rgba(0, 230, 118, .1);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 8px
+        }
+        
+        .step-num {
+            min-width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(0, 230, 118, .15);
+            color: #00e676;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px
+        }
+        
+        .step-text {
+            font-size: 12.5px;
+            color: #8aa4c0;
+            line-height: 1.6
+        }
+        
+        .ref-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+        
+        .ref-tag {
+            font-size: 11px;
+            color: #4a9eff;
+            background: rgba(74, 158, 255, .08);
+            border: 1px solid rgba(74, 158, 255, .2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .no-vulns {
+            text-align: center;
+            padding: 40px;
+            color: #00e676;
+            font-size: 14px
+        }
+        
+        .no-vulns svg {
+            margin-bottom: 16px
+        }
+        
+        .safe-banner {
+            background: rgba(0, 230, 118, .06);
+            border: 1px solid rgba(0, 230, 118, .2);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 24px
+        }
+        
+        .safe-banner h2 {
+            color: #00e676;
+            font-size: 20px;
+            margin-bottom: 8px
+        }
+        
+        .safe-banner p {
+            color: #4a8a6a;
+            font-size: 13px
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5">
+      <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+      <path d="M9 12l2 2 4-4" stroke="#00e5ff" stroke-width="2"/>
+    </svg>
+            <div>
+                <div class="header-title">SENTINEL</div>
+                <div class="header-sub">UNIVERSAL VULNERABILITY SCANNER</div>
+            </div>
+        </div>
+        <button class="btn btn-new" id="btnNew" onclick="resetApp()">NEW SCAN</button>
+    </header>
+
+    <!-- ========== UPLOAD ========== -->
+    <div class="upload-wrapper" id="uploadScreen">
+        <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" style="display:none" accept="*/*" />
+            <div class="upload-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+            </div>
+            <div class="upload-title">Drop any file here to scan</div>
+            <div class="upload-sub">Supports every file type — code, documents, images, configs, archives & more</div>
+            <div class="file-categories">
+                <div class="file-cat">
+                    <div class="file-cat-title">📄 Documents</div>
+                    <div class="file-cat-exts">.pdf .docx .doc .xlsx .xls .pptx .csv .txt .rtf .odt</div>
+                </div>
+                <div class="file-cat">
+                    <div class="file-cat-title">💻 Source Code</div>
+                    <div class="file-cat-exts">.js .py .java .cpp .ts .go .rb .php .rs .c .cs .swift</div>
+                </div>
+                <div class="file-cat">
+                    <div class="file-cat-title">⚙️ Config Files</div>
+                    <div class="file-cat-exts">.json .xml .yaml .yml .env .ini .toml .cfg .conf .properties</div>
+                </div>
+                <div class="file-cat">
+                    <div class="file-cat-title">🌐 Web Files</div>
+                    <div class="file-cat-exts">.html .css .jsx .vue .svelte .php .asp .jsp</div>
+                </div>
+                <div class="file-cat">
+                    <div class="file-cat-title">🖼️ Media</div>
+                    <div class="file-cat-exts">.png .jpg .gif .svg .mp4 .mp3 .wav .bmp .ico .webp</div>
+                </div>
+                <div class="file-cat">
+                    <div class="file-cat-title">📦 Others</div>
+                    <div class="file-cat-exts">.zip .tar .gz .exe .dll .sh .bat .sql .db .log .md</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SCANNING ========== -->
+    <div class="scan-wrapper" id="scanScreen">
+        <div class="scan-box">
+            <div class="scan-filename" id="scanFilename">SCANNING: file.js</div>
+            <div class="scan-filetype" id="scanFiletype">SOURCE CODE</div>
+            <div class="progress-ring">
+                <svg width="180" height="180" viewBox="0 0 180 180">
+        <circle class="bg" cx="90" cy="90" r="78"/>
+        <circle class="fg" id="progressCircle" cx="90" cy="90" r="78" stroke-dasharray="0 490"/>
+      </svg>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+            <div class="scan-phase" id="scanPhase">Initializing...</div>
+            <div class="scan-checks" id="scanChecks"></div>
+        </div>
+    </div>
+
+    <!-- ========== DASHBOARD ========== -->
+    <div class="dashboard" id="dashboard">
+        <div id="safeBanner"></div>
+        <div class="stats-row" id="statsRow"></div>
+        <div class="filters" id="filters"></div>
+        <div class="main-content">
+            <div class="vuln-list" id="vulnList"></div>
+            <div class="detail-panel" id="detailPanel">
+                <div class="detail-empty">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="1">
+          <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+        </svg>
+                    <div style="margin-top:20px;font-size:14px;font-weight:500">Select a vulnerability to view details</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================== FILE TYPE MAPPING ========================
+        const FILE_TYPES = {
+            // Source Code
+            js: "Source Code",
+            jsx: "Source Code",
+            ts: "Source Code",
+            tsx: "Source Code",
+            py: "Source Code",
+            java: "Source Code",
+            c: "Source Code",
+            cpp: "Source Code",
+            cs: "Source Code",
+            go: "Source Code",
+            rb: "Source Code",
+            php: "Source Code",
+            rs: "Source Code",
+            swift: "Source Code",
+            kt: "Source Code",
+            scala: "Source Code",
+            r: "Source Code",
+            m: "Source Code",
+            h: "Source Code",
+            hpp: "Source Code",
+            // Web
+            html: "Web File",
+            htm: "Web File",
+            css: "Web File",
+            vue: "Web File",
+            svelte: "Web File",
+            asp: "Web File",
+            jsp: "Web File",
+            // Documents
+            pdf: "Document",
+            doc: "Document",
+            docx: "Document",
+            odt: "Document",
+            rtf: "Document",
+            txt: "Text File",
+            md: "Text File",
+            // Spreadsheets
+            xlsx: "Spreadsheet",
+            xls: "Spreadsheet",
+            csv: "Spreadsheet",
+            tsv: "Spreadsheet",
+            // Presentations
+            pptx: "Presentation",
+            ppt: "Presentation",
+            // Config
+            json: "Config File",
+            xml: "Config File",
+            yaml: "Config File",
+            yml: "Config File",
+            env: "Config File",
+            ini: "Config File",
+            toml: "Config File",
+            cfg: "Config File",
+            conf: "Config File",
+            properties: "Config File",
+            // Database
+            sql: "Database File",
+            db: "Database File",
+            sqlite: "Database File",
+            // Images
+            png: "Image",
+            jpg: "Image",
+            jpeg: "Image",
+            gif: "Image",
+            bmp: "Image",
+            svg: "Image",
+            ico: "Image",
+            webp: "Image",
+            tiff: "Image",
+            // Audio/Video
+            mp3: "Audio File",
+            wav: "Audio File",
+            ogg: "Audio File",
+            flac: "Audio File",
+            mp4: "Video File",
+            avi: "Video File",
+            mov: "Video File",
+            mkv: "Video File",
+            webm: "Video File",
+            // Archives
+            zip: "Archive",
+            tar: "Archive",
+            gz: "Archive",
+            rar: "Archive",
+            "7z": "Archive",
+            bz2: "Archive",
+            // Executables
+            exe: "Executable",
+            dll: "Executable",
+            so: "Executable",
+            dylib: "Executable",
+            msi: "Executable",
+            dmg: "Executable",
+            app: "Executable",
+            // Scripts
+            sh: "Shell Script",
+            bat: "Shell Script",
+            ps1: "Shell Script",
+            cmd: "Shell Script",
+            // Logs
+            log: "Log File",
+            // Certificates / Keys
+            pem: "Certificate",
+            crt: "Certificate",
+            key: "Key File",
+            cer: "Certificate",
+            p12: "Certificate",
+            pfx: "Certificate",
+            // Docker / DevOps
+            dockerfile: "DevOps Config",
+            dockerignore: "DevOps Config",
+            // Other
+            lock: "Lock File",
+            gitignore: "Git Config",
+        };
+
+        // ======================== VULNERABILITY DATABASES BY TYPE ========================
+        const VULNS = {
+            "Source Code": [{
+                id: "CVE-2024-1001",
+                name: "SQL Injection Vector",
+                severity: "critical",
+                category: "Injection",
+                line: "Line 42-48",
+                cvss: 9.8,
+                cwe: "CWE-89",
+                owasp: "A03:2021 – Injection",
+                description: "User input concatenated directly into SQL queries without parameterization allows execution of arbitrary SQL commands.",
+                impact: "Full database compromise, data exfiltration, authentication bypass, remote code execution.",
+                remediation: ["Use parameterized queries or prepared statements", "Implement input validation with allowlists", "Apply least privilege on database accounts", "Deploy a Web Application Firewall (WAF)", "Conduct regular code reviews on data access layers"]
+            }, {
+                id: "CVE-2024-1002",
+                name: "Cross-Site Scripting (XSS)",
+                severity: "high",
+                category: "XSS",
+                line: "Line 115-120",
+                cvss: 7.5,
+                cwe: "CWE-79",
+                owasp: "A03:2021 – Injection",
+                description: "Reflected XSS where user-controlled data is rendered in HTML without encoding or escaping.",
+                impact: "Session hijacking, credential theft, phishing, malware distribution.",
+                remediation: ["Encode all user-supplied data before HTML rendering", "Implement Content Security Policy (CSP) headers", "Use auto-escaping frameworks (React, Angular)", "Sanitize HTML with DOMPurify", "Set HttpOnly and Secure flags on cookies"]
+            }, {
+                id: "CVE-2024-1003",
+                name: "Hardcoded Credentials",
+                severity: "critical",
+                category: "Secrets",
+                line: "Line 8-12",
+                cvss: 9.1,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "API keys, passwords, or tokens embedded directly in source code are exposed to anyone with codebase access.",
+                impact: "Unauthorized access, data breaches, service abuse, lateral movement in cloud environments.",
+                remediation: ["Move secrets to environment variables or a secrets manager", "Rotate all exposed credentials immediately", "Add secret scanning to CI/CD pipeline", "Add .gitignore rules for config files", "Use short-lived tokens with automatic rotation"]
+            }, {
+                id: "CVE-2024-1004",
+                name: "Insecure Deserialization",
+                severity: "high",
+                category: "Deserialization",
+                line: "Line 203-210",
+                cvss: 8.1,
+                cwe: "CWE-502",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Untrusted data deserialized without validation allows injection of malicious objects.",
+                impact: "Remote code execution, denial of service, privilege escalation, logic bypass.",
+                remediation: ["Never deserialize from untrusted sources", "Use JSON instead of native serialization", "Implement digital signatures on serialized data", "Apply strict type constraints", "Monitor and log deserialization operations"]
+            }, {
+                id: "CVE-2024-1005",
+                name: "Buffer Overflow Risk",
+                severity: "critical",
+                category: "Memory",
+                line: "Line 67-74",
+                cvss: 9.0,
+                cwe: "CWE-120",
+                owasp: "A06:2021 – Vulnerable Components",
+                description: "Unbounded memory copy operations detected that could allow stack or heap buffer overflows.",
+                impact: "Arbitrary code execution, application crash, privilege escalation, system takeover.",
+                remediation: ["Use bounds-checked functions (strncpy, snprintf)", "Enable compiler protections (ASLR, stack canaries)", "Validate all input lengths before memory operations", "Use memory-safe languages where possible", "Run static analysis tools (Valgrind, AddressSanitizer)"]
+            }, {
+                id: "CVE-2024-1006",
+                name: "Command Injection",
+                severity: "critical",
+                category: "Injection",
+                line: "Line 134-140",
+                cvss: 9.5,
+                cwe: "CWE-78",
+                owasp: "A03:2021 – Injection",
+                description: "User input passed to system shell commands without sanitization enables arbitrary command execution.",
+                impact: "Full system compromise, data destruction, malware installation, lateral movement.",
+                remediation: ["Avoid shell commands — use language-native APIs", "If shell is required, use allowlists for input", "Escape all special characters", "Run processes with minimal privileges", "Implement application-level sandboxing"]
+            }, {
+                id: "CVE-2024-1020",
+                name: "Missing Rate Limiting",
+                severity: "low",
+                category: "DoS",
+                line: "Line 30-35",
+                cvss: 3.7,
+                cwe: "CWE-770",
+                owasp: "A04:2021 – Insecure Design",
+                description: "API endpoints lack rate limiting, making them susceptible to brute-force and DoS attacks.",
+                impact: "Brute-force attacks, resource exhaustion, API abuse, degraded availability.",
+                remediation: ["Implement rate limiting on authentication endpoints", "Use token bucket or sliding window algorithms", "Add CAPTCHA after repeated failures", "Deploy API gateway with rate limiting", "Set alerts for abnormal request patterns"]
+            }, {
+                id: "CVE-2024-1021",
+                name: "Weak Cryptographic Hash",
+                severity: "medium",
+                category: "Cryptography",
+                line: "Line 155-158",
+                cvss: 5.9,
+                cwe: "CWE-328",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "MD5 or SHA-1 used for password hashing — both are vulnerable to collision and brute-force attacks.",
+                impact: "Password cracking, authentication bypass, data tampering.",
+                remediation: ["Use bcrypt, scrypt, or Argon2 for passwords", "Use SHA-256+ for integrity checks", "Implement proper salting", "Configure appropriate work factors", "Plan for cryptographic agility"]
+            }, ],
+            "Web File": [{
+                id: "CVE-2024-2001",
+                name: "DOM-Based XSS",
+                severity: "critical",
+                category: "XSS",
+                line: "Line 23-30",
+                cvss: 8.8,
+                cwe: "CWE-79",
+                owasp: "A03:2021 – Injection",
+                description: "JavaScript reads from URL parameters or document properties and writes to DOM without sanitization.",
+                impact: "Session hijacking, account takeover, keylogging, phishing overlays.",
+                remediation: ["Use textContent instead of innerHTML", "Sanitize all DOM inputs with DOMPurify", "Implement strict Content Security Policy", "Avoid eval(), document.write(), innerHTML", "Use framework-level auto-escaping"]
+            }, {
+                id: "CVE-2024-2002",
+                name: "Missing CSP Header",
+                severity: "high",
+                category: "Headers",
+                line: "<head> section",
+                cvss: 7.2,
+                cwe: "CWE-1021",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "No Content Security Policy header detected, allowing unrestricted script sources.",
+                impact: "XSS exploitation, data exfiltration via injected scripts, clickjacking.",
+                remediation: ["Add Content-Security-Policy header", "Restrict script-src to trusted domains", "Enable report-uri for violation monitoring", "Use nonce-based CSP for inline scripts", "Test CSP with report-only mode first"]
+            }, {
+                id: "CVE-2024-2003",
+                name: "Inline JavaScript Detected",
+                severity: "medium",
+                category: "Code Quality",
+                line: "Line 45-62",
+                cvss: 5.5,
+                cwe: "CWE-710",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Inline event handlers and script blocks increase the attack surface for XSS.",
+                impact: "Easier XSS exploitation, CSP bypass difficulties, code maintainability issues.",
+                remediation: ["Move all JavaScript to external files", "Use addEventListener instead of inline handlers", "Remove onclick, onload, onerror attributes", "Implement nonce-based CSP", "Use strict CSP that blocks inline scripts"]
+            }, {
+                id: "CVE-2024-2004",
+                name: "Mixed Content Warning",
+                severity: "medium",
+                category: "Transport",
+                line: "Multiple locations",
+                cvss: 4.8,
+                cwe: "CWE-319",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "HTTP resources loaded on HTTPS page allow man-in-the-middle content injection.",
+                impact: "Content tampering, credential interception, malware injection via insecure resources.",
+                remediation: ["Convert all resource URLs to HTTPS", "Add Upgrade-Insecure-Requests header", "Use protocol-relative URLs as fallback", "Audit all external resource references", "Enable HSTS to prevent downgrade attacks"]
+            }, {
+                id: "CVE-2024-2005",
+                name: "Sensitive Data in HTML Comments",
+                severity: "low",
+                category: "Info Disclosure",
+                line: "Line 5, 88, 142",
+                cvss: 3.5,
+                cwe: "CWE-615",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "HTML comments contain internal notes, TODO items, or credentials visible in page source.",
+                impact: "Information leakage about internal systems, potential credential exposure.",
+                remediation: ["Remove all comments from production HTML", "Use build tools to strip comments", "Never put credentials or internal URLs in comments", "Audit templates for leftover development notes", "Add comment-stripping to CI/CD pipeline"]
+            }, {
+                id: "CVE-2024-2006",
+                name: "Clickjacking Vulnerability",
+                severity: "high",
+                category: "UI Security",
+                line: "Missing header",
+                cvss: 6.8,
+                cwe: "CWE-1021",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Page can be embedded in iframes on malicious sites, enabling click hijacking attacks.",
+                impact: "Unauthorized actions performed by tricked users, credential theft, social engineering.",
+                remediation: ["Add X-Frame-Options: DENY header", "Use CSP frame-ancestors directive", "Implement frame-busting JavaScript as fallback", "Test iframe embedding from external domains", "Add CSRF tokens to sensitive actions"]
+            }, ],
+            "Document": [{
+                id: "CVE-2024-3001",
+                name: "Embedded Macro Code",
+                severity: "critical",
+                category: "Malware",
+                line: "Macro module",
+                cvss: 9.2,
+                cwe: "CWE-506",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Document contains VBA macros that could execute arbitrary code when the document is opened.",
+                impact: "Malware execution, ransomware deployment, data exfiltration, system compromise.",
+                remediation: ["Disable macros by default in all office applications", "Use Group Policy to block macros from untrusted sources", "Scan documents with antivirus before opening", "Use Protected View for documents from external sources", "Implement application whitelisting"]
+            }, {
+                id: "CVE-2024-3002",
+                name: "Embedded External Links",
+                severity: "high",
+                category: "Phishing",
+                line: "Multiple pages",
+                cvss: 7.0,
+                cwe: "CWE-601",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Document contains hyperlinks pointing to suspicious or potentially malicious external domains.",
+                impact: "Phishing attacks, credential harvesting, drive-by malware downloads.",
+                remediation: ["Verify all external links before distributing documents", "Use link scanners to check URL reputation", "Remove unnecessary external references", "Warn recipients about external links", "Use URL rewriting for link protection"]
+            }, {
+                id: "CVE-2024-3003",
+                name: "Hidden Metadata Exposure",
+                severity: "medium",
+                category: "Privacy",
+                line: "File properties",
+                cvss: 5.4,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Document metadata contains author names, organization info, file paths, edit history, and GPS data.",
+                impact: "Privacy violation, internal structure exposure, author identification, location tracking.",
+                remediation: ["Use metadata removal tools before sharing", "Strip EXIF data from embedded images", "Review document properties before distribution", "Configure templates to minimize metadata", "Use the Document Inspector feature to clean files"]
+            }, {
+                id: "CVE-2024-3004",
+                name: "Embedded Objects/OLE",
+                severity: "high",
+                category: "Malware",
+                line: "Embedded content",
+                cvss: 7.8,
+                cwe: "CWE-829",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Document contains embedded OLE objects or ActiveX controls that could execute code.",
+                impact: "Code execution on document open, data theft, system compromise.",
+                remediation: ["Remove unnecessary embedded objects", "Block OLE/ActiveX in security policies", "Use Protected View for external documents", "Scan documents before opening", "Use PDF format for sharing when possible"]
+            }, {
+                id: "CVE-2024-3005",
+                name: "Unencrypted Sensitive Content",
+                severity: "medium",
+                category: "Data Protection",
+                line: "Document body",
+                cvss: 6.2,
+                cwe: "CWE-311",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Document may contain PII, financial data, or credentials without document-level encryption.",
+                impact: "Data breach if document is intercepted or leaked, regulatory non-compliance.",
+                remediation: ["Apply password protection to sensitive documents", "Use document encryption (AES-256)", "Classify documents by sensitivity level", "Implement DLP policies for document sharing", "Use rights management (IRM) for confidential docs"]
+            }, ],
+            "Spreadsheet": [{
+                id: "CVE-2024-3101",
+                name: "Macro-Enabled Spreadsheet",
+                severity: "critical",
+                category: "Malware",
+                line: "VBA Module",
+                cvss: 9.0,
+                cwe: "CWE-506",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Spreadsheet contains macro code that executes automatically, potentially running malicious payloads.",
+                impact: "Ransomware, data exfiltration, system compromise, lateral movement.",
+                remediation: ["Disable macros by default", "Block .xlsm files from untrusted sources", "Use Group Policy for macro restrictions", "Scan files with endpoint protection", "Convert to .xlsx to remove macros"]
+            }, {
+                id: "CVE-2024-3102",
+                name: "External Data Connections",
+                severity: "high",
+                category: "Data Leakage",
+                line: "Data connections",
+                cvss: 7.3,
+                cwe: "CWE-918",
+                owasp: "A10:2021 – SSRF",
+                description: "Spreadsheet contains external data connections that could fetch data from or send data to remote servers.",
+                impact: "Server-side request forgery, data exfiltration, internal network scanning.",
+                remediation: ["Remove unnecessary external connections", "Block external data connections by policy", "Review all connection strings", "Use firewalls to restrict outbound connections", "Audit spreadsheets before distribution"]
+            }, {
+                id: "CVE-2024-3103",
+                name: "Sensitive Data in Plain Text",
+                severity: "high",
+                category: "Privacy",
+                line: "Multiple cells",
+                cvss: 7.5,
+                cwe: "CWE-312",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Spreadsheet contains potential PII, credentials, or financial data without sheet or file-level protection.",
+                impact: "Data breach, identity theft, regulatory fines, reputation damage.",
+                remediation: ["Encrypt spreadsheet with strong password", "Remove or mask sensitive data fields", "Use cell protection for sensitive ranges", "Implement data classification policies", "Apply DLP rules for spreadsheet sharing"]
+            }, {
+                id: "CVE-2024-3104",
+                name: "Hidden Sheets Detected",
+                severity: "medium",
+                category: "Info Disclosure",
+                line: "Hidden tabs",
+                cvss: 4.9,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Spreadsheet contains hidden or very-hidden sheets that may contain sensitive or outdated data.",
+                impact: "Unintended data disclosure, stale data leakage, unauthorized access to internal info.",
+                remediation: ["Review and remove unnecessary hidden sheets", "Unhide all sheets before security review", "Delete unused sheets with sensitive data", "Use workbook protection to prevent unhiding", "Audit all sheet visibility settings"]
+            }, {
+                id: "CVE-2024-3105",
+                name: "Formula Injection Risk",
+                severity: "medium",
+                category: "Injection",
+                line: "Multiple cells",
+                cvss: 6.1,
+                cwe: "CWE-1236",
+                owasp: "A03:2021 – Injection",
+                description: "Cells contain formulas starting with =, +, -, @ that could execute commands when opened in certain applications.",
+                impact: "Command execution, data exfiltration via crafted CSV/XLSX, DDE attacks.",
+                remediation: ["Sanitize all user inputs before placing in cells", "Prefix dangerous characters with single quote", "Disable DDE in spreadsheet applications", "Validate CSV imports before processing", "Use data validation rules on input cells"]
+            }, ],
+            "Presentation": [{
+                id: "CVE-2024-3201",
+                name: "Embedded Macros in Slides",
+                severity: "critical",
+                category: "Malware",
+                line: "Macro module",
+                cvss: 9.0,
+                cwe: "CWE-506",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Presentation contains VBA macros that could execute malicious code automatically.",
+                impact: "Malware execution, ransomware, system compromise.",
+                remediation: ["Remove macros from presentations", "Use .pptx format (macro-free)", "Block .pptm files from email", "Enable Protected View", "Scan with antivirus before opening"]
+            }, {
+                id: "CVE-2024-3202",
+                name: "External Media Links",
+                severity: "high",
+                category: "Network",
+                line: "Slide media",
+                cvss: 6.5,
+                cwe: "CWE-918",
+                owasp: "A10:2021 – SSRF",
+                description: "Slides reference external media or fonts from remote URLs that load when presentation opens.",
+                impact: "IP tracking, network reconnaissance, malware delivery via media.",
+                remediation: ["Embed all media locally in the file", "Remove external URL references", "Block network access during presentation", "Audit all linked media sources", "Use offline mode for sensitive presentations"]
+            }, {
+                id: "CVE-2024-3203",
+                name: "Metadata Leakage",
+                severity: "medium",
+                category: "Privacy",
+                line: "File properties",
+                cvss: 5.0,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Presentation metadata exposes author, organization, revision history, and internal file paths.",
+                impact: "Author identification, organizational intelligence, internal path disclosure.",
+                remediation: ["Run Document Inspector before sharing", "Strip metadata with cleanup tools", "Use templates with minimal default metadata", "Review properties panel before distribution", "Automate metadata removal in workflow"]
+            }, ],
+            "Config File": [{
+                id: "CVE-2024-4001",
+                name: "Exposed Database Credentials",
+                severity: "critical",
+                category: "Secrets",
+                line: "Line 5-12",
+                cvss: 9.8,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Configuration file contains database connection strings with plaintext usernames and passwords.",
+                impact: "Full database access, data theft, data manipulation, privilege escalation.",
+                remediation: ["Move credentials to environment variables", "Use a secrets manager (Vault, AWS SM)", "Encrypt config files at rest", "Restrict file permissions to owner only", "Rotate exposed credentials immediately"]
+            }, {
+                id: "CVE-2024-4002",
+                name: "API Keys in Config",
+                severity: "critical",
+                category: "Secrets",
+                line: "Line 15-20",
+                cvss: 9.1,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Third-party API keys, tokens, or secret keys are stored in plaintext configuration files.",
+                impact: "Service abuse, billing fraud, data breaches via third-party APIs.",
+                remediation: ["Use environment variables for all API keys", "Implement key rotation policies", "Add config files to .gitignore", "Use encrypted secrets in CI/CD", "Set up API key usage alerts"]
+            }, {
+                id: "CVE-2024-4003",
+                name: "Debug Mode Enabled",
+                severity: "high",
+                category: "Misconfiguration",
+                line: "Line 3",
+                cvss: 7.5,
+                cwe: "CWE-489",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Debug or development mode is enabled in production configuration, exposing verbose error details.",
+                impact: "Stack trace exposure, internal path disclosure, detailed error information leakage.",
+                remediation: ["Set DEBUG=false in production configs", "Use environment-specific configuration files", "Implement deployment checks for debug flags", "Add CI/CD validation for production settings", "Monitor for accidental debug enablement"]
+            }, {
+                id: "CVE-2024-4004",
+                name: "Insecure Default Settings",
+                severity: "medium",
+                category: "Misconfiguration",
+                line: "Multiple lines",
+                cvss: 6.0,
+                cwe: "CWE-1188",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Configuration uses insecure defaults like wildcard CORS, disabled CSRF, or permissive access controls.",
+                impact: "Cross-origin attacks, CSRF exploitation, unauthorized access.",
+                remediation: ["Review and harden all default settings", "Restrict CORS to specific trusted domains", "Enable CSRF protection", "Apply principle of least privilege", "Use security configuration baselines"]
+            }, {
+                id: "CVE-2024-4005",
+                name: "Overly Permissive Access",
+                severity: "medium",
+                category: "Access Control",
+                line: "Line 25-30",
+                cvss: 5.8,
+                cwe: "CWE-732",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Configuration grants excessive permissions or uses wildcard access rules (e.g., 0.0.0.0, *, chmod 777).",
+                impact: "Unauthorized access, privilege escalation, data exposure to unintended users.",
+                remediation: ["Apply principle of least privilege", "Replace wildcards with specific values", "Set restrictive file permissions (644/755)", "Bind services to specific interfaces", "Audit permission configurations regularly"]
+            }, ],
+            "Image": [{
+                id: "CVE-2024-5001",
+                name: "EXIF Metadata Privacy Risk",
+                severity: "high",
+                category: "Privacy",
+                line: "EXIF data",
+                cvss: 7.0,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Image contains EXIF metadata with GPS coordinates, camera model, timestamps, and software details.",
+                impact: "Physical location tracking, device identification, privacy violation, stalking risk.",
+                remediation: ["Strip EXIF data before uploading or sharing", "Use metadata removal tools (ExifTool, mogrify)", "Configure camera to disable GPS tagging", "Implement server-side EXIF stripping on upload", "Audit all published images for metadata"]
+            }, {
+                id: "CVE-2024-5002",
+                name: "Steganography Detection",
+                severity: "medium",
+                category: "Hidden Data",
+                line: "Pixel data",
+                cvss: 5.5,
+                cwe: "CWE-506",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Image file size is disproportionately large or contains suspicious data patterns that may indicate hidden content.",
+                impact: "Covert data exfiltration, hidden malware payloads, command & control channels.",
+                remediation: ["Use steganalysis tools to inspect images", "Re-encode images to strip hidden data", "Monitor image uploads for anomalous sizes", "Implement image processing pipeline", "Use content-aware firewalls"]
+            }, {
+                id: "CVE-2024-5003",
+                name: "SVG Script Injection",
+                severity: "critical",
+                category: "XSS",
+                line: "SVG markup",
+                cvss: 8.5,
+                cwe: "CWE-79",
+                owasp: "A03:2021 – Injection",
+                description: "SVG file contains embedded JavaScript or event handlers that execute when rendered in a browser.",
+                impact: "XSS attacks, session hijacking, malware delivery when SVG is displayed.",
+                remediation: ["Sanitize SVG files before serving", "Remove all script and event handler elements", "Convert SVGs to rasterized format for untrusted sources", "Implement strict CSP for SVG rendering", "Use SVG sanitization libraries"]
+            }, {
+                id: "CVE-2024-5004",
+                name: "Image-Based Malware Loader",
+                severity: "high",
+                category: "Malware",
+                line: "File structure",
+                cvss: 7.8,
+                cwe: "CWE-434",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "File has image extension but contains executable code or polyglot structure that can be executed.",
+                impact: "Malware execution, bypass of file type restrictions, system compromise.",
+                remediation: ["Validate file content matches extension (magic bytes)", "Use content-type validation on upload", "Re-process images server-side", "Block execution from upload directories", "Implement virus scanning on all uploads"]
+            }, ],
+            "Archive": [{
+                id: "CVE-2024-6001",
+                name: "Zip Bomb Detected",
+                severity: "critical",
+                category: "DoS",
+                line: "File structure",
+                cvss: 8.5,
+                cwe: "CWE-409",
+                owasp: "A04:2021 – Insecure Design",
+                description: "Archive has extremely high compression ratio indicating potential zip bomb that expands to fill disk space.",
+                impact: "Denial of service, disk space exhaustion, system crash, resource depletion.",
+                remediation: ["Check compression ratio before extraction", "Set maximum extraction size limits", "Use sandboxed extraction environments", "Monitor disk space during extraction", "Implement timeout limits for extraction"]
+            }, {
+                id: "CVE-2024-6002",
+                name: "Path Traversal in Archive",
+                severity: "critical",
+                category: "File Access",
+                line: "Entry paths",
+                cvss: 9.0,
+                cwe: "CWE-22",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Archive entries contain '../' sequences that could write files outside the target extraction directory.",
+                impact: "Arbitrary file overwrite, code execution, configuration tampering, system compromise.",
+                remediation: ["Validate all entry paths before extraction", "Reject entries with path traversal sequences", "Use libraries with built-in path validation", "Extract to isolated temporary directories", "Verify extracted file locations after extraction"]
+            }, {
+                id: "CVE-2024-6003",
+                name: "Executable Content in Archive",
+                severity: "high",
+                category: "Malware",
+                line: "Archive entries",
+                cvss: 7.5,
+                cwe: "CWE-434",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Archive contains executable files (.exe, .dll, .sh, .bat) that could be malicious.",
+                impact: "Malware execution, ransomware deployment, backdoor installation.",
+                remediation: ["Scan archive contents before extraction", "Block archives containing executables", "Use application whitelisting", "Extract in sandboxed environment", "Implement email gateway scanning"]
+            }, {
+                id: "CVE-2024-6004",
+                name: "Password-Protected Content",
+                severity: "low",
+                category: "Encryption",
+                line: "Archive header",
+                cvss: 3.0,
+                cwe: "CWE-311",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Archive uses password protection but may use weak encryption (ZipCrypto vs AES-256).",
+                impact: "Content accessible via brute force, false sense of security with weak encryption.",
+                remediation: ["Use AES-256 encryption for archives", "Use strong, unique passwords", "Consider alternative encrypted containers", "Verify encryption algorithm used", "Transmit passwords through separate channel"]
+            }, ],
+            "Executable": [{
+                id: "CVE-2024-7001",
+                name: "Unsigned Executable",
+                severity: "critical",
+                category: "Integrity",
+                line: "File header",
+                cvss: 8.8,
+                cwe: "CWE-353",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Executable is not digitally signed, making it impossible to verify the publisher or detect tampering.",
+                impact: "Malware masquerading as legitimate software, code tampering, supply chain attacks.",
+                remediation: ["Only run signed executables from trusted publishers", "Implement code signing for all builds", "Use application whitelisting", "Verify signatures before deployment", "Set OS to block unsigned executables"]
+            }, {
+                id: "CVE-2024-7002",
+                name: "Suspicious API Imports",
+                severity: "high",
+                category: "Malware",
+                line: "Import table",
+                cvss: 7.8,
+                cwe: "CWE-506",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Executable imports suspicious APIs commonly used by malware (keyloggers, screen capture, network exfiltration).",
+                impact: "Keylogging, screen capture, data theft, remote access trojan functionality.",
+                remediation: ["Submit to malware analysis sandbox", "Check against known malware signatures", "Monitor runtime behavior in isolated environment", "Verify publisher and download source", "Use endpoint detection and response (EDR)"]
+            }, {
+                id: "CVE-2024-7003",
+                name: "Missing DEP/ASLR Protection",
+                severity: "high",
+                category: "Memory",
+                line: "PE header",
+                cvss: 7.5,
+                cwe: "CWE-119",
+                owasp: "A06:2021 – Vulnerable Components",
+                description: "Executable compiled without DEP (Data Execution Prevention) or ASLR (Address Space Layout Randomization).",
+                impact: "Easier exploitation of memory corruption bugs, reliable exploit development.",
+                remediation: ["Recompile with /NXCOMPAT and /DYNAMICBASE flags", "Enable system-wide DEP enforcement", "Use compiler security features (stack canaries, CFG)", "Update build toolchains", "Run security verification on all builds"]
+            }, {
+                id: "CVE-2024-7004",
+                name: "Packed/Obfuscated Binary",
+                severity: "high",
+                category: "Evasion",
+                line: "Binary structure",
+                cvss: 7.0,
+                cwe: "CWE-506",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Executable appears packed or obfuscated using tools commonly employed to evade antivirus detection.",
+                impact: "Malware evasion, hidden malicious functionality, analysis resistance.",
+                remediation: ["Unpack and analyze the underlying binary", "Submit to multiple AV engines for scanning", "Run in malware analysis sandbox", "Verify the packer is used for legitimate purposes", "Block packed executables by policy"]
+            }, ],
+            "Shell Script": [{
+                id: "CVE-2024-8001",
+                name: "Unsafe Command Execution",
+                severity: "critical",
+                category: "Injection",
+                line: "Line 15-22",
+                cvss: 9.5,
+                cwe: "CWE-78",
+                owasp: "A03:2021 – Injection",
+                description: "Script uses eval, backticks, or unquoted variables in commands allowing injection of arbitrary commands.",
+                impact: "Full system compromise, privilege escalation, data destruction.",
+                remediation: ["Quote all variable expansions", "Avoid eval and backtick substitution", "Use arrays for command arguments", "Validate all external inputs", "Run scripts with minimal privileges"]
+            }, {
+                id: "CVE-2024-8002",
+                name: "World-Writable File Operations",
+                severity: "high",
+                category: "Permissions",
+                line: "Line 8-10",
+                cvss: 7.5,
+                cwe: "CWE-732",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Script creates files or directories with world-writable permissions (777, 666).",
+                impact: "Unauthorized file modification, privilege escalation, symlink attacks.",
+                remediation: ["Use restrictive permissions (755 for dirs, 644 for files)", "Set umask before file creation", "Avoid chmod 777 entirely", "Use mktemp for temporary files", "Validate permissions after creation"]
+            }, {
+                id: "CVE-2024-8003",
+                name: "Credential Exposure",
+                severity: "critical",
+                category: "Secrets",
+                line: "Line 3-5",
+                cvss: 9.0,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Script contains hardcoded passwords, API keys, or tokens passed as command arguments.",
+                impact: "Credential theft via process listing, command history, log files.",
+                remediation: ["Use environment variables for secrets", "Read credentials from protected files", "Use credential managers or vaults", "Clear command history after use", "Restrict access to script files"]
+            }, {
+                id: "CVE-2024-8004",
+                name: "Insecure Download (HTTP)",
+                severity: "medium",
+                category: "Transport",
+                line: "Line 28",
+                cvss: 5.5,
+                cwe: "CWE-319",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Script downloads files over HTTP instead of HTTPS, vulnerable to man-in-the-middle attacks.",
+                impact: "Malicious code injection, tampered downloads, credential interception.",
+                remediation: ["Use HTTPS for all downloads", "Verify checksums after download", "Use certificate pinning where possible", "Implement GPG signature verification", "Avoid curl/wget with --insecure flags"]
+            }, ],
+            "Database File": [{
+                id: "CVE-2024-9001",
+                name: "Unencrypted Database",
+                severity: "critical",
+                category: "Encryption",
+                line: "File header",
+                cvss: 9.0,
+                cwe: "CWE-311",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Database file is not encrypted at rest, exposing all data if the file is accessed or stolen.",
+                impact: "Complete data exposure, regulatory violations, identity theft.",
+                remediation: ["Enable database-level encryption (TDE)", "Use filesystem-level encryption", "Implement column-level encryption for sensitive fields", "Restrict file access permissions", "Use encrypted backups"]
+            }, {
+                id: "CVE-2024-9002",
+                name: "Default/Weak Authentication",
+                severity: "critical",
+                category: "Authentication",
+                line: "Config section",
+                cvss: 9.5,
+                cwe: "CWE-1393",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Database uses default credentials or has authentication disabled entirely.",
+                impact: "Unauthorized full access to all data, data manipulation, data theft.",
+                remediation: ["Change default credentials immediately", "Enable strong password authentication", "Implement role-based access control", "Use certificate-based authentication", "Audit database access logs regularly"]
+            }, {
+                id: "CVE-2024-9003",
+                name: "Sensitive PII Detected",
+                severity: "high",
+                category: "Privacy",
+                line: "Multiple tables",
+                cvss: 8.0,
+                cwe: "CWE-312",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Database contains personally identifiable information (PII) stored without encryption or masking.",
+                impact: "Privacy violations, regulatory fines (GDPR, CCPA), identity theft.",
+                remediation: ["Encrypt PII columns at rest", "Implement data masking for non-production", "Apply access controls to PII fields", "Conduct data classification audit", "Implement data retention policies"]
+            }, ],
+            "Text File": [{
+                id: "CVE-2024-T001",
+                name: "Credential Patterns Detected",
+                severity: "critical",
+                category: "Secrets",
+                line: "Multiple lines",
+                cvss: 9.0,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Text file contains patterns matching passwords, API keys, tokens, or connection strings.",
+                impact: "Credential theft, unauthorized access, account compromise.",
+                remediation: ["Remove credentials from text files", "Use secrets managers instead", "Add files to .gitignore", "Rotate any exposed credentials", "Implement secret scanning in CI/CD"]
+            }, {
+                id: "CVE-2024-T002",
+                name: "Sensitive Information Exposure",
+                severity: "medium",
+                category: "Privacy",
+                line: "Multiple lines",
+                cvss: 5.5,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "File contains email addresses, IP addresses, phone numbers, or internal URLs.",
+                impact: "Social engineering attacks, network reconnaissance, spam targeting.",
+                remediation: ["Redact sensitive information before sharing", "Use placeholders for internal URLs", "Remove personal contact information", "Implement access controls on file", "Review content before public distribution"]
+            }, ],
+            "Log File": [{
+                id: "CVE-2024-L001",
+                name: "Credentials in Log Output",
+                severity: "critical",
+                category: "Secrets",
+                line: "Multiple entries",
+                cvss: 9.0,
+                cwe: "CWE-532",
+                owasp: "A09:2021 – Logging Failures",
+                description: "Log file contains authentication tokens, passwords, API keys, or session IDs in plain text.",
+                impact: "Credential theft, session hijacking, unauthorized access via harvested tokens.",
+                remediation: ["Implement log sanitization to mask secrets", "Configure logging frameworks to redact sensitive fields", "Never log passwords or full tokens", "Use structured logging with field-level filtering", "Rotate any credentials found in logs"]
+            }, {
+                id: "CVE-2024-L002",
+                name: "PII in Log Entries",
+                severity: "high",
+                category: "Privacy",
+                line: "Multiple entries",
+                cvss: 7.5,
+                cwe: "CWE-532",
+                owasp: "A09:2021 – Logging Failures",
+                description: "Logs contain personally identifiable information like emails, IPs, names, SSNs, or credit card numbers.",
+                impact: "Privacy violations, GDPR/CCPA non-compliance, identity theft risk.",
+                remediation: ["Mask PII in log output", "Implement log redaction policies", "Use structured logging with PII filters", "Restrict log file access", "Set up log retention and deletion policies"]
+            }, {
+                id: "CVE-2024-L003",
+                name: "Verbose Error Stack Traces",
+                severity: "medium",
+                category: "Info Disclosure",
+                line: "Error entries",
+                cvss: 5.0,
+                cwe: "CWE-209",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Logs contain full stack traces revealing internal file paths, library versions, and architecture details.",
+                impact: "Reconnaissance data for attackers, technology stack identification.",
+                remediation: ["Limit stack trace detail in production logs", "Use error IDs instead of full traces", "Restrict access to detailed logs", "Implement log level management", "Separate detailed and summary logs"]
+            }, ],
+            "Certificate": [{
+                id: "CVE-2024-C001",
+                name: "Expired Certificate",
+                severity: "critical",
+                category: "Cryptography",
+                line: "Validity field",
+                cvss: 8.5,
+                cwe: "CWE-298",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Certificate has expired or is about to expire, breaking TLS/SSL trust chain.",
+                impact: "Service outages, browser warnings, loss of user trust, MITM vulnerability.",
+                remediation: ["Renew certificate immediately", "Set up automated renewal (Let's Encrypt, ACME)", "Implement certificate expiry monitoring", "Maintain certificate inventory", "Set alerts 30+ days before expiry"]
+            }, {
+                id: "CVE-2024-C002",
+                name: "Weak Key Length",
+                severity: "high",
+                category: "Cryptography",
+                line: "Public key",
+                cvss: 7.5,
+                cwe: "CWE-326",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Certificate uses a key length below current security standards (RSA < 2048 bits or ECC < 256 bits).",
+                impact: "Key compromise via factoring attacks, TLS downgrade, impersonation.",
+                remediation: ["Regenerate with RSA 2048+ or ECC P-256+", "Migrate to ECC for better performance", "Update all systems using the weak certificate", "Revoke the weak certificate", "Update security policies for key requirements"]
+            }, {
+                id: "CVE-2024-C003",
+                name: "Self-Signed Certificate",
+                severity: "medium",
+                category: "Trust",
+                line: "Issuer field",
+                cvss: 5.8,
+                cwe: "CWE-295",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Certificate is self-signed and not issued by a trusted Certificate Authority (CA).",
+                impact: "No third-party trust verification, susceptible to MITM, browser warnings.",
+                remediation: ["Obtain certificate from trusted CA", "Use free CAs like Let's Encrypt", "Reserve self-signed for internal dev only", "Implement certificate pinning if self-signed is required", "Document and approve self-signed cert usage"]
+            }, ],
+            "Key File": [{
+                id: "CVE-2024-K001",
+                name: "Unprotected Private Key",
+                severity: "critical",
+                category: "Secrets",
+                line: "Key header",
+                cvss: 9.8,
+                cwe: "CWE-522",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Private key file has no passphrase encryption, exposing it if the file is accessed.",
+                impact: "Complete authentication compromise, impersonation, data decryption, system access.",
+                remediation: ["Encrypt private key with strong passphrase", "Set file permissions to 600 (owner only)", "Store in hardware security module (HSM)", "Use key management services", "Rotate key if exposure is suspected"]
+            }, {
+                id: "CVE-2024-K002",
+                name: "Key File in Public Location",
+                severity: "critical",
+                category: "Access Control",
+                line: "File path",
+                cvss: 9.5,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Private key file detected in a location that may be publicly accessible or in a code repository.",
+                impact: "Complete compromise of all systems using this key, data decryption, impersonation.",
+                remediation: ["Move key to secure directory immediately", "Add key patterns to .gitignore", "Revoke and regenerate the key", "Audit git history for key exposure", "Use secrets managers for key storage"]
+            }, ],
+            "DevOps Config": [{
+                id: "CVE-2024-D001",
+                name: "Privileged Container Configuration",
+                severity: "critical",
+                category: "Container Security",
+                line: "Dockerfile",
+                cvss: 9.0,
+                cwe: "CWE-250",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Container runs as root user or with privileged mode enabled, violating container security best practices.",
+                impact: "Container escape, host system compromise, privilege escalation.",
+                remediation: ["Add USER directive to run as non-root", "Never use --privileged flag", "Drop unnecessary capabilities", "Use read-only filesystem where possible", "Implement pod security policies"]
+            }, {
+                id: "CVE-2024-D002",
+                name: "Secrets in Build Configuration",
+                severity: "critical",
+                category: "Secrets",
+                line: "Build args/ENV",
+                cvss: 9.2,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "Secrets passed via ENV or ARG instructions are baked into image layers and accessible to anyone with the image.",
+                impact: "Credential exposure in image registries, supply chain compromise.",
+                remediation: ["Use multi-stage builds to exclude secrets", "Use Docker BuildKit secrets mount", "Never use ENV/ARG for secrets", "Use runtime secrets injection", "Scan images for embedded secrets"]
+            }, {
+                id: "CVE-2024-D003",
+                name: "Unversioned Base Image",
+                severity: "medium",
+                category: "Supply Chain",
+                line: "FROM directive",
+                cvss: 6.0,
+                cwe: "CWE-1104",
+                owasp: "A06:2021 – Vulnerable Components",
+                description: "Base image uses 'latest' tag instead of a specific version, leading to unpredictable builds.",
+                impact: "Dependency confusion, unexpected vulnerabilities, build reproducibility issues.",
+                remediation: ["Pin base images to specific SHA digests", "Use specific version tags", "Scan base images for vulnerabilities", "Maintain approved base image registry", "Update base images on a schedule"]
+            }, ],
+            "Audio File": [{
+                id: "CVE-2024-A001",
+                name: "Embedded Metadata Privacy Risk",
+                severity: "medium",
+                category: "Privacy",
+                line: "ID3/metadata tags",
+                cvss: 4.5,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Audio file contains metadata with recording location, device info, artist details, or embedded images.",
+                impact: "Location tracking, device fingerprinting, privacy violation.",
+                remediation: ["Strip metadata before sharing", "Use metadata editing tools", "Configure recording apps to limit metadata", "Review metadata before public upload", "Implement automated metadata stripping"]
+            }, {
+                id: "CVE-2024-A002",
+                name: "Malformed Audio Header",
+                severity: "low",
+                category: "Integrity",
+                line: "File header",
+                cvss: 3.5,
+                cwe: "CWE-20",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Audio file has malformed headers that could trigger parser vulnerabilities in media players.",
+                impact: "Application crash, potential code execution via parser exploit.",
+                remediation: ["Re-encode the audio file", "Use updated media players", "Validate file structure before processing", "Implement fuzzing for media parsers", "Use sandboxed media playback"]
+            }, ],
+            "Video File": [{
+                id: "CVE-2024-V001",
+                name: "Embedded Metadata Exposure",
+                severity: "medium",
+                category: "Privacy",
+                line: "Container metadata",
+                cvss: 5.0,
+                cwe: "CWE-200",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Video contains GPS coordinates, camera information, recording timestamps, and software details.",
+                impact: "Location tracking, device identification, timeline reconstruction.",
+                remediation: ["Strip metadata before sharing", "Use FFmpeg to remove metadata", "Disable GPS in recording device", "Review metadata before upload", "Implement automated stripping pipeline"]
+            }, {
+                id: "CVE-2024-V002",
+                name: "Embedded Subtitle Script Injection",
+                severity: "high",
+                category: "XSS",
+                line: "Subtitle track",
+                cvss: 7.0,
+                cwe: "CWE-79",
+                owasp: "A03:2021 – Injection",
+                description: "Video contains embedded subtitle tracks with HTML/JavaScript that could execute in vulnerable players.",
+                impact: "Code execution in media players, phishing overlays, data theft.",
+                remediation: ["Sanitize subtitle content", "Use plain text subtitle formats", "Update media players", "Strip embedded subtitles from untrusted sources", "Validate subtitle encoding"]
+            }, ],
+            "Lock File": [{
+                id: "CVE-2024-LK01",
+                name: "Known Vulnerable Dependencies",
+                severity: "high",
+                category: "Dependencies",
+                line: "Multiple entries",
+                cvss: 8.0,
+                cwe: "CWE-1104",
+                owasp: "A06:2021 – Vulnerable Components",
+                description: "Lock file pins versions of dependencies with known security vulnerabilities.",
+                impact: "Exploitation of known CVEs, supply chain attacks, application compromise.",
+                remediation: ["Run dependency audit (npm audit, pip audit)", "Update vulnerable packages", "Implement automated dependency scanning", "Use tools like Dependabot or Snyk", "Review changelogs before updating"]
+            }, {
+                id: "CVE-2024-LK02",
+                name: "Dependency Confusion Risk",
+                severity: "medium",
+                category: "Supply Chain",
+                line: "Package sources",
+                cvss: 6.5,
+                cwe: "CWE-427",
+                owasp: "A08:2021 – Integrity Failures",
+                description: "Lock file references packages that could be targets for dependency confusion attacks.",
+                impact: "Malicious package installation, code execution, supply chain compromise.",
+                remediation: ["Use scoped package names", "Configure private registry priority", "Verify package integrity hashes", "Implement package allowlisting", "Monitor for new packages matching internal names"]
+            }, ],
+            "Git Config": [{
+                id: "CVE-2024-G001",
+                name: "Insufficient Ignore Rules",
+                severity: "medium",
+                category: "Secrets",
+                line: ".gitignore",
+                cvss: 6.0,
+                cwe: "CWE-200",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Gitignore file does not exclude common sensitive files like .env, *.pem, *.key, or IDE configs.",
+                impact: "Accidental commit of secrets, credentials, or sensitive configuration.",
+                remediation: ["Add .env, *.pem, *.key to .gitignore", "Use comprehensive gitignore templates", "Add IDE and OS-specific exclusions", "Run git-secrets as pre-commit hook", "Audit repository for previously committed secrets"]
+            }, ],
+        };
+
+        // Default fallback for unrecognized types
+        const DEFAULT_VULNS = [{
+            id: "CVE-2024-0001",
+            name: "Unknown File Type Risk",
+            severity: "medium",
+            category: "File Safety",
+            line: "Full file",
+            cvss: 5.0,
+            cwe: "CWE-434",
+            owasp: "A04:2021 – Insecure Design",
+            description: "File type could not be fully classified. Unknown file types may contain hidden executable code or exploit payloads.",
+            impact: "Potential malware execution, parser exploitation, data exfiltration.",
+            remediation: ["Verify file origin and authenticity", "Scan with multiple antivirus engines", "Open only in sandboxed environments", "Check file magic bytes match extension", "Contact sender to verify file type"]
+        }, {
+            id: "CVE-2024-0002",
+            name: "File Integrity Unverified",
+            severity: "low",
+            category: "Integrity",
+            line: "File hash",
+            cvss: 3.5,
+            cwe: "CWE-354",
+            owasp: "A08:2021 – Integrity Failures",
+            description: "No checksum or digital signature available to verify this file has not been tampered with.",
+            impact: "Undetected file modification, supply chain compromise, content manipulation.",
+            remediation: ["Request checksum/hash from file provider", "Use GPG signatures for verification", "Implement file integrity monitoring", "Compare hash against known-good values", "Establish trusted file distribution channels"]
+        }, ];
+
+        // ======================== SCAN PHASES BY TYPE ========================
+        const SCAN_PHASES = {
+            "Source Code": ["Parsing syntax tree...", "Analyzing control flow...", "Checking injection vectors...", "Scanning for hardcoded secrets...", "Evaluating crypto usage...", "Checking access controls...", "Running taint analysis...", "Testing deserialization paths...", "Reviewing error handling...", "Generating report..."],
+            "Web File": ["Parsing DOM structure...", "Checking script sources...", "Analyzing CSP headers...", "Scanning for XSS vectors...", "Checking mixed content...", "Reviewing iframe usage...", "Detecting inline scripts...", "Analyzing form actions...", "Checking CORS policies...", "Generating report..."],
+            "Document": ["Extracting document structure...", "Scanning for embedded macros...", "Checking OLE objects...", "Analyzing hyperlinks...", "Extracting metadata...", "Scanning for hidden content...", "Checking document protection...", "Analyzing embedded media...", "Reviewing revision history...", "Generating report..."],
+            "Spreadsheet": ["Parsing sheet structure...", "Scanning for macros...", "Checking external links...", "Analyzing formulas...", "Detecting hidden sheets...", "Scanning for PII patterns...", "Checking data connections...", "Reviewing cell protection...", "Analyzing named ranges...", "Generating report..."],
+            "Presentation": ["Parsing slide structure...", "Scanning for macros...", "Checking embedded media...", "Analyzing external links...", "Extracting metadata...", "Scanning speaker notes...", "Checking OLE objects...", "Reviewing animations...", "Analyzing master slides...", "Generating report..."],
+            "Config File": ["Parsing configuration format...", "Scanning for credentials...", "Checking API keys...", "Analyzing permissions...", "Detecting debug settings...", "Reviewing access rules...", "Checking encryption settings...", "Analyzing network bindings...", "Validating security headers...", "Generating report..."],
+            "Image": ["Reading file headers...", "Extracting EXIF metadata...", "Checking GPS coordinates...", "Analyzing pixel data patterns...", "Scanning for steganography...", "Checking for embedded scripts...", "Validating file structure...", "Analyzing compression ratio...", "Scanning for polyglot content...", "Generating report..."],
+            "Archive": ["Reading archive structure...", "Checking compression ratio...", "Scanning entry paths...", "Detecting path traversal...", "Listing executable content...", "Checking encryption method...", "Analyzing nested archives...", "Scanning file signatures...", "Checking total uncompressed size...", "Generating report..."],
+            "Executable": ["Reading PE/ELF headers...", "Checking digital signature...", "Analyzing import table...", "Scanning for packing...", "Checking security features...", "Analyzing entropy...", "Detecting obfuscation...", "Reviewing permissions...", "Scanning for known signatures...", "Generating report..."],
+            "Shell Script": ["Parsing script commands...", "Checking for eval usage...", "Scanning for credentials...", "Analyzing file permissions...", "Checking download sources...", "Reviewing variable quoting...", "Detecting privilege escalation...", "Analyzing network calls...", "Checking temp file usage...", "Generating report..."],
+            "Database File": ["Reading database schema...", "Checking encryption status...", "Scanning for PII patterns...", "Analyzing authentication...", "Checking access controls...", "Reviewing stored procedures...", "Scanning for sensitive data...", "Checking audit logging...", "Analyzing backup settings...", "Generating report..."],
+            "Text File": ["Scanning content patterns...", "Checking for credentials...", "Detecting PII patterns...", "Analyzing data formats...", "Checking for encoded secrets...", "Scanning URLs and IPs...", "Reviewing content sensitivity...", "Checking file permissions...", "Analyzing content structure...", "Generating report..."],
+            "Log File": ["Parsing log entries...", "Scanning for leaked credentials...", "Detecting PII in logs...", "Analyzing error patterns...", "Checking for stack traces...", "Reviewing log levels...", "Detecting sensitive URLs...", "Scanning for session tokens...", "Checking log rotation...", "Generating report..."],
+            "Certificate": ["Parsing certificate fields...", "Checking validity dates...", "Analyzing key length...", "Verifying trust chain...", "Checking signature algorithm...", "Scanning for weak ciphers...", "Reviewing SANs...", "Checking revocation status...", "Analyzing certificate policies...", "Generating report..."],
+            "Key File": ["Reading key format...", "Checking encryption status...", "Analyzing key length...", "Verifying file permissions...", "Checking key type...", "Scanning for known weak keys...", "Reviewing key usage...", "Checking key protection...", "Analyzing storage location...", "Generating report..."],
+            "DevOps Config": ["Parsing build instructions...", "Checking user privileges...", "Scanning for embedded secrets...", "Analyzing base images...", "Reviewing exposed ports...", "Checking volume mounts...", "Analyzing health checks...", "Reviewing network config...", "Checking resource limits...", "Generating report..."],
+            "Audio File": ["Reading audio format...", "Extracting metadata tags...", "Checking embedded images...", "Analyzing file structure...", "Scanning for anomalies...", "Checking encoding integrity...", "Reviewing ID3/Vorbis tags...", "Analyzing bitrate patterns...", "Checking for hidden data...", "Generating report..."],
+            "Video File": ["Reading container format...", "Extracting metadata...", "Checking subtitle tracks...", "Analyzing embedded content...", "Scanning for anomalies...", "Checking GPS metadata...", "Reviewing audio tracks...", "Analyzing codec info...", "Checking for hidden streams...", "Generating report..."],
+            "Lock File": ["Parsing dependency list...", "Checking known CVE database...", "Analyzing version constraints...", "Detecting outdated packages...", "Checking package sources...", "Reviewing integrity hashes...", "Scanning for typosquatting...", "Analyzing dependency tree...", "Checking license compliance...", "Generating report..."],
+            "Git Config": ["Parsing ignore patterns...", "Checking for missing rules...", "Analyzing path exclusions...", "Detecting common omissions...", "Reviewing sensitive patterns...", "Checking OS-specific rules...", "Analyzing IDE exclusions...", "Reviewing build artifacts...", "Checking secret patterns...", "Generating report..."],
+        };
+
+        const DEFAULT_PHASES = ["Analyzing file structure...", "Checking file headers...", "Scanning for patterns...", "Detecting anomalies...", "Checking for embedded content...", "Analyzing metadata...", "Scanning for signatures...", "Reviewing file integrity...", "Running heuristic analysis...", "Generating report..."];
+
+        // ======================== HELPERS ========================
+        const sevColor = s => ({
+            critical: "#ff1744",
+            high: "#ff6d00",
+            medium: "#ffc400",
+            low: "#00e5ff"
+        }[s] || "#888");
+        const sevBg = s => ({
+            critical: "rgba(255,23,68,.12)",
+            high: "rgba(255,109,0,.12)",
+            medium: "rgba(255,196,0,.12)",
+            low: "rgba(0,229,255,.12)"
+        }[s] || "rgba(136,136,136,.12)");
+
+        let currentFile = null,
+            vulns = [],
+            currentFilter = "all",
+            selectedVuln = null;
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            // Special cases for filenames without traditional extensions
+            const name = filename.toLowerCase();
+            if (name === 'dockerfile' || name.startsWith('dockerfile.')) return "DevOps Config";
+            if (name === '.dockerignore') return "DevOps Config";
+            if (name === '.gitignore') return "Git Config";
+            if (name === '.env' || name.startsWith('.env.')) return "Config File";
+            return FILE_TYPES[ext] || "Unknown";
+        }
+
+        // ======================== UPLOAD ========================
+        const uploadZone = document.getElementById("uploadZone");
+        const fileInput = document.getElementById("fileInput");
+        uploadZone.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", e => {
+            if (e.target.files[0]) startScan(e.target.files[0])
+        });
+        uploadZone.addEventListener("dragover", e => {
+            e.preventDefault();
+            uploadZone.classList.add("dragover")
+        });
+        uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+        uploadZone.addEventListener("drop", e => {
+            e.preventDefault();
+            uploadZone.classList.remove("dragover");
+            if (e.dataTransfer.files[0]) startScan(e.dataTransfer.files[0])
+        });
+
+        // ======================== SCAN ========================
+        function startScan(file) {
+            currentFile = file;
+            const fileType = getFileType(file.name);
+            document.getElementById("uploadScreen").style.display = "none";
+            document.getElementById("scanScreen").style.display = "flex";
+            document.getElementById("scanFilename").textContent = "SCANNING: " + file.name;
+            document.getElementById("scanFiletype").textContent = fileType.toUpperCase();
+
+            const phases = SCAN_PHASES[fileType] || DEFAULT_PHASES;
+            const checksEl = document.getElementById("scanChecks");
+            checksEl.innerHTML = phases.map((p, i) => `<div class="scan-check" id="check${i}"><div class="check-icon">○</div>${p.replace("...","")}</div>`).join("");
+
+            let p = 0,
+                lastPhase = -1;
+            const circle = document.getElementById("progressCircle");
+            const text = document.getElementById("progressText");
+            const phase = document.getElementById("scanPhase");
+
+            const interval = setInterval(() => {
+                p += Math.floor(Math.random() * 3) + 1;
+                if (p > 100) p = 100;
+                circle.setAttribute("stroke-dasharray", `${p*4.9} 490`);
+                text.textContent = p + "%";
+                const pi = Math.min(Math.floor(p / 10), phases.length - 1);
+                phase.textContent = phases[pi];
+
+                if (pi !== lastPhase) {
+                    for (let i = 0; i < pi; i++) {
+                        const el = document.getElementById("check" + i);
+                        if (el) {
+                            el.classList.add("done");
+                            el.classList.remove("active");
+                            el.querySelector(".check-icon").textContent = "✓"
+                        }
+                    }
+                    const cur = document.getElementById("check" + pi);
+                    if (cur) {
+                        cur.classList.add("active");
+                        cur.querySelector(".check-icon").textContent = "⟳"
+                    }
+                    lastPhase = pi;
+                }
+
+                if (p >= 100) {
+                    clearInterval(interval);
+                    // Mark all done
+                    for (let i = 0; i < phases.length; i++) {
+                        const el = document.getElementById("check" + i);
+                        if (el) {
+                            el.classList.add("done");
+                            el.classList.remove("active");
+                            el.querySelector(".check-icon").textContent = "✓"
+                        }
+                    }
+                    setTimeout(() => {
+                        const pool = VULNS[fileType] || DEFAULT_VULNS;
+                        const count = 1 + Math.floor(Math.random() * Math.min(pool.length, 5));
+                        const shuffled = [...pool].sort(() => Math.random() - .5);
+                        vulns = shuffled.slice(0, count);
+                        showDashboard(fileType);
+                    }, 800);
+                }
+            }, 100);
+        }
+
+        // ======================== DASHBOARD ========================
+        function showDashboard(fileType) {
+            document.getElementById("scanScreen").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+            document.getElementById("btnNew").style.display = "block";
+
+            const counts = {
+                all: vulns.length,
+                critical: vulns.filter(v => v.severity === "critical").length,
+                high: vulns.filter(v => v.severity === "high").length,
+                medium: vulns.filter(v => v.severity === "medium").length,
+                low: vulns.filter(v => v.severity === "low").length
+            };
+            const riskScore = Math.max(0, 100 - vulns.reduce((a, v) => a + v.cvss * 3, 0));
+            const riskLabel = riskScore > 70 ? "Low Risk" : riskScore > 40 ? "Medium Risk" : "High Risk";
+            const riskColor = riskScore > 70 ? "#00e676" : riskScore > 40 ? "#ffc400" : "#ff1744";
+
+            document.getElementById("safeBanner").innerHTML = vulns.length === 0 ? `<div class="safe-banner"><h2>✓ No Vulnerabilities Detected</h2><p>This file passed all security checks.</p></div>` : "";
+
+            document.getElementById("statsRow").innerHTML =
+                statCard("File Scanned", currentFile.name, (currentFile.size / 1024).toFixed(1) + " KB", "#4a9eff") +
+                statCard("File Type", fileType, "Detected", "#4a9eff") +
+                statCard("Risk Score", Math.round(riskScore) + "/100", riskLabel, riskColor) +
+                statCard("Vulnerabilities", vulns.length, "Total Found", "#ff6d00") +
+                statCard("Critical", counts.critical, "Immediate Action", "#ff1744");
+
+            document.getElementById("filters").innerHTML = ["all", "critical", "high", "medium", "low"].map(f =>
+                `<button class="filter-btn ${currentFilter===f?'active':''}" onclick="setFilter('${f}')">${f} ${counts[f]>0?'('+counts[f]+')':''}</button>`
+            ).join("");
+
+            renderVulnList(fileType);
+            renderDetail();
+        }
+
+        function statCard(label, value, sub, color) {
+            return `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-value" style="color:${color}">${value}</div><div class="stat-sub">${sub}</div></div>`;
+        }
+
+        function setFilter(f) {
+            currentFilter = f;
+            document.querySelectorAll(".filter-btn").forEach(btn => {
+                btn.classList.toggle("active", btn.textContent.trim().toLowerCase().startsWith(f))
+            });
+            selectedVuln = null;
+            renderVulnList();
+            renderDetail();
+        }
+
+        function renderVulnList() {
+            const filtered = currentFilter === "all" ? vulns : vulns.filter(v => v.severity === currentFilter);
+            const list = document.getElementById("vulnList");
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="no-vulns"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="1.5"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/><path d="M9 12l2 2 4-4" stroke-width="2"/></svg><br>No vulnerabilities in this category</div>';
+                return;
+            }
+            list.innerHTML = filtered.map(v => `
+    <div class="vuln-card ${selectedVuln&&selectedVuln.id===v.id?'selected':''}" style="border-left-color:${sevColor(v.severity)}" onclick="selectVuln('${v.id}')">
+      <div class="vuln-card-top">
+        <span class="severity-badge" style="color:${sevColor(v.severity)};background:${sevBg(v.severity)}">${v.severity}</span>
+        <span class="vuln-cvss">CVSS ${v.cvss}</span>
+      </div>
+      <div class="vuln-name">${v.name}<span class="vuln-filetag">${v.category}</span></div>
+      <div class="vuln-meta">${v.id} · ${v.line}</div>
+    </div>`).join("");
+        }
+
+        function selectVuln(id) {
+            selectedVuln = vulns.find(v => v.id === id);
+            renderVulnList();
+            renderDetail()
+        }
+
+        function renderDetail() {
+            const panel = document.getElementById("detailPanel");
+            if (!selectedVuln) {
+                panel.innerHTML = `<div class="detail-empty"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg><div style="margin-top:20px;font-size:14px;font-weight:500">Select a vulnerability to view details</div></div>`;
+                return;
+            }
+            const v = selectedVuln,
+                sc = sevColor(v.severity);
+            panel.innerHTML = `<div class="detail-content">
+    <div class="detail-header">
+      <div class="detail-icon" style="background:${sevBg(v.severity)};border:1px solid ${sc}33">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${sc}" stroke-width="1.5"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div><div class="detail-title">${v.name}</div><div class="detail-id">${v.id}</div></div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-box"><div class="metric-label">Severity</div><div class="metric-value" style="color:${sc}">${v.severity.toUpperCase()}</div></div>
+      <div class="metric-box"><div class="metric-label">CVSS Score</div><div class="metric-value" style="color:${sc}">${v.cvss}</div></div>
+      <div class="metric-box"><div class="metric-label">Category</div><div class="metric-value" style="color:#4a9eff">${v.category}</div></div>
+    </div>
+    <div class="section"><div class="section-title" style="color:#4a9eff">Location</div><span class="location-code">${v.line}</span></div>
+    <div class="section"><div class="section-title" style="color:#4a9eff">Description</div><p class="section-text">${v.description}</p></div>
+    <div class="section"><div class="section-title" style="color:#ff6d00">Impact</div><p class="section-text">${v.impact}</p></div>
+    <div class="section"><div class="section-title" style="color:#00e676">Remediation Steps</div>
+      ${v.remediation.map((s,i)=>`<div class="remediation-step"><span class="step-num">${i+1}</span><span class="step-text">${s}</span></div>`).join("")}
+    </div>
+    <div class="section"><div class="section-title" style="color:#4a9eff">References</div>
+      <div class="ref-tags"><span class="ref-tag">${v.cwe}</span><span class="ref-tag">${v.owasp}</span></div>
+    </div>
+  </div>`;
+}
+
+// ======================== RESET ========================
+function resetApp(){
+  currentFile=null;vulns=[];currentFilter="all";selectedVuln=null;
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("scanScreen").style.display="none";
+  document.getElementById("uploadScreen").style.display="flex";
+  document.getElementById("btnNew").style.display="none";
+  document.getElementById("progressCircle").setAttribute("stroke-dasharray","0 490");
+  document.getElementById("progressText").textContent="0%";
+  document.getElementById("safeBanner").innerHTML="";
+  fileInput.value="";
+}
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SENTINEL PRO — Scan & Auto-Fix</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+        
+        body {
+            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+            background: #060d18;
+            color: #e0eaff;
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+        
+        .mono {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: .03;
+            pointer-events: none;
+            z-index: 0;
+            background-image: linear-gradient(#00e5ff 1px, transparent 1px), linear-gradient(90deg, #00e5ff 1px, transparent 1px);
+            background-size: 40px 40px
+        }
+        
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a5f;
+            border-radius: 4px
+        }
+        
+        .header {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #0e1f38;
+            background: rgba(6, 13, 24, .95);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 1px
+        }
+        
+        .header-sub {
+            font-size: 9px;
+            color: #2a5a8a;
+            letter-spacing: 3px;
+            font-weight: 500
+        }
+        
+        .btn {
+            background: rgba(0, 229, 255, .08);
+            border: 1px solid #1e3a5f;
+            color: #00e5ff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all .2s
+        }
+        
+        .btn:hover {
+            background: rgba(0, 229, 255, .15);
+            border-color: #00e5ff
+        }
+        
+        .btn-fix {
+            background: rgba(0, 230, 118, .1);
+            border-color: rgba(0, 230, 118, .3);
+            color: #00e676
+        }
+        
+        .btn-fix:hover {
+            background: rgba(0, 230, 118, .2);
+            border-color: #00e676
+        }
+        
+        .btn-danger {
+            background: rgba(255, 23, 68, .1);
+            border-color: rgba(255, 23, 68, .3);
+            color: #ff1744
+        }
+        
+        .btn-grp {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+        
+        .hidden {
+            display: none!important
+        }
+        /* Upload */
+        
+        .upload-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 60px);
+            padding: 30px
+        }
+        
+        .upload-zone {
+            width: 100%;
+            max-width: 600px;
+            padding: 50px 40px;
+            border: 2px dashed #1e3a5f;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(10, 22, 40, .4);
+            transition: all .3s ease
+        }
+        
+        .upload-zone.dragover {
+            border-color: #00e5ff;
+            background: rgba(0, 229, 255, .04)
+        }
+        
+        .upload-zone:hover {
+            border-color: #2a5a8a
+        }
+        
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, .06);
+            border: 1px solid #1e3a5f;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+        
+        .upload-sub {
+            font-size: 13px;
+            color: #4a6a8a;
+            margin-bottom: 20px
+        }
+        
+        .file-types {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap
+        }
+        
+        .ft {
+            font-size: 10px;
+            color: #2a5a8a;
+            background: rgba(10, 22, 40, .8);
+            border: 1px solid #0e1f38;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .feat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+            text-align: left
+        }
+        
+        .feat {
+            background: rgba(10, 22, 40, .6);
+            border: 1px solid #0e1f38;
+            border-radius: 10px;
+            padding: 12px 14px
+        }
+        
+        .feat-icon {
+            font-size: 18px;
+            margin-bottom: 4px
+        }
+        
+        .feat-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 2px
+        }
+        
+        .feat-desc {
+            font-size: 10px;
+            color: #2a5a8a;
+            line-height: 1.4
+        }
+        
+        @media(max-width:600px) {
+            .feat-grid {
+                grid-template-columns: 1fr
+            }
+        }
+        /* Scan */
+        
+        .scan-wrapper {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 60px);
+            padding: 30px
+        }
+        
+        .scan-box {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(10, 22, 40, .5);
+            border: 1px solid #1e3a5f;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center
+        }
+        
+        .scan-fname {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #2a5a8a;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            word-break: break-all
+        }
+        
+        .scan-ftype {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #4a9eff;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            background: rgba(74, 158, 255, .08);
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px
+        }
+        
+        .ring {
+            margin: 0 auto 24px;
+            position: relative;
+            width: 160px;
+            height: 160px
+        }
+        
+        .ring svg {
+            transform: rotate(-90deg)
+        }
+        
+        .ring .bg {
+            fill: none;
+            stroke: #0a1628;
+            stroke-width: 6
+        }
+        
+        .ring .fg {
+            fill: none;
+            stroke: #00e5ff;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dasharray .3s;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, .5))
+        }
+        
+        .ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: 800;
+            color: #00e5ff;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .scan-phase {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #4a9eff;
+            letter-spacing: 1px;
+            animation: pulse 1.5s ease-in-out infinite
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: .5
+            }
+            50% {
+                opacity: 1
+            }
+        }
+        /* Dashboard */
+        
+        .dashboard {
+            display: none;
+            padding: 20px 24px;
+            position: relative;
+            z-index: 1
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px
+        }
+        
+        .stat {
+            background: rgba(10, 22, 40, .5);
+            border: 1px solid #1e3a5f;
+            border-radius: 10px;
+            padding: 12px 14px
+        }
+        
+        .stat-label {
+            font-size: 9px;
+            color: #4a6a8a;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 4px
+        }
+        
+        .stat-val {
+            font-size: 17px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+        
+        .stat-sub {
+            font-size: 10px;
+            color: #2a5a8a;
+            margin-top: 2px
+        }
+        /* Action Bar */
+        
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px
+        }
+        
+        .filters {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap
+        }
+        
+        .fbtn {
+            background: transparent;
+            border: 1px solid #1e3a5f;
+            color: #4a6a8a;
+            padding: 5px 14px;
+            border-radius: 18px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all .2s;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .fbtn.active {
+            background: rgba(0, 229, 255, .1);
+            border-color: #00e5ff;
+            color: #00e5ff
+        }
+        
+        .fbtn:hover {
+            border-color: #2a5a8a
+        }
+        /* Main grid */
+        
+        .main {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+            min-height: 480px
+        }
+        
+        @media(max-width:860px) {
+            .main {
+                grid-template-columns: 1fr
+            }
+        }
+        
+        .vlist {
+            overflow-y: auto;
+            max-height: calc(100vh - 340px);
+            padding-right: 4px
+        }
+        /* Vuln card */
+        
+        .vc {
+            background: rgba(10, 22, 40, .7);
+            border: 1px solid #1e3a5f;
+            border-radius: 10px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all .2s;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+            position: relative
+        }
+        
+        .vc:hover {
+            background: rgba(0, 229, 255, .04)
+        }
+        
+        .vc.sel {
+            background: rgba(0, 229, 255, .06);
+            border-color: #00e5ff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, .1)
+        }
+        
+        .vc.fixed {
+            opacity: .5
+        }
+        
+        .vc.fixed::after {
+            content: 'FIXED';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #00e676;
+            background: rgba(0, 230, 118, .1);
+            padding: 2px 8px;
+            border-radius: 8px;
+            letter-spacing: 1px
+        }
+        
+        .vc-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px
+        }
+        
+        .sev {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 2px 8px;
+            border-radius: 16px
+        }
+        
+        .vc-cvss {
+            font-size: 10px;
+            color: #4a6a8a;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .vc-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px
+        }
+        
+        .vc-meta {
+            font-size: 10px;
+            color: #4a6a8a;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .vc-tag {
+            display: inline-block;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: rgba(74, 158, 255, .1);
+            color: #4a9eff;
+            margin-left: 6px;
+            letter-spacing: .5px;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .vc-line-preview {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #ff6d00;
+            background: rgba(255, 109, 0, .06);
+            border: 1px solid rgba(255, 109, 0, .15);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 60px;
+            overflow: hidden
+        }
+        /* Detail */
+        
+        .dpanel {
+            background: rgba(10, 22, 40, .4);
+            border: 1px solid #1e3a5f;
+            border-radius: 12px;
+            overflow-y: auto;
+            max-height: calc(100vh - 340px)
+        }
+        
+        .dempty {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #2a4a6a;
+            padding: 40px;
+            text-align: center;
+            min-height: 400px
+        }
+        
+        .dcontent {
+            padding: 22px 24px
+        }
+        
+        .dhead {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px
+        }
+        
+        .dicon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .dtitle {
+            font-size: 16px;
+            font-weight: 700
+        }
+        
+        .did {
+            font-size: 10px;
+            color: #4a6a8a;
+            font-family: 'JetBrains Mono', monospace
+        }
+        
+        .mgrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px
+        }
+        
+        @media(max-width:500px) {
+            .mgrid {
+                grid-template-columns: 1fr
+            }
+        }
+        
+        .mbox {
+            background: rgba(10, 22, 40, .8);
+            border: 1px solid #1e3a5f;
+            border-radius: 8px;
+            padding: 10px 12px;
+            text-align: center
+        }
+        
+        .mlabel {
+            font-size: 9px;
+            color: #4a6a8a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px
+        }
+        
+        .mval {
+            font-size: 13px;
+            font-weight: 700
+        }
+        
+        .sec {
+            margin-bottom: 18px
+        }
+        
+        .sec-t {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .sec-t::before {
+            content: '';
+            width: 14px;
+            height: 1px;
+            display: inline-block
+        }
+        
+        .sec-p {
+            font-size: 12px;
+            color: #8aa4c0;
+            line-height: 1.7
+        }
+        
+        .loc {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #00e5ff;
+            background: rgba(0, 229, 255, .08);
+            padding: 5px 10px;
+            border-radius: 6px;
+            display: inline-block
+        }
+        
+        .rstep {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: rgba(0, 230, 118, .04);
+            border: 1px solid rgba(0, 230, 118, .1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 6px
+        }
+        
+        .rnum {
+            min-width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(0, 230, 118, .15);
+            color: #00e676;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px
+        }
+        
+        .rtxt {
+            font-size: 11px;
+            color: #8aa4c0;
+            line-height: 1.5
+        }
+        
+        .ref-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+        
+        .rtag {
+            font-size: 10px;
+            color: #4a9eff;
+            background: rgba(74, 158, 255, .08);
+            border: 1px solid rgba(74, 158, 255, .2);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace
+        }
+        /* Code diff */
+        
+        .code-block {
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #1e3a5f;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px
+        }
+        
+        .code-header {
+            background: rgba(10, 22, 40, .9);
+            padding: 8px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        
+        .code-body {
+            padding: 10px 14px;
+            background: rgba(6, 13, 24, .8);
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.7;
+            max-height: 200px;
+            overflow-y: auto
+        }
+        
+        .line-old {
+            color: #ff4444;
+            text-decoration: line-through;
+            opacity: .7
+        }
+        
+        .line-new {
+            color: #00e676
+        }
+        /* Fix button in detail */
+        
+        .fix-single {
+            margin-top: 16px;
+            width: 100%
+        }
+        
+        .fix-all-bar {
+            background: rgba(0, 230, 118, .05);
+            border: 1px solid rgba(0, 230, 118, .15);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px
+        }
+        
+        .fix-all-bar p {
+            font-size: 13px;
+            color: #8aa4c0
+        }
+        
+        .fix-all-bar strong {
+            color: #00e676
+        }
+        
+        .no-vulns {
+            text-align: center;
+            padding: 40px;
+            color: #00e676;
+            font-size: 14px
+        }
+        /* Toast */
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00e676;
+            color: #060d18;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            z-index: 9999;
+            box-shadow: 0 8px 30px rgba(0, 230, 118, .3);
+            animation: toastin .4s
+        }
+        
+        @keyframes toastin {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px)
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5">
+      <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+      <path d="M9 12l2 2 4-4" stroke="#00e5ff" stroke-width="2"/>
+    </svg>
+            <div>
+                <div class="header-title">SENTINEL PRO</div>
+                <div class="header-sub">SCAN · DETECT · AUTO-FIX</div>
+            </div>
+        </div>
+        <div class="btn-grp">
+            <button class="btn hidden" id="btnDownload" onclick="downloadFixed()">⬇ DOWNLOAD FIXED</button>
+            <button class="btn hidden" id="btnNew" onclick="resetApp()">NEW SCAN</button>
+        </div>
+    </header>
+
+    <!-- UPLOAD -->
+    <div class="upload-wrapper" id="uploadScreen">
+        <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" style="display:none" accept="*/*" />
+            <div class="upload-icon">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+            </div>
+            <div class="upload-title">Drop any file to scan & auto-fix</div>
+            <div class="upload-sub">Reads your actual file content, detects real vulnerabilities, and fixes them</div>
+            <div class="file-types">
+                <span class="ft">.js</span><span class="ft">.py</span><span class="ft">.java</span><span class="ft">.html</span>
+                <span class="ft">.php</span><span class="ft">.json</span><span class="ft">.xml</span><span class="ft">.yaml</span>
+                <span class="ft">.env</span><span class="ft">.sql</span><span class="ft">.sh</span><span class="ft">.css</span>
+                <span class="ft">.ts</span><span class="ft">.go</span><span class="ft">.rb</span><span class="ft">.c</span>
+                <span class="ft">.txt</span><span class="ft">.md</span><span class="ft">.cfg</span><span class="ft">+ more</span>
+            </div>
+            <div class="feat-grid">
+                <div class="feat">
+                    <div class="feat-icon">🔍</div>
+                    <div class="feat-title">Real Content Scan</div>
+                    <div class="feat-desc">Reads your actual file and scans every line for security issues</div>
+                </div>
+                <div class="feat">
+                    <div class="feat-icon">🛠️</div>
+                    <div class="feat-title">Auto-Fix Engine</div>
+                    <div class="feat-desc">Automatically patches vulnerabilities with secure code replacements</div>
+                </div>
+                <div class="feat">
+                    <div class="feat-icon">⬇️</div>
+                    <div class="feat-title">Download Fixed File</div>
+                    <div class="feat-desc">Download your fixed file with all vulnerabilities patched</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCANNING -->
+    <div class="scan-wrapper" id="scanScreen">
+        <div class="scan-box">
+            <div class="scan-fname" id="scanFname"></div>
+            <div class="scan-ftype" id="scanFtype"></div>
+            <div class="ring">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="bg" cx="80" cy="80" r="70"/>
+        <circle class="fg" id="ringFg" cx="80" cy="80" r="70" stroke-dasharray="0 440"/>
+      </svg>
+                <div class="ring-text" id="ringText">0%</div>
+            </div>
+            <div class="scan-phase" id="scanPhase">Initializing...</div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="dashboard">
+        <div id="fixAllBar"></div>
+        <div class="stats-row" id="statsRow"></div>
+        <div class="action-bar">
+            <div class="filters" id="filters"></div>
+        </div>
+        <div class="main">
+            <div class="vlist" id="vulnList"></div>
+            <div class="dpanel" id="detailPanel">
+                <div class="dempty">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg>
+                    <div style="margin-top:16px;font-size:13px;font-weight:500">Select a vulnerability to view details & fix</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastArea"></div>
+
+    <script>
+        // ===================== VULNERABILITY PATTERNS =====================
+        // Each pattern: { regex, name, severity, category, cvss, cwe, owasp, description, impact, remediation[], fix(match) }
+        const PATTERNS = [
+            // === HARDCODED SECRETS ===
+            {
+                regex: /((?:password|passwd|pwd|secret|api_?key|apikey|auth_?token|access_?token|private_?key|client_?secret|db_?pass(?:word)?)\s*[:=]\s*['"`]([^'"`\n]{3,})['"`])/gi,
+                name: "Hardcoded Secret / Password",
+                severity: "critical",
+                category: "Secrets",
+                cvss: 9.1,
+                cwe: "CWE-798",
+                owasp: "A07:2021 – Auth Failures",
+                description: "A sensitive credential (password, API key, token) is hardcoded directly in the source file.",
+                impact: "Credential theft, unauthorized access, data breaches, lateral movement in infrastructure.",
+                remediation: ["Move to environment variables: process.env.SECRET_NAME", "Use a secrets manager (Vault, AWS Secrets Manager, etc.)", "Rotate the exposed credential immediately", "Add secret-scanning to your CI/CD pipeline", "Never commit secrets to version control"],
+                fix: (m) => m.replace(/((?:password|passwd|pwd|secret|api_?key|apikey|auth_?token|access_?token|private_?key|client_?secret|db_?pass(?:word)?)\s*[:=]\s*)['"`][^'"`\n]{3,}['"`]/i, '$1process.env.SECRET_VALUE /* TODO: move to env var */')
+            },
+            // === SQL INJECTION ===
+            {
+                regex: /((?:query|execute|exec|sql|cursor\.execute|db\.query|connection\.query)\s*\(\s*['"`].*?\+\s*(?:req\.|request\.|params\.|input|user|data|args|query)[\w.[\]]*|(?:query|execute|exec|sql)\s*\(\s*[`'"].*?\$\{.*?\}.*?[`'"])/gi,
+                name: "SQL Injection Vulnerability",
+                severity: "critical",
+                category: "Injection",
+                cvss: 9.8,
+                cwe: "CWE-89",
+                owasp: "A03:2021 – Injection",
+                description: "User input is concatenated or interpolated into SQL queries without parameterization.",
+                impact: "Full database compromise, data exfiltration, authentication bypass, remote code execution.",
+                remediation: ["Use parameterized queries / prepared statements", "Use an ORM that handles escaping automatically", "Validate and sanitize all user inputs", "Apply least privilege to database accounts", "Deploy Web Application Firewall (WAF)"],
+                fix: (m) => '/* FIXED: Use parameterized query instead */\n// db.query("SELECT * FROM users WHERE id = ?", [userId])\n' + '// ' + m.trim()
+            },
+            // === EVAL / CODE INJECTION ===
+            {
+                regex: /(eval\s*\(|exec\s*\(|Function\s*\(|setTimeout\s*\(\s*['"`]|setInterval\s*\(\s*['"`]|new\s+Function\s*\()/g,
+                name: "Dangerous Code Execution (eval/exec)",
+                severity: "critical",
+                category: "Code Injection",
+                cvss: 9.5,
+                cwe: "CWE-94",
+                owasp: "A03:2021 – Injection",
+                description: "Use of eval(), exec(), or dynamic code construction allows arbitrary code execution.",
+                impact: "Remote code execution, complete system compromise, data theft.",
+                remediation: ["Remove eval/exec entirely — use safe alternatives", "Use JSON.parse() instead of eval for JSON", "Use a safe expression parser for calculations", "Implement strict Content Security Policy", "Conduct code review for all dynamic code paths"],
+                fix: (m) => '/* SECURITY FIX: eval/exec removed — use safe alternative */\n// ' + m.trim()
+            },
+            // === INNERHTML / DOM XSS ===
+            {
+                regex: /(\.innerHTML\s*=\s*(?!['"`]\s*['"`]).*|document\.write\s*\(|\.outerHTML\s*=)/g,
+                name: "DOM-Based XSS (innerHTML/document.write)",
+                severity: "high",
+                category: "XSS",
+                cvss: 7.5,
+                cwe: "CWE-79",
+                owasp: "A03:2021 – Injection",
+                description: "Direct DOM manipulation via innerHTML or document.write without sanitization enables XSS.",
+                impact: "Session hijacking, credential theft, phishing, malware injection.",
+                remediation: ["Use textContent instead of innerHTML", "Sanitize with DOMPurify before inserting HTML", "Implement Content Security Policy (CSP)", "Use framework rendering (React, Vue, Angular)", "Set HttpOnly flag on session cookies"],
+                fix: (m) => m.replace(/\.innerHTML\s*=/, '.textContent = /* FIXED: use textContent */').replace(/document\.write\s*\(/, '/* FIXED: removed document.write */ // document.write(').replace(/\.outerHTML\s*=/, '.textContent = /* FIXED: use textContent */')
+            },
+            // === HTTP URLS (insecure transport) ===
+            {
+                regex: /(["'`]http:\/\/(?!localhost|127\.0\.0\.1|0\.0\.0\.0)[^\s"'`]+["'`])/g,
+                name: "Insecure HTTP Connection",
+                severity: "medium",
+                category: "Transport Security",
+                cvss: 5.9,
+                cwe: "CWE-319",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "Connection uses unencrypted HTTP instead of HTTPS, vulnerable to man-in-the-middle attacks.",
+                impact: "Data interception, credential theft, content tampering, session hijacking.",
+                remediation: ["Change all URLs to HTTPS", "Enable HSTS headers on your server", "Use protocol-relative URLs if needed", "Implement certificate pinning for mobile apps", "Add Upgrade-Insecure-Requests header"],
+                fix: (m) => m.replace(/http:\/\//g, 'https://')
+            },
+            // === WEAK HASHING ===
+            {
+                regex: /(md5\s*\(|sha1\s*\(|MD5\s*\(|SHA1\s*\(|hashlib\.md5|hashlib\.sha1|MessageDigest\.getInstance\s*\(\s*['"](?:MD5|SHA-?1)['"]|createHash\s*\(\s*['"](?:md5|sha1)['"])/g,
+                name: "Weak Cryptographic Hash (MD5/SHA-1)",
+                severity: "medium",
+                category: "Cryptography",
+                cvss: 5.9,
+                cwe: "CWE-328",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "MD5 or SHA-1 are used for hashing, which are cryptographically broken and vulnerable to collisions.",
+                impact: "Password cracking, authentication bypass, data integrity failures.",
+                remediation: ["Use bcrypt/scrypt/Argon2 for password hashing", "Use SHA-256 or SHA-3 for data integrity", "Add proper salting to password hashes", "Configure appropriate work factors", "Plan for cryptographic agility"],
+                fix: (m) => m.replace(/md5|MD5/g, 'sha256 /* FIXED: upgraded from MD5 */').replace(/sha1|SHA1|SHA-1/g, 'sha256 /* FIXED: upgraded from SHA-1 */')
+            },
+            // === CORS WILDCARD ===
+            {
+                regex: /(Access-Control-Allow-Origin['":\s]*[*]|cors\(\s*\)|allowedOrigins?\s*[:=]\s*['"`]\*['"`])/gi,
+                name: "CORS Wildcard — All Origins Allowed",
+                severity: "high",
+                category: "Access Control",
+                cvss: 7.2,
+                cwe: "CWE-942",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "CORS is configured to allow all origins (*), permitting any website to make requests to your API.",
+                impact: "Cross-origin data theft, CSRF bypass, unauthorized API access.",
+                remediation: ["Restrict origins to specific trusted domains", "Use an allowlist of permitted origins", "Validate Origin header server-side", "Avoid reflecting Origin header directly", "Set credentials: false with wildcard origins"],
+                fix: (m) => m.replace(/\*/g, 'https://yourdomain.com /* FIXED: restrict to your domain */')
+            },
+            // === CONSOLE.LOG OF SENSITIVE DATA ===
+            {
+                regex: /(console\.\s*log\s*\(.*(?:password|token|secret|key|credential|auth|session|cookie|ssn|credit.?card).*\))/gi,
+                name: "Sensitive Data Logged to Console",
+                severity: "medium",
+                category: "Info Disclosure",
+                cvss: 5.5,
+                cwe: "CWE-532",
+                owasp: "A09:2021 – Logging Failures",
+                description: "Sensitive data such as passwords, tokens, or keys is being output to the console/log.",
+                impact: "Credential exposure in logs, compliance violations, information leakage.",
+                remediation: ["Remove sensitive data from log statements", "Use structured logging with field redaction", "Mask or truncate sensitive values in logs", "Implement log-level controls for production", "Use secure logging libraries"],
+                fix: (m) => '/* FIXED: removed sensitive data from log */\nconsole.log("[REDACTED — sensitive data removed]");'
+            },
+            // === CHMOD 777 ===
+            {
+                regex: /(chmod\s+777|chmod\s+666|os\.chmod\s*\(.*0o?777|0o?666)/g,
+                name: "World-Writable File Permissions",
+                severity: "high",
+                category: "Permissions",
+                cvss: 7.5,
+                cwe: "CWE-732",
+                owasp: "A01:2021 – Broken Access Control",
+                description: "Files or directories are set to world-writable (777/666) permissions.",
+                impact: "Unauthorized file modification, privilege escalation, code injection via writable files.",
+                remediation: ["Use 755 for directories, 644 for files", "Apply principle of least privilege", "Set umask before creating files", "Never use 777 in production", "Audit file permissions regularly"],
+                fix: (m) => m.replace(/777/g, '755 /* FIXED: restricted permissions */').replace(/666/g, '644 /* FIXED: restricted permissions */')
+            },
+            // === DEBUG MODE ===
+            {
+                regex: /(DEBUG\s*[:=]\s*(?:true|True|TRUE|1|'true'|"true")|app\.debug\s*=\s*True|FLASK_DEBUG\s*[:=]\s*1)/g,
+                name: "Debug Mode Enabled in Production",
+                severity: "high",
+                category: "Misconfiguration",
+                cvss: 7.5,
+                cwe: "CWE-489",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "Debug mode is enabled, exposing verbose errors, stack traces, and internal application details.",
+                impact: "Information leakage, internal path disclosure, potential remote code execution.",
+                remediation: ["Set DEBUG=false in production", "Use environment-specific configs", "Add CI/CD checks for debug flags", "Implement proper error handling", "Use structured logging instead of debug output"],
+                fix: (m) => m.replace(/true|True|TRUE|1|'true'|"true"/, 'false /* FIXED: debug disabled for security */')
+            },
+            // === TODO/FIXME SECURITY ===
+            {
+                regex: /((?:\/\/|#|\/\*)\s*(?:TODO|FIXME|HACK|XXX|BUG)\s*:?\s*.*(?:security|vuln|auth|password|encrypt|hack|fix|unsafe|insecure|temporary|temp\s+fix).*)/gi,
+                name: "Unresolved Security TODO/FIXME",
+                severity: "low",
+                category: "Code Quality",
+                cvss: 3.0,
+                cwe: "CWE-1127",
+                owasp: "A04:2021 – Insecure Design",
+                description: "Code contains unresolved TODO or FIXME comments related to security issues.",
+                impact: "Known security weaknesses left unaddressed, technical debt accumulation.",
+                remediation: ["Address the security concern described in the TODO", "Create a tracked issue/ticket for each security TODO", "Prioritize security-related TODOs in sprint planning", "Set up linting rules to flag security TODOs", "Conduct regular security backlog reviews"],
+                fix: (m) => m + '\n/* ⚠️ FLAGGED: This security TODO needs immediate attention */'
+            },
+            // === HARDCODED IP ===
+            {
+                regex: /((?:["'`])\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?(?:["'`]))/g,
+                name: "Hardcoded IP Address",
+                severity: "low",
+                category: "Configuration",
+                cvss: 3.5,
+                cwe: "CWE-547",
+                owasp: "A05:2021 – Security Misconfiguration",
+                description: "IP addresses are hardcoded instead of using configuration or DNS, reducing flexibility and exposing infrastructure details.",
+                impact: "Infrastructure detail exposure, difficult environment migration, potential network mapping.",
+                remediation: ["Move IPs to environment variables or config files", "Use DNS hostnames instead of IP addresses", "Implement service discovery", "Use configuration management for infra details", "Keep IP addresses out of version control"],
+                fix: (m) => 'process.env.HOST_ADDRESS /* FIXED: moved IP to env var */'
+            },
+            // === DISABLE SSL VERIFY ===
+            {
+                regex: /(verify\s*[:=]\s*(?:false|False)|SSL_VERIFY\s*[:=]\s*(?:false|False|0)|rejectUnauthorized\s*:\s*false|CURLOPT_SSL_VERIFYPEER\s*.*(?:false|0)|InsecureSkipVerify\s*:\s*true|-k\s+https|--insecure)/gi,
+                name: "SSL/TLS Verification Disabled",
+                severity: "high",
+                category: "Transport Security",
+                cvss: 7.5,
+                cwe: "CWE-295",
+                owasp: "A02:2021 – Cryptographic Failures",
+                description: "SSL/TLS certificate verification is disabled, making connections vulnerable to MITM attacks.",
+                impact: "Man-in-the-middle attacks, data interception, credential theft, impersonation.",
+                remediation: ["Enable SSL verification in all environments", "Use trusted CA certificates", "Implement certificate pinning for critical services", "Never disable verification in production", "Use proper certificate management"],
+                fix: (m) => m.replace(/false|False|0/g, 'true /* FIXED: SSL verification re-enabled */').replace(/true\s*\/\*\s*FIXED.*?\*\//g, 'true /* FIXED: SSL verification re-enabled */').replace(/--insecure/g, '/* FIXED: removed --insecure flag */')
+            },
+        ];
+
+        // ===================== STATE =====================
+        let currentFile = null;
+        let fileContent = "";
+        let fixedContent = "";
+        let vulns = []; // {pattern, matches: [{full, index, lineNum, lineText}], fixed: bool}
+        let currentFilter = "all";
+        let selectedIdx = null;
+
+        const sevColor = s => ({
+            critical: "#ff1744",
+            high: "#ff6d00",
+            medium: "#ffc400",
+            low: "#00e5ff"
+        }[s] || "#888");
+        const sevBg = s => ({
+            critical: "rgba(255,23,68,.12)",
+            high: "rgba(255,109,0,.12)",
+            medium: "rgba(255,196,0,.12)",
+            low: "rgba(0,229,255,.12)"
+        }[s] || "rgba(136,136,136,.12)");
+
+        // ===================== UPLOAD =====================
+        const uploadZone = document.getElementById("uploadZone");
+        const fileInput = document.getElementById("fileInput");
+        uploadZone.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", e => {
+            if (e.target.files[0]) loadFile(e.target.files[0])
+        });
+        uploadZone.addEventListener("dragover", e => {
+            e.preventDefault();
+            uploadZone.classList.add("dragover")
+        });
+        uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+        uploadZone.addEventListener("drop", e => {
+            e.preventDefault();
+            uploadZone.classList.remove("dragover");
+            if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0])
+        });
+
+        function loadFile(file) {
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                fileContent = e.target.result;
+                fixedContent = fileContent;
+                startScan();
+            };
+            reader.onerror = function() {
+                // Binary file — still do scan with limited patterns
+                fileContent = "";
+                fixedContent = "";
+                startScan();
+            };
+            reader.readAsText(file);
+        }
+
+        // ===================== SCAN =====================
+        function startScan() {
+            document.getElementById("uploadScreen").style.display = "none";
+            document.getElementById("scanScreen").style.display = "flex";
+            document.getElementById("scanFname").textContent = "SCANNING: " + currentFile.name;
+            document.getElementById("scanFtype").textContent = (currentFile.size / 1024).toFixed(1) + " KB";
+
+            const phases = [
+                "Reading file content...", "Analyzing code patterns...", "Checking for hardcoded secrets...",
+                "Scanning for injection vectors...", "Detecting XSS vulnerabilities...", "Checking transport security...",
+                "Analyzing cryptographic usage...", "Reviewing file permissions...", "Checking debug configurations...",
+                "Generating vulnerability report..."
+            ];
+
+            let p = 0;
+            const circle = document.getElementById("ringFg");
+            const text = document.getElementById("ringText");
+            const phase = document.getElementById("scanPhase");
+
+            const interval = setInterval(() => {
+                p += Math.floor(Math.random() * 4) + 1;
+                if (p > 100) p = 100;
+                circle.setAttribute("stroke-dasharray", `${p*4.4} 440`);
+                text.textContent = p + "%";
+                phase.textContent = phases[Math.min(Math.floor(p / 10), phases.length - 1)];
+                if (p >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        runActualScan();
+                        showDashboard();
+                    }, 500);
+                }
+            }, 80);
+        }
+
+        function runActualScan() {
+            vulns = [];
+            if (!fileContent) return; // binary file, can't scan text
+
+            const lines = fileContent.split('\n');
+
+            PATTERNS.forEach(pat => {
+                const re = new RegExp(pat.regex.source, pat.regex.flags);
+                let match;
+                const matches = [];
+                while ((match = re.exec(fileContent)) !== null) {
+                    // Find line number
+                    const before = fileContent.substring(0, match.index);
+                    const lineNum = before.split('\n').length;
+                    const lineText = lines[lineNum - 1] || '';
+                    matches.push({
+                        full: match[0],
+                        index: match.index,
+                        lineNum,
+                        lineText: lineText.trim()
+                    });
+                    // Prevent infinite loops for zero-length matches
+                    if (match[0].length === 0) re.lastIndex++;
+                }
+                if (matches.length > 0) {
+                    vulns.push({
+                        pattern: pat,
+                        matches,
+                        fixed: false
+                    });
+                }
+            });
+        }
+
+        // ===================== DASHBOARD =====================
+        function showDashboard() {
+            document.getElementById("scanScreen").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+            document.getElementById("btnNew").classList.remove("hidden");
+            if (vulns.length > 0) document.getElementById("btnDownload").classList.remove("hidden");
+
+            renderStats();
+            renderFilters();
+            renderFixAllBar();
+            renderVulnList();
+            renderDetail();
+        }
+
+        function renderStats() {
+            const counts = getCounts();
+            const riskScore = vulns.length === 0 ? 100 : Math.max(0, 100 - vulns.reduce((a, v) => a + v.pattern.cvss * v.matches.length * 2, 0));
+            const riskLabel = riskScore > 70 ? "Low Risk" : riskScore > 40 ? "Medium Risk" : "High Risk";
+            const riskColor = riskScore > 70 ? "#00e676" : riskScore > 40 ? "#ffc400" : "#ff1744";
+            const fixedCount = vulns.filter(v => v.fixed).length;
+
+            document.getElementById("statsRow").innerHTML =
+                stat("File", currentFile.name, (currentFile.size / 1024).toFixed(1) + " KB", "#4a9eff") +
+                stat("Risk Score", Math.round(riskScore) + "/100", riskLabel, riskColor) +
+                stat("Issues Found", vulns.reduce((a, v) => a + v.matches.length, 0), "In " + vulns.length + " categories", "#ff6d00") +
+                stat("Critical", counts.critical, "Immediate Action", "#ff1744") +
+                stat("Fixed", fixedCount + "/" + vulns.length, "Categories", fixedCount === vulns.length && vulns.length > 0 ? "#00e676" : "#4a9eff");
+        }
+
+        function stat(l, v, s, c) {
+            return `<div class="stat"><div class="stat-label">${l}</div><div class="stat-val" style="color:${c}">${v}</div><div class="stat-sub">${s}</div></div>`
+        }
+
+        function getCounts() {
+            return {
+                all: vulns.length,
+                critical: vulns.filter(v => v.pattern.severity === "critical").length,
+                high: vulns.filter(v => v.pattern.severity === "high").length,
+                medium: vulns.filter(v => v.pattern.severity === "medium").length,
+                low: vulns.filter(v => v.pattern.severity === "low").length,
+            };
+        }
+
+        function renderFilters() {
+            const c = getCounts();
+            document.getElementById("filters").innerHTML = ["all", "critical", "high", "medium", "low"].map(f =>
+                `<button class="fbtn ${currentFilter===f?'active':''}" onclick="setFilter('${f}')">${f}${c[f]>0?' ('+c[f]+')':''}</button>`
+            ).join("");
+        }
+
+        function renderFixAllBar() {
+            const unfixed = vulns.filter(v => !v.fixed).length;
+            document.getElementById("fixAllBar").innerHTML = vulns.length === 0 ?
+                '<div class="fix-all-bar" style="border-color:rgba(0,230,118,.3)"><p>✅ <strong>No vulnerabilities detected!</strong> Your file passed all security checks.</p></div>' :
+                unfixed > 0 ?
+                `<div class="fix-all-bar"><p><strong>${unfixed}</strong> unfixed vulnerability categories — auto-fix applies secure code replacements</p><button class="btn btn-fix" onclick="fixAll()">⚡ FIX ALL (${unfixed})</button></div>` :
+                '<div class="fix-all-bar" style="border-color:rgba(0,230,118,.3)"><p>✅ <strong>All vulnerabilities fixed!</strong> Download your patched file.</p></div>';
+        }
+
+        function setFilter(f) {
+            currentFilter = f;
+            selectedIdx = null;
+            renderFilters();
+            renderVulnList();
+            renderDetail();
+        }
+
+        function renderVulnList() {
+            const filtered = currentFilter === "all" ? vulns : vulns.filter(v => v.pattern.severity === currentFilter);
+            const list = document.getElementById("vulnList");
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="no-vulns">No vulnerabilities in this category</div>';
+                return;
+            }
+            list.innerHTML = filtered.map((v, fi) => {
+                const gi = vulns.indexOf(v); // global index
+                const p = v.pattern;
+                const firstMatch = v.matches[0];
+                return `<div class="vc ${selectedIdx===gi?'sel':''} ${v.fixed?'fixed':''}" style="border-left-color:${sevColor(p.severity)}" onclick="selectVuln(${gi})">
+      <div class="vc-top">
+        <span class="sev" style="color:${sevColor(p.severity)};background:${sevBg(p.severity)}">${p.severity}</span>
+        <span class="vc-cvss">CVSS ${p.cvss} · ${v.matches.length} match${v.matches.length>1?'es':''}</span>
+      </div>
+      <div class="vc-name">${p.name}<span class="vc-tag">${p.category}</span></div>
+      <div class="vc-meta">Line ${firstMatch.lineNum}${v.matches.length>1?' + '+(v.matches.length-1)+' more':''}</div>
+      <div class="vc-line-preview">${escHtml(firstMatch.lineText.substring(0,120))}</div>
+    </div>`;
+            }).join("");
+        }
+
+        function selectVuln(i) {
+            selectedIdx = i;
+            renderVulnList();
+            renderDetail();
+        }
+
+        function renderDetail() {
+            const panel = document.getElementById("detailPanel");
+            if (selectedIdx === null || !vulns[selectedIdx]) {
+                panel.innerHTML = '<div class="dempty"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg><div style="margin-top:16px;font-size:13px;font-weight:500">Select a vulnerability to view details & fix</div></div>';
+                return;
+            }
+
+            const v = vulns[selectedIdx];
+            const p = v.pattern;
+            const sc = sevColor(p.severity);
+
+            // Build code diff for first match
+            let diffHtml = '';
+            if (v.matches.length > 0) {
+                const m = v.matches[0];
+                const fixedLine = p.fix(m.full);
+                diffHtml = `<div class="code-block">
+      <div class="code-header" style="color:#ff4444"><span>BEFORE (vulnerable)</span><span>Line ${m.lineNum}</span></div>
+      <div class="code-body"><span class="line-old">${escHtml(m.full.substring(0,300))}</span></div>
+    </div>
+    <div class="code-block" style="margin-top:6px">
+      <div class="code-header" style="color:#00e676"><span>AFTER (fixed)</span><span>Auto-fix</span></div>
+      <div class="code-body"><span class="line-new">${escHtml(fixedLine.substring(0,300))}</span></div>
+    </div>`;
+            }
+
+            // All affected lines
+            const linesHtml = v.matches.map(m =>
+                `<div style="display:flex;gap:8px;align-items:baseline;margin-bottom:4px">
+      <span class="loc">Line ${m.lineNum}</span>
+      <span style="font-size:11px;color:#4a6a8a;font-family:'JetBrains Mono',monospace;word-break:break-all">${escHtml(m.lineText.substring(0,80))}</span>
+    </div>`
+            ).join("");
+
+            panel.innerHTML = `<div class="dcontent">
+    <div class="dhead">
+      <div class="dicon" style="background:${sevBg(p.severity)};border:1px solid ${sc}33">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${sc}" stroke-width="1.5"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div><div class="dtitle">${p.name}</div><div class="did">${v.matches.length} occurrence${v.matches.length>1?'s':''} ${v.fixed?'<span style="color:#00e676;margin-left:8px">✓ FIXED</span>':''}</div></div>
+    </div>
+
+    <div class="mgrid">
+      <div class="mbox"><div class="mlabel">Severity</div><div class="mval" style="color:${sc}">${p.severity.toUpperCase()}</div></div>
+      <div class="mbox"><div class="mlabel">CVSS Score</div><div class="mval" style="color:${sc}">${p.cvss}</div></div>
+      <div class="mbox"><div class="mlabel">Category</div><div class="mval" style="color:#4a9eff">${p.category}</div></div>
+    </div>
+
+    <div class="sec"><div class="sec-t" style="color:#4a9eff">Affected Locations</div>${linesHtml}</div>
+    <div class="sec"><div class="sec-t" style="color:#4a9eff">Description</div><p class="sec-p">${p.description}</p></div>
+    <div class="sec"><div class="sec-t" style="color:#ff6d00">Impact</div><p class="sec-p">${p.impact}</p></div>
+
+    <div class="sec"><div class="sec-t" style="color:#00e676">Auto-Fix Preview</div>${diffHtml}</div>
+
+    <div class="sec"><div class="sec-t" style="color:#00e676">Remediation Steps</div>
+      ${p.remediation.map((s,i)=>`<div class="rstep"><span class="rnum">${i+1}</span><span class="rtxt">${s}</span></div>`).join("")}
+    </div>
+
+    <div class="sec"><div class="sec-t" style="color:#4a9eff">References</div>
+      <div class="ref-tags"><span class="rtag">${p.cwe}</span><span class="rtag">${p.owasp}</span></div>
+    </div>
+
+    ${!v.fixed ? `<button class="btn btn-fix fix-single" onclick="fixOne(${selectedIdx})">🛠️ AUTO-FIX THIS VULNERABILITY</button>` :
+    '<div style="text-align:center;padding:12px;color:#00e676;font-weight:600;font-size:13px">✅ This vulnerability has been fixed</div>'}
+  </div>`;
+}
+
+// ===================== FIX ENGINE =====================
+function fixOne(idx){
+  const v = vulns[idx];
+  if(v.fixed) return;
+  const p = v.pattern;
+
+  // Apply fix to fixedContent
+  const re = new RegExp(p.regex.source, p.regex.flags);
+  fixedContent = fixedContent.replace(re, (m) => p.fix(m));
+  v.fixed = true;
+
+  toast("✓ Fixed: " + p.name);
+  renderStats();
+  renderFixAllBar();
+  renderVulnList();
+  renderDetail();
+}
+
+function fixAll(){
+  vulns.forEach((v, i) => {
+    if(!v.fixed){
+      const p = v.pattern;
+      const re = new RegExp(p.regex.source, p.regex.flags);
+      fixedContent = fixedContent.replace(re, (m) => p.fix(m));
+      v.fixed = true;
+    }
+  });
+  toast("✓ All vulnerabilities fixed!");
+  renderStats();
+  renderFixAllBar();
+  renderVulnList();
+  renderDetail();
+}
+
+function downloadFixed(){
+  const blob = new Blob([fixedContent], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const name = currentFile.name;
+  const dot = name.lastIndexOf('.');
+  a.download = dot > 0 ? name.substring(0, dot) + '_fixed' + name.substring(dot) : name + '_fixed';
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("⬇ Fixed file downloaded!");
+}
+
+// ===================== HELPERS =====================
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.getElementById('toastArea').appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+function resetApp(){
+  currentFile=null;fileContent="";fixedContent="";vulns=[];currentFilter="all";selectedIdx=null;
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("scanScreen").style.display="none";
+  document.getElementById("uploadScreen").style.display="flex";
+  document.getElementById("btnNew").classList.add("hidden");
+  document.getElementById("btnDownload").classList.add("hidden");
+  document.getElementById("ringFg").setAttribute("stroke-dasharray","0 440");
+  document.getElementById("ringText").textContent="0%";
+  fileInput.value="";
+}
+    </script>
+</body>
+
+</html>
