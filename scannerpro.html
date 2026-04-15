@@ -15,8 +15,8 @@
         
         body {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-            background: #060d18;
-            color: #e0eaff;
+            background: #ffffff;
+            color: #111111;
             min-height: 100vh;
             overflow-x: hidden
         }
@@ -32,20 +32,20 @@
             opacity: .03;
             pointer-events: none;
             z-index: 0;
-            background-image: linear-gradient(#00e5ff 1px, transparent 1px), linear-gradient(90deg, #00e5ff 1px, transparent 1px);
+            background-image: linear-gradient(#000000 1px, transparent 1px), linear-gradient(90deg, #000000 1px, transparent 1px);
             background-size: 40px 40px
         }
         
-        ::-webkit-scrollbar {
-            width: 5px
+         ::-webkit-scrollbar {
+            width: 4px
         }
         
-        ::-webkit-scrollbar-track {
+         ::-webkit-scrollbar-track {
             background: transparent
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: #1e3a5f;
+         ::-webkit-scrollbar-thumb {
+            background: #cccccc;
             border-radius: 4px
         }
         
@@ -54,8 +54,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #0e1f38;
-            background: rgba(6, 13, 24, .95);
+            border-bottom: 1px solid #e8e8e8;
+            background: rgba(255, 255, 255, .97);
             backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
@@ -71,20 +71,21 @@
         .header-title {
             font-size: 17px;
             font-weight: 700;
-            letter-spacing: 1px
+            letter-spacing: 1px;
+            color: #111111
         }
         
         .header-sub {
             font-size: 9px;
-            color: #2a5a8a;
+            color: #999999;
             letter-spacing: 3px;
             font-weight: 500
         }
         
         .btn {
-            background: rgba(0, 229, 255, .08);
-            border: 1px solid #1e3a5f;
-            color: #00e5ff;
+            background: #f4f4f4;
+            border: 1px solid #d8d8d8;
+            color: #333333;
             padding: 8px 18px;
             border-radius: 8px;
             font-size: 12px;
@@ -96,25 +97,26 @@
         }
         
         .btn:hover {
-            background: rgba(0, 229, 255, .15);
-            border-color: #00e5ff
+            background: #ebebeb;
+            border-color: #aaaaaa;
+            color: #111111
         }
         
         .btn-fix {
-            background: rgba(0, 230, 118, .1);
-            border-color: rgba(0, 230, 118, .3);
-            color: #00e676
+            background: #111111;
+            border-color: #111111;
+            color: #111111
         }
         
         .btn-fix:hover {
-            background: rgba(0, 230, 118, .2);
-            border-color: #00e676
+            background: #cccccc;
+            border-color: #333333
         }
         
         .btn-danger {
-            background: rgba(255, 23, 68, .1);
-            border-color: rgba(255, 23, 68, .3);
-            color: #ff1744
+            background: rgba(200, 50, 50, .07);
+            border-color: rgba(200, 50, 50, .25);
+            color: #cc3333
         }
         
         .btn-grp {
@@ -140,21 +142,21 @@
             width: 100%;
             max-width: 600px;
             padding: 50px 40px;
-            border: 2px dashed #1e3a5f;
+            border: 2px dashed #cccccc;
             border-radius: 16px;
             text-align: center;
             cursor: pointer;
-            background: rgba(10, 22, 40, .4);
+            background: #fafafa;
             transition: all .3s ease
         }
         
         .upload-zone.dragover {
-            border-color: #00e5ff;
-            background: rgba(0, 229, 255, .04)
+            border-color: #111111;
+            background: rgba(0, 0, 0, .02)
         }
         
         .upload-zone:hover {
-            border-color: #2a5a8a
+            border-color: #aaaaaa
         }
         
         .upload-icon {
@@ -162,8 +164,8 @@
             height: 80px;
             margin: 0 auto 20px;
             border-radius: 50%;
-            background: rgba(0, 229, 255, .06);
-            border: 1px solid #1e3a5f;
+            background: #f0f0f0;
+            border: 1px solid #dddddd;
             display: flex;
             align-items: center;
             justify-content: center
@@ -172,12 +174,13 @@
         .upload-title {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 6px
+            margin-bottom: 6px;
+            color: #111111
         }
         
         .upload-sub {
             font-size: 13px;
-            color: #4a6a8a;
+            color: #888888;
             margin-bottom: 20px
         }
         
@@ -190,9 +193,9 @@
         
         .ft {
             font-size: 10px;
-            color: #2a5a8a;
-            background: rgba(10, 22, 40, .8);
-            border: 1px solid #0e1f38;
+            color: #777777;
+            background: #f0f0f0;
+            border: 1px solid #e0e0e0;
             padding: 2px 8px;
             border-radius: 10px;
             font-family: 'JetBrains Mono', monospace
@@ -207,8 +210,8 @@
         }
         
         .feat {
-            background: rgba(10, 22, 40, .6);
-            border: 1px solid #0e1f38;
+            background: #f5f5f5;
+            border: 1px solid #e8e8e8;
             border-radius: 10px;
             padding: 12px 14px
         }
@@ -221,13 +224,13 @@
         .feat-title {
             font-size: 12px;
             font-weight: 600;
-            color: #4a9eff;
+            color: #333333;
             margin-bottom: 2px
         }
         
         .feat-desc {
             font-size: 10px;
-            color: #2a5a8a;
+            color: #888888;
             line-height: 1.4
         }
         
@@ -249,8 +252,8 @@
         .scan-box {
             width: 100%;
             max-width: 500px;
-            background: rgba(10, 22, 40, .5);
-            border: 1px solid #1e3a5f;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
             border-radius: 16px;
             padding: 36px;
             text-align: center
@@ -259,7 +262,7 @@
         .scan-fname {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: #2a5a8a;
+            color: #888888;
             letter-spacing: 1px;
             margin-bottom: 6px;
             word-break: break-all
@@ -268,10 +271,10 @@
         .scan-ftype {
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
-            color: #4a9eff;
+            color: #444444;
             letter-spacing: 1px;
             margin-bottom: 16px;
-            background: rgba(74, 158, 255, .08);
+            background: #eeeeee;
             display: inline-block;
             padding: 3px 12px;
             border-radius: 12px
@@ -290,17 +293,17 @@
         
         .ring .bg {
             fill: none;
-            stroke: #0a1628;
+            stroke: #e8e8e8;
             stroke-width: 6
         }
         
         .ring .fg {
             fill: none;
-            stroke: #00e5ff;
+            stroke: #111111;
             stroke-width: 6;
             stroke-linecap: round;
             transition: stroke-dasharray .3s;
-            filter: drop-shadow(0 0 8px rgba(0, 229, 255, .5))
+            filter: drop-shadow(0 0 6px rgba(0, 0, 0, .15))
         }
         
         .ring-text {
@@ -310,14 +313,14 @@
             transform: translate(-50%, -50%);
             font-size: 32px;
             font-weight: 800;
-            color: #00e5ff;
+            color: #111111;
             font-family: 'JetBrains Mono', monospace
         }
         
         .scan-phase {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: #4a9eff;
+            color: #aaaaaa;
             letter-spacing: 1px;
             animation: pulse 1.5s ease-in-out infinite
         }
@@ -348,15 +351,15 @@
         }
         
         .stat {
-            background: rgba(10, 22, 40, .5);
-            border: 1px solid #1e3a5f;
+            background: #f8f8f8;
+            border: 1px solid #e8e8e8;
             border-radius: 10px;
             padding: 12px 14px
         }
         
         .stat-label {
             font-size: 9px;
-            color: #4a6a8a;
+            color: #888888;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-bottom: 4px
@@ -373,7 +376,7 @@
         
         .stat-sub {
             font-size: 10px;
-            color: #2a5a8a;
+            color: #aaaaaa;
             margin-top: 2px
         }
         /* Action Bar */
@@ -395,8 +398,8 @@
         
         .fbtn {
             background: transparent;
-            border: 1px solid #1e3a5f;
-            color: #4a6a8a;
+            border: 1px solid #dddddd;
+            color: #999999;
             padding: 5px 14px;
             border-radius: 18px;
             font-size: 10px;
@@ -409,13 +412,14 @@
         }
         
         .fbtn.active {
-            background: rgba(0, 229, 255, .1);
-            border-color: #00e5ff;
-            color: #00e5ff
+            background: #111111;
+            border-color: #111111;
+            color: #111111
         }
         
         .fbtn:hover {
-            border-color: #2a5a8a
+            border-color: #aaaaaa;
+            color: #444444
         }
         /* Main grid */
         
@@ -440,25 +444,27 @@
         /* Vuln card */
         
         .vc {
-            background: rgba(10, 22, 40, .7);
-            border: 1px solid #1e3a5f;
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
             border-radius: 10px;
             padding: 14px 16px;
             cursor: pointer;
             transition: all .2s;
             margin-bottom: 8px;
             border-left: 3px solid;
-            position: relative
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .04)
         }
         
         .vc:hover {
-            background: rgba(0, 229, 255, .04)
+            background: #fafafa;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08)
         }
         
         .vc.sel {
-            background: rgba(0, 229, 255, .06);
-            border-color: #00e5ff;
-            box-shadow: 0 0 20px rgba(0, 229, 255, .1)
+            background: #f5f5f5;
+            border-color: #aaaaaa;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .1)
         }
         
         .vc.fixed {
@@ -472,8 +478,8 @@
             right: 8px;
             font-size: 9px;
             font-weight: 700;
-            color: #00e676;
-            background: rgba(0, 230, 118, .1);
+            color: #777777;
+            background: #eeeeee;
             padding: 2px 8px;
             border-radius: 8px;
             letter-spacing: 1px
@@ -497,19 +503,20 @@
         
         .vc-cvss {
             font-size: 10px;
-            color: #4a6a8a;
+            color: #aaaaaa;
             font-family: 'JetBrains Mono', monospace
         }
         
         .vc-name {
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 3px
+            margin-bottom: 3px;
+            color: #111111
         }
         
         .vc-meta {
             font-size: 10px;
-            color: #4a6a8a;
+            color: #aaaaaa;
             font-family: 'JetBrains Mono', monospace
         }
         
@@ -518,8 +525,8 @@
             font-size: 8px;
             padding: 2px 6px;
             border-radius: 6px;
-            background: rgba(74, 158, 255, .1);
-            color: #4a9eff;
+            background: rgba(0, 0, 0, .04);
+            color: #888888;
             margin-left: 6px;
             letter-spacing: .5px;
             font-family: 'JetBrains Mono', monospace
@@ -528,9 +535,9 @@
         .vc-line-preview {
             margin-top: 8px;
             font-size: 11px;
-            color: #ff6d00;
-            background: rgba(255, 109, 0, .06);
-            border: 1px solid rgba(255, 109, 0, .15);
+            color: #666666;
+            background: rgba(0, 0, 0, .03);
+            border: 1px solid #e8e8e8;
             border-radius: 6px;
             padding: 6px 10px;
             font-family: 'JetBrains Mono', monospace;
@@ -542,8 +549,8 @@
         /* Detail */
         
         .dpanel {
-            background: rgba(10, 22, 40, .4);
-            border: 1px solid #1e3a5f;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #e8e8e8;
             border-radius: 12px;
             overflow-y: auto;
             max-height: calc(100vh - 340px)
@@ -555,7 +562,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #2a4a6a;
+            color: #cccccc;
             padding: 40px;
             text-align: center;
             min-height: 400px
@@ -583,12 +590,13 @@
         
         .dtitle {
             font-size: 16px;
-            font-weight: 700
+            font-weight: 700;
+            color: #111111
         }
         
         .did {
             font-size: 10px;
-            color: #4a6a8a;
+            color: #aaaaaa;
             font-family: 'JetBrains Mono', monospace
         }
         
@@ -606,8 +614,8 @@
         }
         
         .mbox {
-            background: rgba(10, 22, 40, .8);
-            border: 1px solid #1e3a5f;
+            background: rgba(248, 248, 248, 1);
+            border: 1px solid #ebebeb;
             border-radius: 8px;
             padding: 10px 12px;
             text-align: center
@@ -615,7 +623,7 @@
         
         .mlabel {
             font-size: 9px;
-            color: #4a6a8a;
+            color: #aaaaaa;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 3px
@@ -650,15 +658,15 @@
         
         .sec-p {
             font-size: 12px;
-            color: #8aa4c0;
+            color: #555555;
             line-height: 1.7
         }
         
         .loc {
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
-            color: #00e5ff;
-            background: rgba(0, 229, 255, .08);
+            color: #cccccc;
+            background: rgba(0, 0, 0, .04);
             padding: 5px 10px;
             border-radius: 6px;
             display: inline-block
@@ -668,8 +676,8 @@
             display: flex;
             gap: 10px;
             align-items: flex-start;
-            background: rgba(0, 230, 118, .04);
-            border: 1px solid rgba(0, 230, 118, .1);
+            background: rgba(0, 0, 0, .02);
+            border: 1px solid #ebebeb;
             border-radius: 8px;
             padding: 8px 12px;
             margin-bottom: 6px
@@ -679,8 +687,8 @@
             min-width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: rgba(0, 230, 118, .15);
-            color: #00e676;
+            background: rgba(0, 0, 0, .08);
+            color: #444444;
             font-size: 10px;
             font-weight: 700;
             display: flex;
@@ -691,7 +699,7 @@
         
         .rtxt {
             font-size: 11px;
-            color: #8aa4c0;
+            color: #555555;
             line-height: 1.5
         }
         
@@ -703,9 +711,9 @@
         
         .rtag {
             font-size: 10px;
-            color: #4a9eff;
-            background: rgba(74, 158, 255, .08);
-            border: 1px solid rgba(74, 158, 255, .2);
+            color: #888888;
+            background: rgba(0, 0, 0, .03);
+            border: 1px solid #e0e0e0;
             padding: 4px 10px;
             border-radius: 16px;
             font-family: 'JetBrains Mono', monospace
@@ -716,13 +724,13 @@
             margin-top: 10px;
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #1e3a5f;
+            border: 1px solid #222222;
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px
         }
         
         .code-header {
-            background: rgba(10, 22, 40, .9);
+            background: rgba(242, 242, 242, 1);
             padding: 8px 12px;
             font-size: 10px;
             font-weight: 600;
@@ -734,7 +742,7 @@
         
         .code-body {
             padding: 10px 14px;
-            background: rgba(6, 13, 24, .8);
+            background: rgba(252, 252, 252, 1);
             white-space: pre-wrap;
             word-break: break-all;
             line-height: 1.7;
@@ -743,13 +751,13 @@
         }
         
         .line-old {
-            color: #ff4444;
+            color: #cc5555;
             text-decoration: line-through;
             opacity: .7
         }
         
         .line-new {
-            color: #00e676
+            color: #88cc88
         }
         /* Fix button in detail */
         
@@ -759,8 +767,8 @@
         }
         
         .fix-all-bar {
-            background: rgba(0, 230, 118, .05);
-            border: 1px solid rgba(0, 230, 118, .15);
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
             padding: 14px 18px;
             display: flex;
@@ -771,17 +779,17 @@
         
         .fix-all-bar p {
             font-size: 13px;
-            color: #8aa4c0
+            color: #555555
         }
         
         .fix-all-bar strong {
-            color: #00e676
+            color: #111111
         }
         
         .no-vulns {
             text-align: center;
             padding: 40px;
-            color: #00e676;
+            color: #666666;
             font-size: 14px
         }
         /* Toast */
@@ -791,14 +799,14 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: #00e676;
-            color: #060d18;
+            background: #111111;
+            color: #ffffff;
             padding: 12px 28px;
             border-radius: 10px;
             font-weight: 700;
             font-size: 13px;
             z-index: 9999;
-            box-shadow: 0 8px 30px rgba(0, 230, 118, .3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .18);
             animation: toastin .4s
         }
         
@@ -819,9 +827,9 @@
 
     <header class="header">
         <div class="header-left">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.5">
       <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
-      <path d="M9 12l2 2 4-4" stroke="#00e5ff" stroke-width="2"/>
+      <path d="M9 12l2 2 4-4" stroke="#111111" stroke-width="2"/>
     </svg>
             <div>
                 <div class="header-title">SENTINEL PRO</div>
@@ -839,7 +847,7 @@
         <div class="upload-zone" id="uploadZone">
             <input type="file" id="fileInput" style="display:none" accept="*/*" />
             <div class="upload-icon">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="1.5">
         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
       </svg>
             </div>
@@ -899,7 +907,7 @@
             <div class="vlist" id="vulnList"></div>
             <div class="dpanel" id="detailPanel">
                 <div class="dempty">
-                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg>
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#cccccc" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg>
                     <div style="margin-top:16px;font-size:13px;font-weight:500">Select a vulnerability to view details & fix</div>
                 </div>
             </div>
@@ -1105,17 +1113,17 @@
         let selectedIdx = null;
 
         const sevColor = s => ({
-            critical: "#ff1744",
-            high: "#ff6d00",
-            medium: "#ffc400",
-            low: "#00e5ff"
-        }[s] || "#888");
+            critical: "#e05555",
+            high: "#cc8844",
+            medium: "#ccaa55",
+            low: "#888888"
+        }[s] || "#666");
         const sevBg = s => ({
-            critical: "rgba(255,23,68,.12)",
-            high: "rgba(255,109,0,.12)",
-            medium: "rgba(255,196,0,.12)",
-            low: "rgba(0,229,255,.12)"
-        }[s] || "rgba(136,136,136,.12)");
+            critical: "rgba(220,80,80,.12)",
+            high: "rgba(200,130,60,.12)",
+            medium: "rgba(200,170,80,.10)",
+            low: "rgba(180,180,180,.08)"
+        }[s] || "rgba(100,100,100,.08)");
 
         // ===================== UPLOAD =====================
         const uploadZone = document.getElementById("uploadZone");
@@ -1239,15 +1247,15 @@
             const counts = getCounts();
             const riskScore = vulns.length === 0 ? 100 : Math.max(0, 100 - vulns.reduce((a, v) => a + v.pattern.cvss * v.matches.length * 2, 0));
             const riskLabel = riskScore > 70 ? "Low Risk" : riskScore > 40 ? "Medium Risk" : "High Risk";
-            const riskColor = riskScore > 70 ? "#00e676" : riskScore > 40 ? "#ffc400" : "#ff1744";
+            const riskColor = riskScore > 70 ? "#aaaaaa" : riskScore > 40 ? "#cccccc" : "#ffffff";
             const fixedCount = vulns.filter(v => v.fixed).length;
 
             document.getElementById("statsRow").innerHTML =
-                stat("File", currentFile.name, (currentFile.size / 1024).toFixed(1) + " KB", "#4a9eff") +
+                stat("File", currentFile.name, (currentFile.size / 1024).toFixed(1) + " KB", "#999999") +
                 stat("Risk Score", Math.round(riskScore) + "/100", riskLabel, riskColor) +
-                stat("Issues Found", vulns.reduce((a, v) => a + v.matches.length, 0), "In " + vulns.length + " categories", "#ff6d00") +
-                stat("Critical", counts.critical, "Immediate Action", "#ff1744") +
-                stat("Fixed", fixedCount + "/" + vulns.length, "Categories", fixedCount === vulns.length && vulns.length > 0 ? "#00e676" : "#4a9eff");
+                stat("Issues Found", vulns.reduce((a, v) => a + v.matches.length, 0), "In " + vulns.length + " categories", "#333333") +
+                stat("Critical", counts.critical, "Immediate Action", "#cc3333") +
+                stat("Fixed", fixedCount + "/" + vulns.length, "Categories", fixedCount === vulns.length && vulns.length > 0 ? "#aaaaaa" : "#999999");
         }
 
         function stat(l, v, s, c) {
@@ -1274,10 +1282,10 @@
         function renderFixAllBar() {
             const unfixed = vulns.filter(v => !v.fixed).length;
             document.getElementById("fixAllBar").innerHTML = vulns.length === 0 ?
-                '<div class="fix-all-bar" style="border-color:rgba(0,230,118,.3)"><p>✅ <strong>No vulnerabilities detected!</strong> Your file passed all security checks.</p></div>' :
+                '<div class="fix-all-bar" style="border-color:rgba(0,0,0,.12)"><p>✅ <strong>No vulnerabilities detected!</strong> Your file passed all security checks.</p></div>' :
                 unfixed > 0 ?
                 `<div class="fix-all-bar"><p><strong>${unfixed}</strong> unfixed vulnerability categories — auto-fix applies secure code replacements</p><button class="btn btn-fix" onclick="fixAll()">⚡ FIX ALL (${unfixed})</button></div>` :
-                '<div class="fix-all-bar" style="border-color:rgba(0,230,118,.3)"><p>✅ <strong>All vulnerabilities fixed!</strong> Download your patched file.</p></div>';
+                '<div class="fix-all-bar" style="border-color:rgba(0,0,0,.12)"><p>✅ <strong>All vulnerabilities fixed!</strong> Download your patched file.</p></div>';
         }
 
         function setFilter(f) {
@@ -1320,7 +1328,7 @@
         function renderDetail() {
             const panel = document.getElementById("detailPanel");
             if (selectedIdx === null || !vulns[selectedIdx]) {
-                panel.innerHTML = '<div class="dempty"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg><div style="margin-top:16px;font-size:13px;font-weight:500">Select a vulnerability to view details & fix</div></div>';
+                panel.innerHTML = '<div class="dempty"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#cccccc" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg><div style="margin-top:16px;font-size:13px;font-weight:500;color:#999">Select a vulnerability to view details & fix</div></div>';
                 return;
             }
 
@@ -1334,11 +1342,11 @@
                 const m = v.matches[0];
                 const fixedLine = p.fix(m.full);
                 diffHtml = `<div class="code-block">
-      <div class="code-header" style="color:#ff4444"><span>BEFORE (vulnerable)</span><span>Line ${m.lineNum}</span></div>
+      <div class="code-header" style="color:#cc3333"><span>BEFORE (vulnerable)</span><span>Line ${m.lineNum}</span></div>
       <div class="code-body"><span class="line-old">${escHtml(m.full.substring(0,300))}</span></div>
     </div>
     <div class="code-block" style="margin-top:6px">
-      <div class="code-header" style="color:#00e676"><span>AFTER (fixed)</span><span>Auto-fix</span></div>
+      <div class="code-header" style="color:#336633"><span>AFTER (fixed)</span><span>Auto-fix</span></div>
       <div class="code-body"><span class="line-new">${escHtml(fixedLine.substring(0,300))}</span></div>
     </div>`;
             }
@@ -1356,31 +1364,31 @@
       <div class="dicon" style="background:${sevBg(p.severity)};border:1px solid ${sc}33">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${sc}" stroke-width="1.5"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
-      <div><div class="dtitle">${p.name}</div><div class="did">${v.matches.length} occurrence${v.matches.length>1?'s':''} ${v.fixed?'<span style="color:#00e676;margin-left:8px">✓ FIXED</span>':''}</div></div>
+      <div><div class="dtitle">${p.name}</div><div class="did">${v.matches.length} occurrence${v.matches.length>1?'s':''} ${v.fixed?'<span style="color:#888888;margin-left:8px">✓ FIXED</span>':''}</div></div>
     </div>
 
     <div class="mgrid">
       <div class="mbox"><div class="mlabel">Severity</div><div class="mval" style="color:${sc}">${p.severity.toUpperCase()}</div></div>
       <div class="mbox"><div class="mlabel">CVSS Score</div><div class="mval" style="color:${sc}">${p.cvss}</div></div>
-      <div class="mbox"><div class="mlabel">Category</div><div class="mval" style="color:#4a9eff">${p.category}</div></div>
+      <div class="mbox"><div class="mlabel">Category</div><div class="mval" style="color:#666666">${p.category}</div></div>
     </div>
 
-    <div class="sec"><div class="sec-t" style="color:#4a9eff">Affected Locations</div>${linesHtml}</div>
-    <div class="sec"><div class="sec-t" style="color:#4a9eff">Description</div><p class="sec-p">${p.description}</p></div>
-    <div class="sec"><div class="sec-t" style="color:#ff6d00">Impact</div><p class="sec-p">${p.impact}</p></div>
+    <div class="sec"><div class="sec-t" style="color:#aaaaaa">Affected Locations</div>${linesHtml}</div>
+    <div class="sec"><div class="sec-t" style="color:#aaaaaa">Description</div><p class="sec-p">${p.description}</p></div>
+    <div class="sec"><div class="sec-t" style="color:#aa6622">Impact</div><p class="sec-p">${p.impact}</p></div>
 
-    <div class="sec"><div class="sec-t" style="color:#00e676">Auto-Fix Preview</div>${diffHtml}</div>
+    <div class="sec"><div class="sec-t" style="color:#666666">Auto-Fix Preview</div>${diffHtml}</div>
 
-    <div class="sec"><div class="sec-t" style="color:#00e676">Remediation Steps</div>
+    <div class="sec"><div class="sec-t" style="color:#666666">Remediation Steps</div>
       ${p.remediation.map((s,i)=>`<div class="rstep"><span class="rnum">${i+1}</span><span class="rtxt">${s}</span></div>`).join("")}
     </div>
 
-    <div class="sec"><div class="sec-t" style="color:#4a9eff">References</div>
+    <div class="sec"><div class="sec-t" style="color:#aaaaaa">References</div>
       <div class="ref-tags"><span class="rtag">${p.cwe}</span><span class="rtag">${p.owasp}</span></div>
     </div>
 
     ${!v.fixed ? `<button class="btn btn-fix fix-single" onclick="fixOne(${selectedIdx})">🛠️ AUTO-FIX THIS VULNERABILITY</button>` :
-    '<div style="text-align:center;padding:12px;color:#00e676;font-weight:600;font-size:13px">✅ This vulnerability has been fixed</div>'}
+    '<div style="text-align:center;padding:12px;color:#555555;font-weight:600;font-size:13px">✅ This vulnerability has been fixed</div>'}
   </div>`;
 }
 

@@ -2522,7 +2522,7 @@
             z-index: 8999;
             width: 100vw;
             height: 100vh;
-            background: #ffffff;
+            background: #0a0a0a;
             border: none;
             border-radius: 0;
             overflow: hidden;
@@ -2546,7 +2546,7 @@
         }
         
         #chatMessages::-webkit-scrollbar-thumb {
-            background: #c8c8c8;
+            background: #333;
             border-radius: 3px;
         }
         
@@ -2566,7 +2566,7 @@
             60%,
             100% {
                 transform: translateY(0);
-                background: #c0c0c0;
+                background: #444;
             }
             30% {
                 transform: translateY(-5px);
@@ -3727,9 +3727,10 @@
                 const sw = $('signupModal').querySelector('.modal-switch');
                 showSuccessState('signupBody', 'signupSuccess', sw);
                 setTimeout(() => {
+                    isLoggedIn = true;
                     closeModal('signupModal');
-                    showToast('Account created! Please sign in to access your dashboard.');
-                    setTimeout(() => openModal('loginModal'), 700);
+                    showToast('Welcome, ' + first + '! Your intelligence feeds are activating. 🛡️');
+                    setTimeout(() => openDashboard(), 800);
                 }, 2500);
             }, 1800);
         }
@@ -5326,7 +5327,7 @@
             var e=document.createElement('div');
             e.id='chatEmpty';
             e.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center';
-            e.innerHTML='<div style="font-size:2rem">🤖</div><h3 style="font-size:.9rem;font-weight:500;color:#1a1a1a;margin:0">ThreatPulse AI</h3><p style="font-size:.72rem;color:#666;line-height:1.6;max-width:240px;margin:0">Ask about threats, CVEs, IOCs, or any security topic.</p>';
+            e.innerHTML='<div style="font-size:2rem">🤖</div><h3 style="font-size:.9rem;font-weight:500;color:#f0f0f0;margin:0">ThreatPulse AI</h3><p style="font-size:.72rem;color:#555;line-height:1.6;max-width:240px;margin:0">Ask about threats, CVEs, IOCs, or any security topic.</p>';
             msgs.appendChild(e);
         }
 
@@ -5370,20 +5371,20 @@
             var now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
             // Enhanced markdown rendering
             var fmt=text
-                .replace(/```(\w*)\n([\s\S]*?)```/g,'<pre style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.68rem;color:#333;overflow-x:auto;margin:6px 0;white-space:pre-wrap">$2</pre>')
-                .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#000;font-weight:600">$1</strong>')
+                .replace(/```(\w*)\n([\s\S]*?)```/g,'<pre style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.68rem;color:#ccc;overflow-x:auto;margin:6px 0;white-space:pre-wrap">$2</pre>')
+                .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#fff;font-weight:600">$1</strong>')
                 .replace(/\*([^*]+)\*/g,'<em>$1</em>')
-                .replace(/`([^`]+)`/g,'<code style="font-family:monospace;font-size:.68rem;background:#f0f0f0;border:1px solid #ddd;padding:1px 5px;border-radius:3px;color:#333">$1</code>')
-                .replace(/^### (.+)$/gm,'<div style="font-size:.82rem;font-weight:700;color:#000;margin:8px 0 4px">$1</div>')
-                .replace(/^## (.+)$/gm,'<div style="font-size:.85rem;font-weight:700;color:#000;margin:8px 0 4px">$1</div>')
-                .replace(/^# (.+)$/gm,'<div style="font-size:.9rem;font-weight:700;color:#000;margin:8px 0 4px">$1</div>')
-                .replace(/^- (.+)$/gm,'<div style="padding-left:12px;position:relative;margin:2px 0"><span style="position:absolute;left:0;color:#888">•</span>$1</div>')
+                .replace(/`([^`]+)`/g,'<code style="font-family:monospace;font-size:.68rem;background:#1e1e1e;border:1px solid #2a2a2a;padding:1px 5px;border-radius:3px;color:#ccc">$1</code>')
+                .replace(/^### (.+)$/gm,'<div style="font-size:.82rem;font-weight:700;color:#fff;margin:8px 0 4px">$1</div>')
+                .replace(/^## (.+)$/gm,'<div style="font-size:.85rem;font-weight:700;color:#fff;margin:8px 0 4px">$1</div>')
+                .replace(/^# (.+)$/gm,'<div style="font-size:.9rem;font-weight:700;color:#fff;margin:8px 0 4px">$1</div>')
+                .replace(/^- (.+)$/gm,'<div style="padding-left:12px;position:relative;margin:2px 0"><span style="position:absolute;left:0;color:#555">•</span>$1</div>')
                 .replace(/^\d+\. (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">$1</div>')
                 .replace(/\n\n/g,'</p><p style="margin:6px 0">')
                 .replace(/\n/g,'<br>');
             var d=document.createElement('div');
-            d.style.cssText='display:flex;flex-direction:column;padding:10px 14px;gap:6px;background:'+(isUser?'#f0f0f0':'#ffffff')+';border-bottom:1px solid #eeeeee;animation:chatFadeUp .2s ease';
-            d.innerHTML='<div style="display:flex;align-items:center;gap:7px"><div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;background:'+(isUser?'#1a1a1a':'#ebebeb')+';color:'+(isUser?'#fff':'#333')+';border:'+(isUser?'none':'1px solid #d0d0d0')+'">'+( isUser?'U':'✦')+'</div><span style="font-size:.68rem;font-weight:600;color:#888">'+(isUser?'You':'Claude')+'</span><span style="font-size:.58rem;color:#bbb;font-family:monospace;margin-left:auto">'+now+'</span></div><div style="font-size:.77rem;line-height:1.65;color:#1a1a1a;padding-left:29px"><p style="margin:0">'+fmt+'</p></div>';
+            d.style.cssText='display:flex;flex-direction:column;padding:10px 14px;gap:6px;background:'+(isUser?'#1e1e1e':'#141414')+';animation:chatFadeUp .2s ease';
+            d.innerHTML='<div style="display:flex;align-items:center;gap:7px"><div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;background:'+(isUser?'#fff':'#222')+';color:'+(isUser?'#000':'#aaa')+';border:'+(isUser?'none':'1px solid #333')+'">'+( isUser?'U':'✦')+'</div><span style="font-size:.68rem;font-weight:600;color:#666">'+(isUser?'You':'Claude')+'</span><span style="font-size:.58rem;color:#333;font-family:monospace;margin-left:auto">'+now+'</span></div><div style="font-size:.77rem;line-height:1.65;color:#e0e0e0;padding-left:29px"><p style="margin:0">'+fmt+'</p></div>';
             var ty=document.getElementById('chatTyping');
             if(ty) msgs.insertBefore(d,ty); else msgs.appendChild(d);
             msgs.scrollTop=msgs.scrollHeight;
@@ -5628,78 +5629,78 @@
 
     <!-- ── CHATBOT PANEL ── -->
     <div id="chatbotPanel">
-        <div id="chatHeader" style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #e0e0e0;background:#ffffff;flex-shrink:0">
+        <div id="chatHeader" style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #2a2a2a;background:#111;flex-shrink:0">
             <div style="display:flex;align-items:center;gap:9px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#0d0d0d;box-shadow:0 0 6px rgba(0,0,0,.2);animation:robotFloat 2s ease-in-out infinite"></div>
-                <span style="font-size:.85rem;font-weight:600;color:#1a1a1a;font-family:'DM Sans',sans-serif,sans-serif">ThreatPulse AI</span>
-                <span style="font-size:.6rem;color:#888;background:#f0f0f0;border:1px solid #ddd;padding:2px 7px;border-radius:4px;font-family:monospace">Claude</span>
+                <div style="width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.5);animation:robotFloat 2s ease-in-out infinite"></div>
+                <span style="font-size:.85rem;font-weight:600;color:#f0f0f0;font-family:'DM Sans',sans-serif,sans-serif">ThreatPulse AI</span>
+                <span style="font-size:.6rem;color:#555;background:#1a1a1a;border:1px solid #2a2a2a;padding:2px 7px;border-radius:4px;font-family:monospace">Claude</span>
             </div>
             <div style="display:flex;gap:6px">
-                <button onclick="clearChatPanel()" style="width:28px;height:28px;border:1px solid #ddd;border-radius:6px;background:transparent;color:#555;font-size:.75rem;cursor:pointer" title="Clear">✕</button>
-                <button onclick="toggleChatbot()" style="width:28px;height:28px;border:1px solid #ddd;border-radius:6px;background:transparent;color:#555;font-size:.9rem;cursor:pointer" title="Close">⌄</button>
+                <button onclick="clearChatPanel()" style="width:28px;height:28px;border:1px solid #2a2a2a;border-radius:6px;background:transparent;color:#555;font-size:.75rem;cursor:pointer" title="Clear">✕</button>
+                <button onclick="toggleChatbot()" style="width:28px;height:28px;border:1px solid #2a2a2a;border-radius:6px;background:transparent;color:#555;font-size:.9rem;cursor:pointer" title="Close">⌄</button>
             </div>
         </div>
-        <div style="display:flex;align-items:center;gap:7px;padding:7px 13px;border-bottom:1px solid #e0e0e0;background:#f7f7f5;flex-shrink:0">
-            <div onclick="cycleChatMdl()" style="display:flex;align-items:center;gap:5px;background:#ebebeb;border:1px solid #d0d0d0;border-radius:5px;padding:3px 9px;cursor:pointer">
-                <span id="chatMdlDot" style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block"></span>
-                <span id="chatMdlLbl" style="font-size:.62rem;color:#444;font-family:monospace">claude-sonnet-4</span>
-                <span style="font-size:.5rem;color:#888">▾</span>
+        <div style="display:flex;align-items:center;gap:7px;padding:7px 13px;border-bottom:1px solid #2a2a2a;background:#0f0f0f;flex-shrink:0">
+            <div onclick="cycleChatMdl()" style="display:flex;align-items:center;gap:5px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:5px;padding:3px 9px;cursor:pointer">
+                <span id="chatMdlDot" style="width:5px;height:5px;border-radius:50%;background:#888;display:inline-block"></span>
+                <span id="chatMdlLbl" style="font-size:.62rem;color:#666;font-family:monospace">claude-sonnet-4</span>
+                <span style="font-size:.5rem;color:#444">▾</span>
             </div>
             <button id="cmbChat" onclick="setChatMd('chat')" class="cmb active-cmb">Chat</button>
             <button id="cmbCode" onclick="setChatMd('code')" class="cmb">Code</button>
             <button id="cmbSrch" onclick="setChatMd('search')" class="cmb">Search</button>
         </div>
-        <div id="chatMessages" style="flex:1;overflow-y:auto;background:#ffffff;font-family:'DM Sans',sans-serif,sans-serif;display:flex;flex-direction:column">
+        <div id="chatMessages" style="flex:1;overflow-y:auto;background:#0a0a0a;font-family:'DM Sans',sans-serif,sans-serif;display:flex;flex-direction:column">
             <div id="chatEmpty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
                 <div style="font-size:2rem">🤖</div>
-                <h3 style="font-size:.9rem;font-weight:500;color:#1a1a1a;margin:0">ThreatPulse AI</h3>
-                <p style="font-size:.72rem;color:#666;line-height:1.6;max-width:240px;margin:0">Powered by Claude. Ask about threats, CVEs, IOCs, or any security topic. Live feeds are active.</p>
+                <h3 style="font-size:.9rem;font-weight:500;color:#f0f0f0;margin:0">ThreatPulse AI</h3>
+                <p style="font-size:.72rem;color:#555;line-height:1.6;max-width:240px;margin:0">Powered by Claude. Ask about threats, CVEs, IOCs, or any security topic. Live feeds are active.</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:300px">
-                    <div onclick="fillChatInp('Explain CVE-2025-8812')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('Explain CVE-2025-8812')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">🛡️</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">Explain CVE</div>
-                        <div style="font-size:.58rem;color:#888;margin-top:1px">Apache RCE</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">Explain CVE</div>
+                        <div style="font-size:.58rem;color:#555;margin-top:1px">Apache RCE</div>
                     </div>
-                    <div onclick="fillChatInp('What are Cobalt Strike IOCs?')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('What are Cobalt Strike IOCs?')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">⚠️</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">IOC Analysis</div>
-                        <div style="font-size:.58rem;color:#888;margin-top:1px">Cobalt Strike</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">IOC Analysis</div>
+                        <div style="font-size:.58rem;color:#555;margin-top:1px">Cobalt Strike</div>
                     </div>
-                    <div onclick="fillChatInp('How does phishing detection work?')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('How does phishing detection work?')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">🎣</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">Phishing</div>
-                        <div style="font-size:.58rem;color:#888;margin-top:1px">Detection</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">Phishing</div>
+                        <div style="font-size:.58rem;color:#555;margin-top:1px">Detection</div>
                     </div>
-                    <div onclick="fillChatInp('What is MITRE ATT&amp;CK?')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('What is MITRE ATT&amp;CK?')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">🎯</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">MITRE ATT&amp;CK</div>
-                        <div style="font-size:.58rem;color:#888;margin-top:1px">Framework</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">MITRE ATT&amp;CK</div>
+                        <div style="font-size:.58rem;color:#555;margin-top:1px">Framework</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="chatTyping" style="display:none;align-items:center;gap:5px;padding:9px 16px;background:#f7f7f5;border-top:1px solid #e8e8e8;flex-shrink:0">
-            <span style="width:5px;height:5px;border-radius:50%;background:#aaa;display:inline-block;animation:typingB 1.2s ease-in-out infinite"></span>
-            <span style="width:5px;height:5px;border-radius:50%;background:#aaa;display:inline-block;animation:typingB 1.2s ease-in-out .2s infinite"></span>
-            <span style="width:5px;height:5px;border-radius:50%;background:#aaa;display:inline-block;animation:typingB 1.2s ease-in-out .4s infinite"></span>
+        <div id="chatTyping" style="display:none;align-items:center;gap:5px;padding:9px 16px;background:#111;flex-shrink:0">
+            <span style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block;animation:typingB 1.2s ease-in-out infinite"></span>
+            <span style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block;animation:typingB 1.2s ease-in-out .2s infinite"></span>
+            <span style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block;animation:typingB 1.2s ease-in-out .4s infinite"></span>
         </div>
-        <div style="padding:11px 13px 13px;border-top:1px solid #e0e0e0;background:#f7f7f5;flex-shrink:0">
-            <div style="background:#ffffff;border:1px solid #ddd;border-radius:9px;overflow:hidden" id="chatInputBox">
-                <textarea id="chatInpTA" rows="1" placeholder="Message ThreatPulse AI…" style="background:none;border:none;outline:none;color:#1a1a1a;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:10px 13px 4px;resize:none;min-height:42px;max-height:110px;width:100%;line-height:1.55;display:block"></textarea>
+        <div style="padding:11px 13px 13px;border-top:1px solid #2a2a2a;background:#111;flex-shrink:0">
+            <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;overflow:hidden" id="chatInputBox">
+                <textarea id="chatInpTA" rows="1" placeholder="Message ThreatPulse AI…" style="background:none;border:none;outline:none;color:#f0f0f0;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:10px 13px 4px;resize:none;min-height:42px;max-height:110px;width:100%;line-height:1.55;display:block"></textarea>
                 <div style="display:flex;align-items:center;padding:5px 8px 8px 12px;gap:6px">
-                    <span id="chatCC" style="font-size:.58rem;color:#aaa;font-family:monospace;margin-right:auto">0/4000</span>
-                    <button id="chatSendBtn" onclick="sendChatMessage()" disabled style="padding:5px 13px;background:#1a1a1a;color:#fff;border:none;border-radius:6px;font-size:.7rem;font-weight:600;cursor:pointer;opacity:.3;font-family:'DM Sans',sans-serif">Send ↑</button>
+                    <span id="chatCC" style="font-size:.58rem;color:#333;font-family:monospace;margin-right:auto">0/4000</span>
+                    <button id="chatSendBtn" onclick="sendChatMessage()" disabled style="padding:5px 13px;background:#fff;color:#000;border:none;border-radius:6px;font-size:.7rem;font-weight:600;cursor:pointer;opacity:.3;font-family:'DM Sans',sans-serif">Send ↑</button>
                 </div>
             </div>
-            <p style="font-size:.58rem;color:#888;margin-top:5px;font-family:monospace"><kbd style="background:#ebebeb;border:1px solid #ddd;border-radius:3px;padding:1px 5px">Enter</kbd> send &nbsp;<kbd style="background:#ebebeb;border:1px solid #ddd;border-radius:3px;padding:1px 5px">Shift+Enter</kbd> newline</p>
+            <p style="font-size:.58rem;color:#333;margin-top:5px;font-family:monospace"><kbd style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:3px;padding:1px 5px">Enter</kbd> send &nbsp;<kbd style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:3px;padding:1px 5px">Shift+Enter</kbd> newline</p>
         </div>
     </div>
     <style>
         .cmb {
             font-size: .6rem;
-            color: #666;
+            color: #555;
             background: transparent;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #2a2a2a;
             border-radius: 4px;
             padding: 3px 9px;
             cursor: pointer;
@@ -5709,8 +5710,8 @@
         
         .cmb.active-cmb {
             color: #fff;
-            background: #1a1a1a;
-            border-color: #1a1a1a
+            background: #222;
+            border-color: #555
         }
     </style>
 
