@@ -2522,7 +2522,7 @@
             z-index: 8999;
             width: 100vw;
             height: 100vh;
-            background: #0a0a0a;
+            background: #ffffff;
             border: none;
             border-radius: 0;
             overflow: hidden;
@@ -2546,7 +2546,7 @@
         }
         
         #chatMessages::-webkit-scrollbar-thumb {
-            background: #333;
+            background: #c8c8c8;
             border-radius: 3px;
         }
         
@@ -2566,7 +2566,7 @@
             60%,
             100% {
                 transform: translateY(0);
-                background: #444;
+                background: #c0c0c0;
             }
             30% {
                 transform: translateY(-5px);
@@ -3216,6 +3216,11 @@
                     <span>AI Assistant</span>
                     <span class="db-nav-arrow">▸</span>
                 </div>
+                <div class="db-nav-item" data-view="sentinelpro" style="margin-top:4px;border-top:1px solid rgba(255,255,255,.07);padding-top:8px;">
+                    <span class="db-nav-icon">🛡️</span>
+                    <span>Sentinel Pro</span>
+                    <span class="db-nav-arrow">▸</span>
+                </div>
             </div>
 
         </div>
@@ -3727,10 +3732,9 @@
                 const sw = $('signupModal').querySelector('.modal-switch');
                 showSuccessState('signupBody', 'signupSuccess', sw);
                 setTimeout(() => {
-                    isLoggedIn = true;
                     closeModal('signupModal');
-                    showToast('Welcome, ' + first + '! Your intelligence feeds are activating. 🛡️');
-                    setTimeout(() => openDashboard(), 800);
+                    showToast('Account created! Please sign in to access your dashboard.');
+                    setTimeout(() => openModal('loginModal'), 700);
                 }, 2500);
             }, 1800);
         }
@@ -4237,6 +4241,10 @@
                 title: 'Executive',
                 crumb: '/ Workspaces / Executive'
             },
+            sentinelpro: {
+                title: 'Sentinel Pro',
+                crumb: '/ Scanner'
+            },
         };
 
         const viewContents = {
@@ -4482,81 +4490,208 @@
 <div style="padding:0 0 20px">
   <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:20px">Settings <span style="color:#aaa;margin:0 6px">/</span> Configuration</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-    <!-- API Keys -->
-    <div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px">
-      <div style="font-size:.72rem;font-weight:600;color:#c0392b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">API Keys <span style="font-size:.6rem;color:#27ae60;margin-left:6px">● Live</span></div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">VirusTotal API Key</label>
-        <div style="display:flex;gap:8px">
-          <input type="password" id="settVTKey" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:8px 12px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none" placeholder="Enter VT API key"/>
-          <button onclick="saveApiKey('virustotal',document.getElementById('settVTKey').value);showDbToast('🔑 VT key saved & active')" style="background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:8px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk">Save</button>
-        </div>
-        <div style="font-size:.55rem;color:#888;margin-top:4px">Free key: <a href="https://www.virustotal.com/gui/join-us" target="_blank" style="color:#007baa">virustotal.com/gui/join-us</a></div>
-      </div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Shodan API Key</label>
-        <div style="display:flex;gap:8px">
-          <input type="password" id="settShodanKey" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:8px 12px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none" placeholder="Enter Shodan API key"/>
-          <button onclick="saveApiKey('shodan',document.getElementById('settShodanKey').value);showDbToast('🔑 Shodan key saved & active')" style="background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:8px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk">Save</button>
-        </div>
-        <div style="font-size:.55rem;color:#888;margin-top:4px">Free key: <a href="https://account.shodan.io/register" target="_blank" style="color:#007baa">account.shodan.io</a></div>
-      </div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">AlienVault OTX API Key</label>
-        <div style="display:flex;gap:8px">
-          <input type="password" id="settOTXKey" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:8px 12px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none" placeholder="Enter OTX API key"/>
-          <button onclick="saveApiKey('otx',document.getElementById('settOTXKey').value);showDbToast('🔑 OTX key saved & active')" style="background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:8px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk">Save</button>
-        </div>
-        <div style="font-size:.55rem;color:#888;margin-top:4px">Free key: <a href="https://otx.alienvault.com/api" target="_blank" style="color:#007baa">otx.alienvault.com</a></div>
-      </div>
-      <div>
-        <label style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">AbuseIPDB API Key</label>
-        <div style="display:flex;gap:8px">
-          <input type="password" id="settAbuseKey" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:8px 12px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none" placeholder="Enter AbuseIPDB key"/>
-          <button onclick="saveApiKey('abuseipdb',document.getElementById('settAbuseKey').value);showDbToast('🔑 AbuseIPDB key saved & active')" style="background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:8px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk">Save</button>
-        </div>
-        <div style="font-size:.55rem;color:#888;margin-top:4px">Free key: <a href="https://www.abuseipdb.com/register" target="_blank" style="color:#007baa">abuseipdb.com</a></div>
-      </div>
-      <button onclick="refreshAllFeeds()" style="width:100%;margin-top:14px;background:#27ae60;border:1px solid #1e8449;color:#fff;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">⟳ Refresh All Feeds Now</button>
-    </div>
     <!-- Notifications -->
     <div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px">
-      <div style="font-size:.72rem;font-weight:600;color:#c0392b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Notifications</div>
-      <div id="settingToggles"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:.72rem;font-weight:600;color:#c0392b;text-transform:uppercase;letter-spacing:.1em">🔔 Notifications</div>
+        <button onclick="settMarkAllRead()" style="font-size:.6rem;color:#007baa;background:#e8f8fd;border:1px solid #aaddf0;border-radius:5px;padding:3px 9px;cursor:pointer;font-family:Space Grotesk">Mark All Read</button>
+      </div>
+      <!-- Filter tabs -->
+      <div style="display:flex;gap:6px;margin-bottom:14px" id="notifFilterTabs">
+        <button data-filter="all" onclick="settNotifFilter('all')" style="font-size:.62rem;padding:4px 10px;border-radius:5px;border:1px solid #c0392b;background:#c0392b;color:#fff;cursor:pointer;font-family:Space Grotesk">All</button>
+        <button data-filter="critical" onclick="settNotifFilter('critical')" style="font-size:.62rem;padding:4px 10px;border-radius:5px;border:1px solid #ddd;background:#f7f7f5;color:#555;cursor:pointer;font-family:Space Grotesk">Critical</button>
+        <button data-filter="info" onclick="settNotifFilter('info')" style="font-size:.62rem;padding:4px 10px;border-radius:5px;border:1px solid #ddd;background:#f7f7f5;color:#555;cursor:pointer;font-family:Space Grotesk">Info</button>
+        <button data-filter="unread" onclick="settNotifFilter('unread')" style="font-size:.62rem;padding:4px 10px;border-radius:5px;border:1px solid #ddd;background:#f7f7f5;color:#555;cursor:pointer;font-family:Space Grotesk">Unread</button>
+      </div>
+      <!-- Notification items -->
+      <div id="settNotifList" style="max-height:260px;overflow-y:auto"></div>
+      <!-- Toggle preferences -->
+      <div style="border-top:1px solid #f0f0f0;padding-top:14px;margin-top:10px">
+        <div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Alert Preferences</div>
+        <div id="settingToggles"></div>
+      </div>
     </div>
-    <!-- SIEM Integration -->
-    <div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px">
-      <div style="font-size:.72rem;font-weight:600;color:#c0392b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">SIEM Integration</div>
-      <select onchange="showDbToast('🔗 SIEM set to: '+this.value)" style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:8px 12px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none;margin-bottom:12px">
-        <option>Splunk Enterprise</option>
-        <option>Microsoft Sentinel</option>
-        <option>IBM QRadar</option>
-        <option>Elastic SIEM</option>
-        <option>Sumo Logic</option>
-      </select>
-      <label style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Webhook URL</label>
+    <!-- Account -->
+    <div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px" id="settAccountPanel">
+      <div style="font-size:.72rem;font-weight:600;color:#c0392b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">👤 Account</div>
+      <!-- Avatar + name -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;background:#f7f7f5;border-radius:10px;padding:14px">
+        <div id="settAvCircle" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0cf,#b44fff);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;cursor:pointer;overflow:hidden" onclick="settTriggerAvatarUpload()">
+          <img id="settAvImg" alt="" style="width:100%;height:100%;object-fit:cover;display:none"/>
+          <span id="settAvInitials">AN</span>
+        </div>
+        <div>
+          <div id="settAvName" style="font-size:.85rem;font-weight:600;color:#1a1a1a">Analyst User</div>
+          <div id="settAvEmail" style="font-size:.68rem;color:#777;margin-bottom:4px">analyst@threatpulse.io</div>
+          <span style="font-size:.6rem;color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9;padding:2px 8px;border-radius:4px">● Pro Plan</span>
+        </div>
+      </div>
+      <input type="file" id="settAvFile" accept="image/*" style="display:none" onchange="settOnAvatarFile(event)"/>
+      <!-- Account tabs -->
+      <div style="display:flex;gap:0;border:1px solid #ebebeb;border-radius:8px;overflow:hidden;margin-bottom:16px" id="settAccTabs">
+        <button data-tab="profile" onclick="settAccTab('profile')" style="flex:1;padding:8px 4px;font-size:.68rem;font-family:Space Grotesk;border:none;background:#c0392b;color:#fff;cursor:pointer;font-weight:600">Profile</button>
+        <button data-tab="security" onclick="settAccTab('security')" style="flex:1;padding:8px 4px;font-size:.68rem;font-family:Space Grotesk;border:none;background:#f7f7f5;color:#555;cursor:pointer">Security</button>
+        <button data-tab="plan" onclick="settAccTab('plan')" style="flex:1;padding:8px 4px;font-size:.68rem;font-family:Space Grotesk;border:none;background:#f7f7f5;color:#555;cursor:pointer">Plan</button>
+        <button data-tab="danger" onclick="settAccTab('danger')" style="flex:1;padding:8px 4px;font-size:.68rem;font-family:Space Grotesk;border:none;background:#f7f7f5;color:#c0392b;cursor:pointer">Danger</button>
+      </div>
+      <!-- Tab content -->
+      <div id="settAccTabContent"></div>
+    </div>
+    <!-- placeholder to close grid -->
       <input type="text" value="https://hooks.siem.example.com/v1/..." style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:8px 12px;color:#1a1a1a;font-size:.72rem;font-family:Space Grotesk;outline:none;margin-bottom:10px"/>
       <button onclick="showDbToast('🔗 SIEM connection tested successfully')" style="width:100%;background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Test Connection</button>
     </div>
     <!-- Account -->
     <div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px">
-      <div style="font-size:.72rem;font-weight:600;color:#c0392b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Account</div>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0cf,#b44fff);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff">AN</div>
-        <div>
-          <div style="font-size:.85rem;font-weight:600;color:#1a1a1a">Analyst User</div>
-          <div style="font-size:.68rem;color:#777">analyst@threatpulse.io</div>
-        </div>
-      </div>
-      <button onclick="showDbToast('✏️ Profile edit opened')" style="width:100%;background:#f7f7f5;border:1px solid #ddd;color:#333;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk;margin-bottom:8px">Edit Profile</button>
-      <button onclick="showDbToast('🔒 Password reset email sent')" style="width:100%;background:#f7f7f5;border:1px solid #ddd;color:#333;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk;margin-bottom:8px">Change Password</button>
-      <button onclick="showDbToast('👋 Logged out');setTimeout(closeDashboard,800)" style="width:100%;background:#fdf0f0;border:1px solid #f5c6c6;color:#c0392b;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Sign Out</button>
-    </div>
   </div>
 </div>`,
             soc: `<div style="padding:0 0 20px"><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:20px">SOC Team <span style="color:#aaa;margin:0 6px">/</span> Workspace</div><div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px;min-height:320px"><div style="font-size:.75rem;color:#555;margin-bottom:20px">SOC Analyst workspace — shared queue and real-time collaboration.</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"><div style="background:#f7f7f5;border:1px solid #ebebeb;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.6rem;font-weight:700;color:#c0392b;margin-bottom:4px">14</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">🔍 Active Cases</div></div><div style="background:#f7f7f5;border:1px solid #ebebeb;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.6rem;font-weight:700;color:#d4800a;margin-bottom:4px">7</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">⏳ Pending Triage</div></div><div style="background:#f7f7f5;border:1px solid #ebebeb;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.6rem;font-weight:700;color:#27ae60;margin-bottom:4px">23</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">✅ Resolved Today</div></div></div><div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button onclick="showDbToast('👥 Opening team queue')" style="background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Open Team Queue →</button><button onclick="showDbToast('📊 Generating SOC metrics report')" style="background:#f5f5f5;border:1px solid #ddd;color:#333;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">View Metrics</button><button onclick="showDbToast('🔔 Alert escalation rules opened')" style="background:#f5f5f5;border:1px solid #ddd;color:#333;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Escalation Rules</button></div></div></div>`,
             redteam: `<div style="padding:0 0 20px"><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:20px">Red Team <span style="color:#aaa;margin:0 6px">/</span> Workspace</div><div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px;min-height:320px"><div style="font-size:.75rem;color:#555;margin-bottom:20px">Red Team adversarial simulation and TTPs tracking workspace.</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"><div style="background:#fdf0f0;border:1px solid #f5c6c6;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.6rem;font-weight:700;color:#c0392b;margin-bottom:4px">3</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">🎯 Engagements</div></div><div style="background:#fdf0f0;border:1px solid #f5c6c6;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.6rem;font-weight:700;color:#c0392b;margin-bottom:4px">11</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">🔓 Vulns Found</div></div><div style="background:#fff8e7;border:1px solid #f5e6b8;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.6rem;font-weight:700;color:#d4800a;margin-bottom:4px">2</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">📋 Reports Due</div></div></div><div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button onclick="showDbToast('🎯 Opening engagement tracker')" style="background:#fdf0f0;border:1px solid #f5c6c6;color:#c0392b;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">View Engagements →</button><button onclick="showDbToast('🗺️ Opening MITRE ATT&CK navigator')" style="background:#f5f5f5;border:1px solid #ddd;color:#333;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">ATT&CK Navigator</button><button onclick="showDbToast('📝 Creating new engagement report')" style="background:#f5f5f5;border:1px solid #ddd;color:#333;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">New Report</button></div></div></div>`,
             executive: `<div style="padding:0 0 20px"><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:20px">Executive <span style="color:#aaa;margin:0 6px">/</span> Workspace</div><div style="background:#fff;border:1px solid #ebebeb;border-radius:14px;padding:22px;min-height:320px"><div style="font-size:.75rem;color:#555;margin-bottom:20px">Executive reporting and board-level threat summary dashboard.</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"><div style="background:#fdf0f0;border:1px solid #f5c6c6;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#c0392b;margin-bottom:4px">HIGH</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">📊 Risk Score</div></div><div style="background:#fff8e7;border:1px solid #f5e6b8;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#d4800a;margin-bottom:4px">Fair</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">🛡️ Posture</div></div><div style="background:#f7f7f5;border:1px solid #ebebeb;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#1a1a1a;margin-bottom:4px">47</div><div style="font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:.1em">📈 MTD Incidents</div></div></div><div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button onclick="showDbToast('📄 Generating executive PDF report...')" style="background:#0d0d0d;border:1px solid #333;color:#fff;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Download PDF Report →</button><button onclick="showDbToast('📊 Opening trend analysis')" style="background:#f5f5f5;border:1px solid #ddd;color:#333;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Trend Analysis</button><button onclick="showDbToast('📅 Scheduling board briefing')" style="background:#f5f5f5;border:1px solid #ddd;color:#333;padding:10px 20px;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Schedule Briefing</button></div></div></div>`,
+            sentinelpro: `<style>
+.sp2-wrap{font-family:'Space Grotesk','Segoe UI',sans-serif;color:#1a1a1a;background:#f7f7f5;min-height:calc(100vh - 200px)}
+.sp2-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 0 18px;flex-wrap:wrap;gap:10px}
+.sp2-topbar-left{display:flex;align-items:center;gap:12px}
+.sp2-badge{background:#c0392b;color:#fff;font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:20px;text-transform:uppercase}
+.sp2-title{font-size:18px;font-weight:700;color:#111;letter-spacing:.5px}
+.sp2-sub{font-size:11px;color:#888}
+.sp2-btn{background:#f0f0f0;border:1px solid #d0d0d0;color:#333;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .2s;letter-spacing:.5px}
+.sp2-btn:hover{background:#e0e0e0;border-color:#aaa}
+.sp2-btn-primary{background:#111;border-color:#111;color:#fff}
+.sp2-btn-primary:hover{background:#333}
+.sp2-hidden{display:none!important}
+.sp2-upload-zone{border:2px dashed #ccc;border-radius:16px;padding:48px 28px;text-align:center;cursor:pointer;background:#fafafa;transition:all .3s;max-width:620px;margin:0 auto}
+.sp2-upload-zone.dragover{border-color:#111;background:rgba(0,0,0,.03)}
+.sp2-upload-zone:hover{border-color:#999}
+.sp2-upload-icon{width:72px;height:72px;background:#f0f0f0;border:1px solid #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.sp2-upload-title{font-size:17px;font-weight:600;margin-bottom:6px;color:#111}
+.sp2-upload-sub{font-size:13px;color:#888;margin-bottom:16px}
+.sp2-ft-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.sp2-ft{font-size:10px;color:#666;background:#ebebeb;border:1px solid #ddd;padding:2px 8px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.sp2-feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:20px;text-align:left}
+.sp2-feat{background:#f0f0f0;border:1px solid #e0e0e0;border-radius:10px;padding:12px}
+.sp2-feat-icon{font-size:16px;margin-bottom:4px}
+.sp2-feat-title{font-size:11px;font-weight:600;color:#333;margin-bottom:2px}
+.sp2-feat-desc{font-size:10px;color:#888;line-height:1.4}
+.sp2-scan-wrap{display:flex;align-items:center;justify-content:center;padding:60px 20px}
+.sp2-scan-box{max-width:460px;width:100%;background:#fff;border:1px solid #e0e0e0;border-radius:16px;padding:36px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.sp2-scan-fname{font-family:'JetBrains Mono',monospace;font-size:12px;color:#888;margin-bottom:6px;word-break:break-all}
+.sp2-scan-ftype{font-family:'JetBrains Mono',monospace;font-size:11px;background:#eee;display:inline-block;padding:3px 12px;border-radius:12px;margin-bottom:20px;color:#444}
+.sp2-ring{position:relative;width:160px;height:160px;margin:0 auto 20px}
+.sp2-ring svg{transform:rotate(-90deg)}
+.sp2-ring .sp2-rbg{fill:none;stroke:#e8e8e8;stroke-width:6}
+.sp2-ring .sp2-rfg{fill:none;stroke:#111;stroke-width:6;stroke-linecap:round;transition:stroke-dasharray .3s;filter:drop-shadow(0 0 6px rgba(0,0,0,.15))}
+.sp2-ring-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:800;color:#111;font-family:'JetBrains Mono',monospace}
+.sp2-scan-phase{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;letter-spacing:1px;animation:sp2p 1.5s ease-in-out infinite}
+@keyframes sp2p{0%,100%{opacity:.4}50%{opacity:1}}
+.sp2-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+.sp2-stat{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:12px 14px}
+.sp2-stat-lbl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.sp2-stat-val{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp2-stat-sub{font-size:10px;color:#aaa;margin-top:2px}
+.sp2-fixbar{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:14px 18px;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.sp2-fixbar p{font-size:13px;color:#555}
+.sp2-fixbar strong{color:#111}
+.sp2-filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.sp2-fbtn{background:transparent;border:1px solid #ddd;color:#999;padding:5px 14px;border-radius:18px;font-size:10px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.sp2-fbtn.active{background:#111;border-color:#111;color:#fff}
+.sp2-fbtn:hover{border-color:#aaa;color:#444}
+.sp2-grid{display:grid;grid-template-columns:360px 1fr;gap:16px}
+.sp2-vlist{overflow-y:auto;max-height:520px;padding-right:4px}
+.sp2-vc{background:#fff;border:1px solid #e8e8e8;border-left:3px solid;border-radius:10px;padding:14px 16px;cursor:pointer;margin-bottom:8px;transition:all .2s;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sp2-vc:hover{background:#fafafa;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.sp2-vc.sel{background:#f5f5f5;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.sp2-vc.fixed{opacity:.5}
+.sp2-vc.fixed::after{content:'FIXED';position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;color:#777;background:#eee;padding:2px 8px;border-radius:8px;letter-spacing:1px}
+.sp2-vc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sp2-sev{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:2px 8px;border-radius:16px}
+.sp2-vc-cvss{font-size:10px;color:#aaa;font-family:'JetBrains Mono',monospace}
+.sp2-vc-name{font-size:13px;font-weight:600;margin-bottom:3px;color:#111}
+.sp2-vc-meta{font-size:10px;color:#aaa;font-family:'JetBrains Mono',monospace}
+.sp2-vc-tag{display:inline-block;font-size:8px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.04);color:#888;margin-left:6px;letter-spacing:.5px;font-family:'JetBrains Mono',monospace}
+.sp2-vc-prev{margin-top:8px;font-size:11px;color:#666;background:rgba(0,0,0,.03);border:1px solid #e8e8e8;border-radius:6px;padding:6px 10px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap;word-break:break-all;max-height:60px;overflow:hidden}
+.sp2-dpanel{background:#fff;border:1px solid #e8e8e8;border-radius:12px;overflow-y:auto;max-height:520px}
+.sp2-dempty{min-height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ccc;padding:40px;text-align:center}
+.sp2-dcontent{padding:22px 24px}
+.sp2-dhead{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sp2-dicon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.sp2-dtitle{font-size:16px;font-weight:700;color:#111}
+.sp2-did{font-size:10px;color:#aaa;font-family:'JetBrains Mono',monospace}
+.sp2-mgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.sp2-mbox{background:#f8f8f8;border:1px solid #ebebeb;border-radius:8px;padding:10px 12px;text-align:center}
+.sp2-mlbl{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.sp2-mval{font-size:13px;font-weight:700}
+.sp2-sec{margin-bottom:18px}
+.sp2-sec-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sp2-sec-p{font-size:12px;color:#555;line-height:1.7}
+.sp2-loc{font-family:'JetBrains Mono',monospace;font-size:11px;color:#ccc;background:rgba(0,0,0,.04);padding:4px 8px;border-radius:6px;display:inline-block}
+.sp2-rstep{display:flex;gap:10px;align-items:flex-start;background:rgba(0,0,0,.02);border:1px solid #ebebeb;border-radius:8px;padding:8px 12px;margin-bottom:6px}
+.sp2-rnum{min-width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.08);color:#444;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sp2-rtxt{font-size:11px;color:#555;line-height:1.5}
+.sp2-rtag{font-size:10px;color:#888;background:rgba(0,0,0,.03);border:1px solid #e0e0e0;padding:4px 10px;border-radius:16px;font-family:'JetBrains Mono',monospace;margin-right:6px;display:inline-block;margin-bottom:4px}
+.sp2-code-block{margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid #222;font-family:'JetBrains Mono',monospace;font-size:11px}
+.sp2-code-hdr{background:#f2f2f2;padding:8px 12px;font-size:10px;font-weight:600;letter-spacing:1px;display:flex;justify-content:space-between}
+.sp2-code-body{padding:10px 14px;background:#fcfcfc;white-space:pre-wrap;word-break:break-all;line-height:1.7;max-height:180px;overflow-y:auto}
+.sp2-line-old{color:#cc5555;text-decoration:line-through;opacity:.7}
+.sp2-line-new{color:#228822}
+.sp2-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:11px 26px;border-radius:10px;font-weight:700;font-size:13px;z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,.2);animation:sp2tin .35s}
+@keyframes sp2tin{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+<div class="sp2-wrap" id="sp2Wrap">
+<div class="sp2-topbar">
+  <div class="sp2-topbar-left">
+    <span style="font-size:26px">&#x1F6E1;&#xFE0F;</span>
+    <div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="sp2-title">SENTINEL PRO</span>
+        <span class="sp2-badge">SCAN &amp; FIX</span>
+      </div>
+      <div class="sp2-sub">Upload any source file &mdash; detect vulnerabilities &amp; auto-fix them</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="sp2-btn sp2-hidden" id="sp2BtnDownload" onclick="sp2DownloadFixed()">&#x2B07; DOWNLOAD FIXED</button>
+    <button class="sp2-btn sp2-hidden" id="sp2BtnNew" onclick="sp2Reset()">&#x21BA; NEW SCAN</button>
+  </div>
+</div>
+<div id="sp2UploadScreen">
+  <div class="sp2-upload-zone" id="sp2Zone">
+    <input type="file" id="sp2FileInput" style="display:none" accept="*/*" />
+    <div class="sp2-upload-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <div class="sp2-upload-title">Drop any file to scan &amp; auto-fix</div>
+    <div class="sp2-upload-sub">Reads your actual file content, detects real vulnerabilities, and patches them automatically</div>
+    <div class="sp2-ft-row"><span class="sp2-ft">.js</span><span class="sp2-ft">.py</span><span class="sp2-ft">.java</span><span class="sp2-ft">.html</span><span class="sp2-ft">.php</span><span class="sp2-ft">.json</span><span class="sp2-ft">.yaml</span><span class="sp2-ft">.env</span><span class="sp2-ft">.sql</span><span class="sp2-ft">.sh</span><span class="sp2-ft">.ts</span><span class="sp2-ft">.go</span><span class="sp2-ft">.rb</span><span class="sp2-ft">.c</span><span class="sp2-ft">+ more</span></div>
+    <div class="sp2-feat-grid">
+      <div class="sp2-feat"><div class="sp2-feat-icon">&#x1F50D;</div><div class="sp2-feat-title">Real Content Scan</div><div class="sp2-feat-desc">Reads every line of your file for security issues</div></div>
+      <div class="sp2-feat"><div class="sp2-feat-icon">&#x1F6E0;&#xFE0F;</div><div class="sp2-feat-title">Auto-Fix Engine</div><div class="sp2-feat-desc">Patches vulnerabilities with secure code replacements</div></div>
+      <div class="sp2-feat"><div class="sp2-feat-icon">&#x2B07;&#xFE0F;</div><div class="sp2-feat-title">Download Fixed File</div><div class="sp2-feat-desc">Save your fully patched file instantly</div></div>
+    </div>
+  </div>
+</div>
+<div class="sp2-scan-wrap sp2-hidden" id="sp2ScanScreen">
+  <div class="sp2-scan-box">
+    <div class="sp2-scan-fname" id="sp2ScanFname"></div>
+    <div class="sp2-scan-ftype" id="sp2ScanFtype"></div>
+    <div class="sp2-ring">
+      <svg width="160" height="160" viewBox="0 0 160 160"><circle class="sp2-rbg" cx="80" cy="80" r="70"/><circle class="sp2-rfg" id="sp2RingFg" cx="80" cy="80" r="70" stroke-dasharray="0 440"/></svg>
+      <div class="sp2-ring-pct" id="sp2RingPct">0%</div>
+    </div>
+    <div class="sp2-scan-phase" id="sp2ScanPhase">Initializing...</div>
+  </div>
+</div>
+<div id="sp2Dashboard" class="sp2-hidden">
+  <div class="sp2-fixbar" id="sp2FixBar"></div>
+  <div class="sp2-stats" id="sp2Stats"></div>
+  <div class="sp2-filters" id="sp2Filters"></div>
+  <div class="sp2-grid">
+    <div class="sp2-vlist" id="sp2VulnList"></div>
+    <div class="sp2-dpanel" id="sp2Detail"><div class="sp2-dempty"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg><div style="margin-top:14px;font-size:13px;color:#999;font-weight:500">Select a vulnerability to view details &amp; fix</div></div></div>
+  </div>
+</div>
+<div id="sp2ToastArea"></div>
+</div>`,
         };
 
         let dashboardOriginalContent = null;
@@ -4595,6 +4730,7 @@
                 if (view === 'alerts') populateAlerts();
                 if (view === 'settings') populateSettings();
                 if (view === 'threatmap') populateThreatMapVulns();
+                if (view === 'sentinelpro') setTimeout(initSentinelPro, 30);
             }
         }
 
@@ -4895,44 +5031,225 @@
             }).join('');
         }
 
-        function populateSettings() {
-            const el = document.getElementById('settingToggles');
-            if(!el) return;
-            const toggles = [
-                {label:'Email Alerts', key:'email', on:true},
-                {label:'Critical Threat Push', key:'push', on:true},
-                {label:'Daily Digest', key:'digest', on:false},
-                {label:'Feed Failure Alerts', key:'feed', on:true},
-                {label:'Weekly Report', key:'weekly', on:false},
-            ];
-            el.innerHTML = toggles.map(t=>`
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0">
-              <span style="font-size:.8rem;color:#1a1a1a;font-weight:500">${t.label}</span>
-              <div data-label="${t.label}"
-                   class="db-toggle${t.on?' tog-on':''}"
-                   style="width:36px;height:20px;border-radius:10px;cursor:pointer;position:relative;transition:background .2s;background:${t.on?'#c0392b':'#ddd'}">
-                <div style="position:absolute;top:3px;left:${t.on?'19px':'3px'};width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-              </div>
-            </div>`).join('');
-
-            el.querySelectorAll('.db-toggle').forEach(tog=>{
-                tog.addEventListener('click',function(){
-                    const isOn = this.classList.toggle('tog-on');
-                    this.style.background = isOn ? '#c0392b' : '#ddd';
-                    const dot = this.querySelector('div');
-                    dot.style.left = isOn ? '19px' : '3px';
-                    var label = this.getAttribute('data-label') || '';
-                    showDbToast((isOn?'✅':'🔕')+' '+label+' '+(isOn?'enabled':'disabled'));
-                });
+        /* ━━━━━━━ SETTINGS — NOTIFICATIONS ━━━━━━━ */
+        var settNotifData = [
+            {id:1,type:'critical',icon:'🚨',title:'Cobalt Strike beacon detected',body:'C2 communication from IP 185.220.101.47 — flagged critical.',time:'2m ago',read:false},
+            {id:2,type:'critical',icon:'⚠️',title:'CVE-2024-1234 now exploited in-the-wild',body:'NVD confirms active exploitation — patch immediately.',time:'14m ago',read:false},
+            {id:3,type:'info',icon:'✅',title:'Feed refresh complete',body:'12 feeds updated — 3,847 new IOCs ingested.',time:'1h ago',read:true},
+            {id:4,type:'info',icon:'🔗',title:'Splunk sync completed',body:'2,487 events pushed to your SIEM endpoint.',time:'2h ago',read:true},
+            {id:5,type:'critical',icon:'🛑',title:'Ransomware hash match on watchlist',body:'SHA256 a3f8… matched to LockBit 3.0 sample.',time:'3h ago',read:false},
+            {id:6,type:'info',icon:'📊',title:'Weekly threat digest ready',body:'Your curated intel report is available to download.',time:'5h ago',read:true},
+        ];
+        var settNotifFilter = function(filter){
+            var tabs = document.querySelectorAll('#notifFilterTabs button');
+            tabs.forEach(function(b){
+                var active = b.getAttribute('data-filter')===filter;
+                b.style.background = active?'#c0392b':'#f7f7f5';
+                b.style.color = active?'#fff':'#555';
+                b.style.borderColor = active?'#c0392b':'#ddd';
             });
+            var list = document.getElementById('settNotifList');
+            if(!list) return;
+            var items = settNotifData.filter(function(n){
+                if(filter==='all') return true;
+                if(filter==='critical') return n.type==='critical';
+                if(filter==='info') return n.type==='info';
+                if(filter==='unread') return !n.read;
+                return true;
+            });
+            if(!items.length){list.innerHTML='<div style="text-align:center;padding:20px;font-size:.72rem;color:#aaa">No notifications</div>';return;}
+            list.innerHTML = items.map(function(n){
+                return '<div data-notif-id="'+n.id+'" onclick="settMarkRead('+n.id+')" style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;opacity:'+(n.read?'.55':'1')+'">'
+                    +'<span style="font-size:1rem;flex-shrink:0">'+n.icon+'</span>'
+                    +'<div style="flex:1">'
+                    +'<div style="font-size:.73rem;font-weight:'+(n.read?'400':'600')+';color:#1a1a1a;margin-bottom:2px">'+n.title+(n.read?'':' <span style="display:inline-block;width:6px;height:6px;background:#c0392b;border-radius:50%;vertical-align:middle;margin-left:4px"></span>')+'</div>'
+                    +'<div style="font-size:.65rem;color:#555;line-height:1.4">'+n.body+'</div>'
+                    +'<div style="font-size:.58rem;color:#aaa;margin-top:3px">'+n.time+'</div>'
+                    +'</div></div>';
+            }).join('');
+        };
+        function settMarkRead(id){
+            settNotifData.forEach(function(n){if(n.id===id)n.read=true;});
+            // Re-render current filter
+            var activeTab = document.querySelector('#notifFilterTabs button[style*="c0392b"]');
+            var f = activeTab ? activeTab.getAttribute('data-filter') : 'all';
+            settNotifFilter(f);
+            showDbToast('✓ Notification marked as read');
+        }
+        function settMarkAllRead(){
+            settNotifData.forEach(function(n){n.read=true;});
+            settNotifFilter('all');
+            showDbToast('✅ All notifications marked as read');
+        }
 
-            // Pre-fill saved API keys into settings inputs
-            setTimeout(function(){
-                var vtInp=document.getElementById('settVTKey');if(vtInp&&API_KEYS.virustotal)vtInp.value=API_KEYS.virustotal;
-                var shInp=document.getElementById('settShodanKey');if(shInp&&API_KEYS.shodan)shInp.value=API_KEYS.shodan;
-                var otxInp=document.getElementById('settOTXKey');if(otxInp&&API_KEYS.otx)otxInp.value=API_KEYS.otx;
-                var abInp=document.getElementById('settAbuseKey');if(abInp&&API_KEYS.abuseipdb)abInp.value=API_KEYS.abuseipdb;
-            }, 100);
+        /* ━━━━━━━ SETTINGS — ACCOUNT TABS ━━━━━━━ */
+        var settAccData = {
+            firstName:'Analyst', lastName:'User', email:'analyst@threatpulse.io', role:'SOC Analyst', org:'ThreatPulse Corp', timezone:'UTC+05:30'
+        };
+        function settAccTab(tab){
+            var tabs = document.querySelectorAll('#settAccTabs button');
+            tabs.forEach(function(b){
+                var active = b.getAttribute('data-tab')===tab;
+                b.style.background = active?'#c0392b':'#f7f7f5';
+                b.style.color = active?(active?'#fff':'#555'):(tab==='danger'?'#c0392b':'#555');
+                if(b.getAttribute('data-tab')==='danger') b.style.color=active?'#fff':'#c0392b';
+            });
+            var content = document.getElementById('settAccTabContent');
+            if(!content) return;
+            if(tab==='profile'){
+                content.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+                    +'<div><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">First Name</label>'
+                    +'<input id="sAccFirst" type="text" value="'+settAccData.firstName+'" style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/></div>'
+                    +'<div><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Last Name</label>'
+                    +'<input id="sAccLast" type="text" value="'+settAccData.lastName+'" style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/></div>'
+                    +'</div>'
+                    +'<div style="margin-bottom:8px"><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Email</label>'
+                    +'<input type="email" value="'+settAccData.email+'" readonly style="width:100%;background:#ebebeb;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#888;font-size:.75rem;font-family:Space Grotesk;outline:none"/></div>'
+                    +'<div style="margin-bottom:8px"><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Role / Title</label>'
+                    +'<input id="sAccRole" type="text" value="'+settAccData.role+'" style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/></div>'
+                    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+                    +'<div><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Organisation</label>'
+                    +'<input id="sAccOrg" type="text" value="'+settAccData.org+'" style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/></div>'
+                    +'<div><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Timezone</label>'
+                    +'<select id="sAccTz" style="width:100%;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.72rem;font-family:Space Grotesk;outline:none">'
+                    +'<option>UTC</option><option>UTC+05:30</option><option>UTC-05:00</option><option>UTC+01:00</option><option>UTC+08:00</option>'
+                    +'</select></div></div>'
+                    +'<button onclick="settSaveProfile()" style="width:100%;background:#c0392b;border:none;color:#fff;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk;font-weight:600">Save Profile</button>';
+            } else if(tab==='security'){
+                content.innerHTML = '<div style="margin-bottom:8px"><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Current Password</label>'
+                    +'<div style="display:flex;gap:6px"><input id="sSecCur" type="password" placeholder="Current password" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/>'
+                    +'<button onclick="settTogglePw(\'sSecCur\',this)" style="font-size:.65rem;background:#f0f0f0;border:1px solid #ddd;border-radius:6px;padding:6px 10px;cursor:pointer;color:#555;font-family:Space Grotesk">Show</button></div></div>'
+                    +'<div style="margin-bottom:8px"><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">New Password</label>'
+                    +'<div style="display:flex;gap:6px"><input id="sSecNew" type="password" placeholder="Min 8 characters" oninput="settPwStrength(this.value)" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/>'
+                    +'<button onclick="settTogglePw(\'sSecNew\',this)" style="font-size:.65rem;background:#f0f0f0;border:1px solid #ddd;border-radius:6px;padding:6px 10px;cursor:pointer;color:#555;font-family:Space Grotesk">Show</button></div>'
+                    +'<div style="display:flex;gap:4px;margin-top:5px" id="sSecStr"><div style="height:3px;flex:1;border-radius:2px;background:#ddd"></div><div style="height:3px;flex:1;border-radius:2px;background:#ddd"></div><div style="height:3px;flex:1;border-radius:2px;background:#ddd"></div><div style="height:3px;flex:1;border-radius:2px;background:#ddd"></div></div>'
+                    +'<span id="sSecStrLbl" style="font-size:.58rem;color:#888"></span></div>'
+                    +'<div style="margin-bottom:12px"><label style="font-size:.6rem;color:#777;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px">Confirm Password</label>'
+                    +'<div style="display:flex;gap:6px"><input id="sSecConf" type="password" placeholder="Repeat new password" style="flex:1;background:#f7f7f5;border:1px solid #ddd;border-radius:6px;padding:7px 10px;color:#1a1a1a;font-size:.75rem;font-family:Space Grotesk;outline:none"/>'
+                    +'<button onclick="settTogglePw(\'sSecConf\',this)" style="font-size:.65rem;background:#f0f0f0;border:1px solid #ddd;border-radius:6px;padding:6px 10px;cursor:pointer;color:#555;font-family:Space Grotesk">Show</button></div></div>'
+                    +'<button onclick="settChangePassword()" style="width:100%;background:#c0392b;border:none;color:#fff;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk;font-weight:600;margin-bottom:10px">Update Password</button>'
+                    +'<div style="background:#f7f7f5;border:1px solid #ebebeb;border-radius:8px;padding:12px">'
+                    +'<div style="font-size:.65rem;font-weight:600;color:#1a1a1a;margin-bottom:8px">🔐 Two-Factor Authentication</div>'
+                    +'<div style="font-size:.68rem;color:#555;margin-bottom:8px">Status: <span style="color:#27ae60;font-weight:600">Enabled — TOTP App</span></div>'
+                    +'<div style="display:flex;gap:6px"><button onclick="showDbToast(\'📲 2FA reconfiguration started\')" style="flex:1;background:#e8f8fd;border:1px solid #aaddf0;color:#007baa;padding:7px;border-radius:6px;font-size:.68rem;cursor:pointer;font-family:Space Grotesk">Reconfigure</button>'
+                    +'<button onclick="showDbToast(\'⚠️ 2FA disabled — please re-enable soon\')" style="flex:1;background:#fdf0f0;border:1px solid #f5c6c6;color:#c0392b;padding:7px;border-radius:6px;font-size:.68rem;cursor:pointer;font-family:Space Grotesk">Disable</button></div></div>';
+            } else if(tab==='plan'){
+                content.innerHTML = '<div style="background:linear-gradient(135deg,#0d0d0d,#333);border-radius:10px;padding:16px;color:#fff;margin-bottom:12px">'
+                    +'<div style="font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:4px">Current Plan</div>'
+                    +'<div style="font-size:1.2rem;font-weight:700;margin-bottom:2px">Pro <span style="font-size:.7rem;color:#27ae60;background:rgba(39,174,96,.2);padding:2px 8px;border-radius:4px">Active</span></div>'
+                    +'<div style="font-size:.68rem;color:rgba(255,255,255,.6)">Renews June 1, 2026 · $49/mo</div></div>'
+                    +'<div style="font-size:.68rem;color:#555;margin-bottom:12px"><div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0"><span>Feed Integrations</span><span style="font-weight:600;color:#1a1a1a">Unlimited</span></div>'
+                    +'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0"><span>API Calls / day</span><span style="font-weight:600;color:#1a1a1a">50,000</span></div>'
+                    +'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0"><span>Data Retention</span><span style="font-weight:600;color:#1a1a1a">12 months</span></div>'
+                    +'<div style="display:flex;justify-content:space-between;padding:6px 0"><span>Team Seats</span><span style="font-weight:600;color:#1a1a1a">5</span></div></div>'
+                    +'<button onclick="showDbToast(\'⭐ Upgrade flow opened\')" style="width:100%;background:#c0392b;border:none;color:#fff;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk;font-weight:600;margin-bottom:6px">Upgrade to Enterprise →</button>'
+                    +'<button onclick="showDbToast(\'📄 Billing portal opened\')" style="width:100%;background:#f7f7f5;border:1px solid #ddd;color:#333;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Manage Billing</button>';
+            } else if(tab==='danger'){
+                content.innerHTML = '<div style="border:1px solid #f5c6c6;border-radius:8px;padding:14px;background:#fdf0f0">'
+                    +'<div style="font-size:.7rem;font-weight:700;color:#c0392b;margin-bottom:8px">⚠️ Danger Zone</div>'
+                    +'<div style="font-size:.68rem;color:#555;margin-bottom:12px">These actions are irreversible. Please proceed with caution.</div>'
+                    +'<button onclick="settExportData()" style="width:100%;background:#fff;border:1px solid #ddd;color:#333;padding:8px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk;margin-bottom:6px">📥 Export My Data</button>'
+                    +'<button onclick="settRevokeAllSessions()" style="width:100%;background:#fff;border:1px solid #f5c6c6;color:#c0392b;padding:8px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk;margin-bottom:6px">🔓 Revoke All Active Sessions</button>'
+                    +'<button onclick="settDeactivateAccount()" style="width:100%;background:#fdf0f0;border:1px solid #c0392b;color:#c0392b;padding:8px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:Space Grotesk;font-weight:700">🗑️ Delete Account</button></div>'
+                    +'<button onclick="removePanel();showDbToast(\'👋 Logging out...\');setTimeout(closeDashboard,800)" style="width:100%;margin-top:10px;background:#0d0d0d;border:none;color:#fff;padding:9px;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:Space Grotesk">Sign Out</button>';
+            }
+        }
+        function settSaveProfile(){
+            var f=document.getElementById('sAccFirst'),l=document.getElementById('sAccLast'),r=document.getElementById('sAccRole'),o=document.getElementById('sAccOrg');
+            if(!f||!f.value.trim()){showDbToast('⚠️ First name is required');return;}
+            settAccData.firstName=f.value.trim();
+            settAccData.lastName=l?l.value.trim():'';
+            settAccData.role=r?r.value.trim():'';
+            settAccData.org=o?o.value.trim():'';
+            var nameEl=document.getElementById('settAvName');
+            if(nameEl) nameEl.textContent=settAccData.firstName+' '+settAccData.lastName;
+            var initEl=document.getElementById('settAvInitials');
+            if(initEl) initEl.textContent=(settAccData.firstName[0]||'')+(settAccData.lastName[0]||'');
+            showDbToast('✅ Profile saved successfully');
+        }
+        function settTogglePw(id, btn){
+            var inp=document.getElementById(id);if(!inp)return;
+            var show=inp.type==='password';inp.type=show?'text':'password';btn.textContent=show?'Hide':'Show';
+        }
+        function settPwStrength(val){
+            var segs=document.querySelectorAll('#sSecStr div'), lbl=document.getElementById('sSecStrLbl');
+            if(!segs.length) return;
+            var score=0;
+            if(val.length>=8) score++;
+            if(/[A-Z]/.test(val)) score++;
+            if(/[0-9]/.test(val)) score++;
+            if(/[^A-Za-z0-9]/.test(val)) score++;
+            var colors=['#ddd','#c0392b','#d4800a','#27ae60','#007baa'];
+            var labels=['','Weak','Fair','Strong','Very Strong'];
+            segs.forEach(function(s,i){s.style.background=i<score?colors[score]:'#ddd';});
+            if(lbl){lbl.textContent=labels[score]||'';lbl.style.color=colors[score]||'#888';}
+        }
+        function settChangePassword(){
+            var cur=document.getElementById('sSecCur'),nw=document.getElementById('sSecNew'),cf=document.getElementById('sSecConf');
+            if(!cur||!cur.value){showDbToast('⚠️ Enter your current password');return;}
+            if(!nw||nw.value.length<8){showDbToast('⚠️ New password must be at least 8 characters');return;}
+            if(!cf||cf.value!==nw.value){showDbToast('⚠️ Passwords do not match');return;}
+            showDbToast('🔒 Password updated successfully');
+            if(cur)cur.value='';if(nw)nw.value='';if(cf)cf.value='';
+        }
+        function settExportData(){showDbToast('📥 Preparing data export — you\'ll receive an email shortly');}
+        function settRevokeAllSessions(){showDbToast('🔓 All sessions revoked — please sign in again');}
+        function settDeactivateAccount(){
+            if(confirm('Are you sure? This will permanently delete your account and all data.')){
+                showDbToast('🗑️ Account deletion scheduled — check your email');
+            }
+        }
+        function settTriggerAvatarUpload(){document.getElementById('settAvFile').click();}
+        function settOnAvatarFile(e){
+            var f=e.target.files&&e.target.files[0];if(!f)return;
+            var reader=new FileReader();
+            reader.onload=function(ev){
+                var img=document.getElementById('settAvImg'),init=document.getElementById('settAvInitials');
+                if(img){img.src=ev.target.result;img.style.display='block';}
+                if(init) init.style.display='none';
+                showDbToast('📷 Avatar updated');
+            };
+            reader.readAsDataURL(f);
+        }
+
+        function populateSettings() {
+            // Render notification list
+            setTimeout(function(){ settNotifFilter('all'); }, 50);
+
+            // Render toggle preferences
+            const el = document.getElementById('settingToggles');
+            if(el) {
+                const toggles = [
+                    {label:'Email Alerts', key:'email', on:true},
+                    {label:'Critical Threat Push', key:'push', on:true},
+                    {label:'Daily Digest', key:'digest', on:false},
+                    {label:'Feed Failure Alerts', key:'feed', on:true},
+                    {label:'Weekly Report', key:'weekly', on:false},
+                ];
+                el.innerHTML = toggles.map(t=>`
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                  <span style="font-size:.78rem;color:#1a1a1a;font-weight:500">${t.label}</span>
+                  <div data-label="${t.label}"
+                       class="db-toggle${t.on?' tog-on':''}"
+                       style="width:36px;height:20px;border-radius:10px;cursor:pointer;position:relative;transition:background .2s;background:${t.on?'#c0392b':'#ddd'}">
+                    <div style="position:absolute;top:3px;left:${t.on?'19px':'3px'};width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+                  </div>
+                </div>`).join('');
+
+                el.querySelectorAll('.db-toggle').forEach(tog=>{
+                    tog.addEventListener('click',function(){
+                        const isOn = this.classList.toggle('tog-on');
+                        this.style.background = isOn ? '#c0392b' : '#ddd';
+                        const dot = this.querySelector('div');
+                        dot.style.left = isOn ? '19px' : '3px';
+                        var label = this.getAttribute('data-label') || '';
+                        showDbToast((isOn?'✅':'🔕')+' '+label+' '+(isOn?'enabled':'disabled'));
+                    });
+                });
+            }
+
+            // Initialize Account tab (Profile by default)
+            setTimeout(function(){ settAccTab('profile'); }, 50);
         }
 
         /* ━━━━━━━ PANEL POPUPS ━━━━━━━ */
@@ -5327,7 +5644,7 @@
             var e=document.createElement('div');
             e.id='chatEmpty';
             e.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center';
-            e.innerHTML='<div style="font-size:2rem">🤖</div><h3 style="font-size:.9rem;font-weight:500;color:#f0f0f0;margin:0">ThreatPulse AI</h3><p style="font-size:.72rem;color:#555;line-height:1.6;max-width:240px;margin:0">Ask about threats, CVEs, IOCs, or any security topic.</p>';
+            e.innerHTML='<div style="font-size:2rem">🤖</div><h3 style="font-size:.9rem;font-weight:500;color:#1a1a1a;margin:0">ThreatPulse AI</h3><p style="font-size:.72rem;color:#666;line-height:1.6;max-width:240px;margin:0">Ask about threats, CVEs, IOCs, or any security topic.</p>';
             msgs.appendChild(e);
         }
 
@@ -5371,20 +5688,20 @@
             var now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
             // Enhanced markdown rendering
             var fmt=text
-                .replace(/```(\w*)\n([\s\S]*?)```/g,'<pre style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.68rem;color:#ccc;overflow-x:auto;margin:6px 0;white-space:pre-wrap">$2</pre>')
-                .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#fff;font-weight:600">$1</strong>')
+                .replace(/```(\w*)\n([\s\S]*?)```/g,'<pre style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;padding:10px 12px;font-family:monospace;font-size:.68rem;color:#333;overflow-x:auto;margin:6px 0;white-space:pre-wrap">$2</pre>')
+                .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#000;font-weight:600">$1</strong>')
                 .replace(/\*([^*]+)\*/g,'<em>$1</em>')
-                .replace(/`([^`]+)`/g,'<code style="font-family:monospace;font-size:.68rem;background:#1e1e1e;border:1px solid #2a2a2a;padding:1px 5px;border-radius:3px;color:#ccc">$1</code>')
-                .replace(/^### (.+)$/gm,'<div style="font-size:.82rem;font-weight:700;color:#fff;margin:8px 0 4px">$1</div>')
-                .replace(/^## (.+)$/gm,'<div style="font-size:.85rem;font-weight:700;color:#fff;margin:8px 0 4px">$1</div>')
-                .replace(/^# (.+)$/gm,'<div style="font-size:.9rem;font-weight:700;color:#fff;margin:8px 0 4px">$1</div>')
-                .replace(/^- (.+)$/gm,'<div style="padding-left:12px;position:relative;margin:2px 0"><span style="position:absolute;left:0;color:#555">•</span>$1</div>')
+                .replace(/`([^`]+)`/g,'<code style="font-family:monospace;font-size:.68rem;background:#f0f0f0;border:1px solid #ddd;padding:1px 5px;border-radius:3px;color:#333">$1</code>')
+                .replace(/^### (.+)$/gm,'<div style="font-size:.82rem;font-weight:700;color:#000;margin:8px 0 4px">$1</div>')
+                .replace(/^## (.+)$/gm,'<div style="font-size:.85rem;font-weight:700;color:#000;margin:8px 0 4px">$1</div>')
+                .replace(/^# (.+)$/gm,'<div style="font-size:.9rem;font-weight:700;color:#000;margin:8px 0 4px">$1</div>')
+                .replace(/^- (.+)$/gm,'<div style="padding-left:12px;position:relative;margin:2px 0"><span style="position:absolute;left:0;color:#888">•</span>$1</div>')
                 .replace(/^\d+\. (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">$1</div>')
                 .replace(/\n\n/g,'</p><p style="margin:6px 0">')
                 .replace(/\n/g,'<br>');
             var d=document.createElement('div');
-            d.style.cssText='display:flex;flex-direction:column;padding:10px 14px;gap:6px;background:'+(isUser?'#1e1e1e':'#141414')+';animation:chatFadeUp .2s ease';
-            d.innerHTML='<div style="display:flex;align-items:center;gap:7px"><div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;background:'+(isUser?'#fff':'#222')+';color:'+(isUser?'#000':'#aaa')+';border:'+(isUser?'none':'1px solid #333')+'">'+( isUser?'U':'✦')+'</div><span style="font-size:.68rem;font-weight:600;color:#666">'+(isUser?'You':'Claude')+'</span><span style="font-size:.58rem;color:#333;font-family:monospace;margin-left:auto">'+now+'</span></div><div style="font-size:.77rem;line-height:1.65;color:#e0e0e0;padding-left:29px"><p style="margin:0">'+fmt+'</p></div>';
+            d.style.cssText='display:flex;flex-direction:column;padding:10px 14px;gap:6px;background:'+(isUser?'#f0f0f0':'#ffffff')+';border-bottom:1px solid #eeeeee;animation:chatFadeUp .2s ease';
+            d.innerHTML='<div style="display:flex;align-items:center;gap:7px"><div style="width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;background:'+(isUser?'#1a1a1a':'#ebebeb')+';color:'+(isUser?'#fff':'#333')+';border:'+(isUser?'none':'1px solid #d0d0d0')+'">'+( isUser?'U':'✦')+'</div><span style="font-size:.68rem;font-weight:600;color:#888">'+(isUser?'You':'Claude')+'</span><span style="font-size:.58rem;color:#bbb;font-family:monospace;margin-left:auto">'+now+'</span></div><div style="font-size:.77rem;line-height:1.65;color:#1a1a1a;padding-left:29px"><p style="margin:0">'+fmt+'</p></div>';
             var ty=document.getElementById('chatTyping');
             if(ty) msgs.insertBefore(d,ty); else msgs.appendChild(d);
             msgs.scrollTop=msgs.scrollHeight;
@@ -5629,78 +5946,78 @@
 
     <!-- ── CHATBOT PANEL ── -->
     <div id="chatbotPanel">
-        <div id="chatHeader" style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #2a2a2a;background:#111;flex-shrink:0">
+        <div id="chatHeader" style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #e0e0e0;background:#ffffff;flex-shrink:0">
             <div style="display:flex;align-items:center;gap:9px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.5);animation:robotFloat 2s ease-in-out infinite"></div>
-                <span style="font-size:.85rem;font-weight:600;color:#f0f0f0;font-family:'DM Sans',sans-serif,sans-serif">ThreatPulse AI</span>
-                <span style="font-size:.6rem;color:#555;background:#1a1a1a;border:1px solid #2a2a2a;padding:2px 7px;border-radius:4px;font-family:monospace">Claude</span>
+                <div style="width:8px;height:8px;border-radius:50%;background:#0d0d0d;box-shadow:0 0 6px rgba(0,0,0,.2);animation:robotFloat 2s ease-in-out infinite"></div>
+                <span style="font-size:.85rem;font-weight:600;color:#1a1a1a;font-family:'DM Sans',sans-serif,sans-serif">ThreatPulse AI</span>
+                <span style="font-size:.6rem;color:#888;background:#f0f0f0;border:1px solid #ddd;padding:2px 7px;border-radius:4px;font-family:monospace">Claude</span>
             </div>
             <div style="display:flex;gap:6px">
-                <button onclick="clearChatPanel()" style="width:28px;height:28px;border:1px solid #2a2a2a;border-radius:6px;background:transparent;color:#555;font-size:.75rem;cursor:pointer" title="Clear">✕</button>
-                <button onclick="toggleChatbot()" style="width:28px;height:28px;border:1px solid #2a2a2a;border-radius:6px;background:transparent;color:#555;font-size:.9rem;cursor:pointer" title="Close">⌄</button>
+                <button onclick="clearChatPanel()" style="width:28px;height:28px;border:1px solid #ddd;border-radius:6px;background:transparent;color:#555;font-size:.75rem;cursor:pointer" title="Clear">✕</button>
+                <button onclick="toggleChatbot()" style="width:28px;height:28px;border:1px solid #ddd;border-radius:6px;background:transparent;color:#555;font-size:.9rem;cursor:pointer" title="Close">⌄</button>
             </div>
         </div>
-        <div style="display:flex;align-items:center;gap:7px;padding:7px 13px;border-bottom:1px solid #2a2a2a;background:#0f0f0f;flex-shrink:0">
-            <div onclick="cycleChatMdl()" style="display:flex;align-items:center;gap:5px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:5px;padding:3px 9px;cursor:pointer">
-                <span id="chatMdlDot" style="width:5px;height:5px;border-radius:50%;background:#888;display:inline-block"></span>
-                <span id="chatMdlLbl" style="font-size:.62rem;color:#666;font-family:monospace">claude-sonnet-4</span>
-                <span style="font-size:.5rem;color:#444">▾</span>
+        <div style="display:flex;align-items:center;gap:7px;padding:7px 13px;border-bottom:1px solid #e0e0e0;background:#f7f7f5;flex-shrink:0">
+            <div onclick="cycleChatMdl()" style="display:flex;align-items:center;gap:5px;background:#ebebeb;border:1px solid #d0d0d0;border-radius:5px;padding:3px 9px;cursor:pointer">
+                <span id="chatMdlDot" style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block"></span>
+                <span id="chatMdlLbl" style="font-size:.62rem;color:#444;font-family:monospace">claude-sonnet-4</span>
+                <span style="font-size:.5rem;color:#888">▾</span>
             </div>
             <button id="cmbChat" onclick="setChatMd('chat')" class="cmb active-cmb">Chat</button>
             <button id="cmbCode" onclick="setChatMd('code')" class="cmb">Code</button>
             <button id="cmbSrch" onclick="setChatMd('search')" class="cmb">Search</button>
         </div>
-        <div id="chatMessages" style="flex:1;overflow-y:auto;background:#0a0a0a;font-family:'DM Sans',sans-serif,sans-serif;display:flex;flex-direction:column">
+        <div id="chatMessages" style="flex:1;overflow-y:auto;background:#ffffff;font-family:'DM Sans',sans-serif,sans-serif;display:flex;flex-direction:column">
             <div id="chatEmpty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
                 <div style="font-size:2rem">🤖</div>
-                <h3 style="font-size:.9rem;font-weight:500;color:#f0f0f0;margin:0">ThreatPulse AI</h3>
-                <p style="font-size:.72rem;color:#555;line-height:1.6;max-width:240px;margin:0">Powered by Claude. Ask about threats, CVEs, IOCs, or any security topic. Live feeds are active.</p>
+                <h3 style="font-size:.9rem;font-weight:500;color:#1a1a1a;margin:0">ThreatPulse AI</h3>
+                <p style="font-size:.72rem;color:#666;line-height:1.6;max-width:240px;margin:0">Powered by Claude. Ask about threats, CVEs, IOCs, or any security topic. Live feeds are active.</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:300px">
-                    <div onclick="fillChatInp('Explain CVE-2025-8812')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('Explain CVE-2025-8812')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">🛡️</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">Explain CVE</div>
-                        <div style="font-size:.58rem;color:#555;margin-top:1px">Apache RCE</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">Explain CVE</div>
+                        <div style="font-size:.58rem;color:#888;margin-top:1px">Apache RCE</div>
                     </div>
-                    <div onclick="fillChatInp('What are Cobalt Strike IOCs?')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('What are Cobalt Strike IOCs?')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">⚠️</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">IOC Analysis</div>
-                        <div style="font-size:.58rem;color:#555;margin-top:1px">Cobalt Strike</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">IOC Analysis</div>
+                        <div style="font-size:.58rem;color:#888;margin-top:1px">Cobalt Strike</div>
                     </div>
-                    <div onclick="fillChatInp('How does phishing detection work?')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('How does phishing detection work?')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">🎣</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">Phishing</div>
-                        <div style="font-size:.58rem;color:#555;margin-top:1px">Detection</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">Phishing</div>
+                        <div style="font-size:.58rem;color:#888;margin-top:1px">Detection</div>
                     </div>
-                    <div onclick="fillChatInp('What is MITRE ATT&amp;CK?')" style="background:#111;border:1px solid #222;border-radius:8px;padding:9px;cursor:pointer">
+                    <div onclick="fillChatInp('What is MITRE ATT&amp;CK?')" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:9px;cursor:pointer">
                         <div style="font-size:.85rem;margin-bottom:3px">🎯</div>
-                        <div style="font-size:.65rem;font-weight:600;color:#e0e0e0">MITRE ATT&amp;CK</div>
-                        <div style="font-size:.58rem;color:#555;margin-top:1px">Framework</div>
+                        <div style="font-size:.65rem;font-weight:600;color:#1a1a1a">MITRE ATT&amp;CK</div>
+                        <div style="font-size:.58rem;color:#888;margin-top:1px">Framework</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="chatTyping" style="display:none;align-items:center;gap:5px;padding:9px 16px;background:#111;flex-shrink:0">
-            <span style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block;animation:typingB 1.2s ease-in-out infinite"></span>
-            <span style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block;animation:typingB 1.2s ease-in-out .2s infinite"></span>
-            <span style="width:5px;height:5px;border-radius:50%;background:#555;display:inline-block;animation:typingB 1.2s ease-in-out .4s infinite"></span>
+        <div id="chatTyping" style="display:none;align-items:center;gap:5px;padding:9px 16px;background:#f7f7f5;border-top:1px solid #e8e8e8;flex-shrink:0">
+            <span style="width:5px;height:5px;border-radius:50%;background:#aaa;display:inline-block;animation:typingB 1.2s ease-in-out infinite"></span>
+            <span style="width:5px;height:5px;border-radius:50%;background:#aaa;display:inline-block;animation:typingB 1.2s ease-in-out .2s infinite"></span>
+            <span style="width:5px;height:5px;border-radius:50%;background:#aaa;display:inline-block;animation:typingB 1.2s ease-in-out .4s infinite"></span>
         </div>
-        <div style="padding:11px 13px 13px;border-top:1px solid #2a2a2a;background:#111;flex-shrink:0">
-            <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;overflow:hidden" id="chatInputBox">
-                <textarea id="chatInpTA" rows="1" placeholder="Message ThreatPulse AI…" style="background:none;border:none;outline:none;color:#f0f0f0;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:10px 13px 4px;resize:none;min-height:42px;max-height:110px;width:100%;line-height:1.55;display:block"></textarea>
+        <div style="padding:11px 13px 13px;border-top:1px solid #e0e0e0;background:#f7f7f5;flex-shrink:0">
+            <div style="background:#ffffff;border:1px solid #ddd;border-radius:9px;overflow:hidden" id="chatInputBox">
+                <textarea id="chatInpTA" rows="1" placeholder="Message ThreatPulse AI…" style="background:none;border:none;outline:none;color:#1a1a1a;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:10px 13px 4px;resize:none;min-height:42px;max-height:110px;width:100%;line-height:1.55;display:block"></textarea>
                 <div style="display:flex;align-items:center;padding:5px 8px 8px 12px;gap:6px">
-                    <span id="chatCC" style="font-size:.58rem;color:#333;font-family:monospace;margin-right:auto">0/4000</span>
-                    <button id="chatSendBtn" onclick="sendChatMessage()" disabled style="padding:5px 13px;background:#fff;color:#000;border:none;border-radius:6px;font-size:.7rem;font-weight:600;cursor:pointer;opacity:.3;font-family:'DM Sans',sans-serif">Send ↑</button>
+                    <span id="chatCC" style="font-size:.58rem;color:#aaa;font-family:monospace;margin-right:auto">0/4000</span>
+                    <button id="chatSendBtn" onclick="sendChatMessage()" disabled style="padding:5px 13px;background:#1a1a1a;color:#fff;border:none;border-radius:6px;font-size:.7rem;font-weight:600;cursor:pointer;opacity:.3;font-family:'DM Sans',sans-serif">Send ↑</button>
                 </div>
             </div>
-            <p style="font-size:.58rem;color:#333;margin-top:5px;font-family:monospace"><kbd style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:3px;padding:1px 5px">Enter</kbd> send &nbsp;<kbd style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:3px;padding:1px 5px">Shift+Enter</kbd> newline</p>
+            <p style="font-size:.58rem;color:#888;margin-top:5px;font-family:monospace"><kbd style="background:#ebebeb;border:1px solid #ddd;border-radius:3px;padding:1px 5px">Enter</kbd> send &nbsp;<kbd style="background:#ebebeb;border:1px solid #ddd;border-radius:3px;padding:1px 5px">Shift+Enter</kbd> newline</p>
         </div>
     </div>
     <style>
         .cmb {
             font-size: .6rem;
-            color: #555;
+            color: #666;
             background: transparent;
-            border: 1px solid #2a2a2a;
+            border: 1px solid #d0d0d0;
             border-radius: 4px;
             padding: 3px 9px;
             cursor: pointer;
@@ -5710,8 +6027,8 @@
         
         .cmb.active-cmb {
             color: #fff;
-            background: #222;
-            border-color: #555
+            background: #1a1a1a;
+            border-color: #1a1a1a
         }
     </style>
 
@@ -5880,4 +6197,376 @@
                             .db-gauge-title[style] {
                                 color: #1a1a1a !important;
                             }
-                        </style>
+                        </style><script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║          SENTINEL PRO — Full Security Scanner           ║
+// ║     Embedded as native ThreatPulse Dashboard View       ║
+// ╚══════════════════════════════════════════════════════════╝
+
+const SP2_PATTERNS = [
+  { regex:/((?:password|passwd|pwd|secret|api_?key|apikey|auth_?token|access_?token|private_?key|client_?secret|db_?pass(?:word)?)\s*[:=]\s*['"`]([^'"`\n]{3,})['"`])/gi,
+    name:"Hardcoded Secret / Password",severity:"critical",category:"Secrets",cvss:9.1,cwe:"CWE-798",owasp:"A07:2021 – Auth Failures",
+    description:"A sensitive credential is hardcoded directly in the source file.",
+    impact:"Credential theft, unauthorized access, data breaches, lateral movement.",
+    remediation:["Move to environment variables: process.env.SECRET_NAME","Use a secrets manager (Vault, AWS SM, etc.)","Rotate the exposed credential immediately","Add secret-scanning to CI/CD pipeline","Never commit secrets to version control"],
+    fix:m=>m.replace(/((?:password|passwd|pwd|secret|api_?key|apikey|auth_?token|access_?token|private_?key|client_?secret|db_?pass(?:word)?)\s*[:=]\s*)['"`][^'"`\n]{3,}['"`]/i,'$1process.env.SECRET_VALUE /* TODO: move to env var */')
+  },
+  { regex:/((?:query|execute|exec|sql|cursor\.execute|db\.query|connection\.query)\s*\(\s*['"`].*?\+\s*(?:req\.|request\.|params\.|input|user|data|args|query)[\w.[\]]*|(?:query|execute|exec|sql)\s*\(\s*[`'"].*?\$\{.*?\}.*?[`'"])/gi,
+    name:"SQL Injection Vulnerability",severity:"critical",category:"Injection",cvss:9.8,cwe:"CWE-89",owasp:"A03:2021 – Injection",
+    description:"User input is concatenated into SQL queries without parameterization.",
+    impact:"Full database compromise, data exfiltration, authentication bypass, RCE.",
+    remediation:["Use parameterized queries / prepared statements","Use an ORM that handles escaping","Validate and sanitize all user inputs","Apply least privilege to DB accounts","Deploy a Web Application Firewall"],
+    fix:m=>'/* FIXED: Use parameterized query */\n// db.query("SELECT * FROM table WHERE id = ?", [id])\n// '+m.trim()
+  },
+  { regex:/(eval\s*\(|exec\s*\(|Function\s*\(|setTimeout\s*\(\s*['"`]|setInterval\s*\(\s*['"`]|new\s+Function\s*\()/g,
+    name:"Dangerous Code Execution (eval/exec)",severity:"critical",category:"Code Injection",cvss:9.5,cwe:"CWE-94",owasp:"A03:2021 – Injection",
+    description:"Use of eval(), exec(), or dynamic code construction allows arbitrary code execution.",
+    impact:"Remote code execution, complete system compromise, data theft.",
+    remediation:["Remove eval/exec entirely — use safe alternatives","Use JSON.parse() instead of eval for JSON","Use a safe expression parser for calculations","Implement strict Content Security Policy","Review all dynamic code paths"],
+    fix:m=>'/* SECURITY FIX: eval/exec removed */\n// '+m.trim()
+  },
+  { regex:/(\.innerHTML\s*=\s*(?!['"`]\s*['"`]).*|document\.write\s*\(|\.outerHTML\s*=)/g,
+    name:"DOM-Based XSS (innerHTML / document.write)",severity:"high",category:"XSS",cvss:7.5,cwe:"CWE-79",owasp:"A03:2021 – Injection",
+    description:"Direct DOM manipulation via innerHTML or document.write without sanitization enables XSS.",
+    impact:"Session hijacking, credential theft, phishing, malware injection.",
+    remediation:["Use textContent instead of innerHTML","Sanitize with DOMPurify before inserting HTML","Implement Content Security Policy (CSP)","Use framework rendering (React/Vue/Angular)","Set HttpOnly flag on session cookies"],
+    fix:m=>m.replace(/\.innerHTML\s*=/,'.textContent = /* FIXED: use textContent */').replace(/document\.write\s*\(/,'/* FIXED: removed document.write */ // document.write(').replace(/\.outerHTML\s*=/,'.textContent = /* FIXED */')
+  },
+  { regex:/(["'`]http:\/\/(?!localhost|127\.0\.0\.1|0\.0\.0\.0)[^\s"'`]+["'`])/g,
+    name:"Insecure HTTP Connection",severity:"medium",category:"Transport Security",cvss:5.9,cwe:"CWE-319",owasp:"A02:2021 – Cryptographic Failures",
+    description:"Connection uses unencrypted HTTP instead of HTTPS, vulnerable to MITM attacks.",
+    impact:"Data interception, credential theft, content tampering, session hijacking.",
+    remediation:["Change all URLs to HTTPS","Enable HSTS headers on your server","Use protocol-relative URLs if needed","Implement certificate pinning for mobile","Add Upgrade-Insecure-Requests header"],
+    fix:m=>m.replace(/http:\/\//g,'https://')
+  },
+  { regex:/(md5\s*\(|sha1\s*\(|MD5\s*\(|SHA1\s*\(|hashlib\.md5|hashlib\.sha1|MessageDigest\.getInstance\s*\(\s*['"](?:MD5|SHA-?1)['"]|createHash\s*\(\s*['"](?:md5|sha1)['"])/g,
+    name:"Weak Cryptographic Hash (MD5/SHA-1)",severity:"medium",category:"Cryptography",cvss:5.9,cwe:"CWE-328",owasp:"A02:2021 – Cryptographic Failures",
+    description:"MD5 or SHA-1 are cryptographically broken and vulnerable to collisions.",
+    impact:"Password cracking, authentication bypass, data integrity failures.",
+    remediation:["Use bcrypt/scrypt/Argon2 for password hashing","Use SHA-256 or SHA-3 for data integrity","Add proper salting to password hashes","Configure appropriate work factors","Plan for cryptographic agility"],
+    fix:m=>m.replace(/md5|MD5/g,'sha256 /* FIXED: upgraded from MD5 */').replace(/sha1|SHA1|SHA-1/g,'sha256 /* FIXED: upgraded from SHA-1 */')
+  },
+  { regex:/(Access-Control-Allow-Origin['":\s]*[*]|cors\(\s*\)|allowedOrigins?\s*[:=]\s*['"`]\*['"`])/gi,
+    name:"CORS Wildcard — All Origins Allowed",severity:"high",category:"Access Control",cvss:7.2,cwe:"CWE-942",owasp:"A05:2021 – Security Misconfiguration",
+    description:"CORS is configured to allow all origins (*), permitting any website to make requests.",
+    impact:"Cross-origin data theft, CSRF bypass, unauthorized API access.",
+    remediation:["Restrict origins to specific trusted domains","Use an allowlist of permitted origins","Validate Origin header server-side","Avoid reflecting Origin header directly","Set credentials:false with wildcard origins"],
+    fix:m=>m.replace(/\*/g,'https://yourdomain.com /* FIXED: restrict to your domain */')
+  },
+  { regex:/(console\.\s*log\s*\(.*(?:password|token|secret|key|credential|auth|session|cookie|ssn|credit.?card).*\))/gi,
+    name:"Sensitive Data Logged to Console",severity:"medium",category:"Info Disclosure",cvss:5.5,cwe:"CWE-532",owasp:"A09:2021 – Logging Failures",
+    description:"Sensitive data such as passwords, tokens, or keys is output to the console.",
+    impact:"Credential exposure in logs, compliance violations, information leakage.",
+    remediation:["Remove sensitive data from log statements","Use structured logging with field redaction","Mask or truncate sensitive values","Implement log-level controls for production","Use secure logging libraries"],
+    fix:_=>'/* FIXED: removed sensitive data from log */\nconsole.log("[REDACTED — sensitive data removed]");'
+  },
+  { regex:/(chmod\s+777|chmod\s+666|os\.chmod\s*\(.*0o?777|0o?666)/g,
+    name:"World-Writable File Permissions",severity:"high",category:"Permissions",cvss:7.5,cwe:"CWE-732",owasp:"A01:2021 – Broken Access Control",
+    description:"Files are set to world-writable (777/666) permissions.",
+    impact:"Unauthorized file modification, privilege escalation, code injection.",
+    remediation:["Use 755 for directories, 644 for files","Apply principle of least privilege","Set umask before creating files","Never use 777 in production","Audit file permissions regularly"],
+    fix:m=>m.replace(/777/g,'755 /* FIXED: restricted permissions */').replace(/666/g,'644 /* FIXED: restricted permissions */')
+  },
+  { regex:/(DEBUG\s*[:=]\s*(?:true|True|TRUE|1|'true'|"true")|app\.debug\s*=\s*True|FLASK_DEBUG\s*[:=]\s*1)/g,
+    name:"Debug Mode Enabled in Production",severity:"high",category:"Misconfiguration",cvss:7.5,cwe:"CWE-489",owasp:"A05:2021 – Security Misconfiguration",
+    description:"Debug mode is enabled, exposing verbose errors, stack traces, and internal details.",
+    impact:"Information leakage, internal path disclosure, potential RCE.",
+    remediation:["Set DEBUG=false in production","Use environment-specific configs","Add CI/CD checks for debug flags","Implement proper error handling","Use structured logging"],
+    fix:m=>m.replace(/true|True|TRUE|1|'true'|"true"/,'false /* FIXED: debug disabled */')
+  },
+  { regex:/((?:\/\/|#|\/\*)\s*(?:TODO|FIXME|HACK|XXX|BUG)\s*:?\s*.*(?:security|vuln|auth|password|encrypt|hack|fix|unsafe|insecure|temporary|temp\s+fix).*)/gi,
+    name:"Unresolved Security TODO/FIXME",severity:"low",category:"Code Quality",cvss:3.0,cwe:"CWE-1127",owasp:"A04:2021 – Insecure Design",
+    description:"Code contains unresolved TODO/FIXME comments related to security issues.",
+    impact:"Known security weaknesses left unaddressed, technical debt accumulation.",
+    remediation:["Address the security concern described in the TODO","Create a tracked issue for each security TODO","Prioritize security TODOs in sprint planning","Set up linting rules to flag security TODOs","Conduct regular security backlog reviews"],
+    fix:m=>m+'\n/* ⚠️ FLAGGED: This security TODO needs immediate attention */'
+  },
+  { regex:/((?:["'`])\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?(?:["'`]))/g,
+    name:"Hardcoded IP Address",severity:"low",category:"Configuration",cvss:3.5,cwe:"CWE-547",owasp:"A05:2021 – Security Misconfiguration",
+    description:"IP addresses are hardcoded instead of using configuration or DNS.",
+    impact:"Infrastructure detail exposure, difficult environment migration.",
+    remediation:["Move IPs to environment variables or config files","Use DNS hostnames instead of IPs","Implement service discovery","Use configuration management for infra","Keep IPs out of version control"],
+    fix:_=>'process.env.HOST_ADDRESS /* FIXED: moved IP to env var */'
+  },
+  { regex:/(verify\s*[:=]\s*(?:false|False)|SSL_VERIFY\s*[:=]\s*(?:false|False|0)|rejectUnauthorized\s*:\s*false|InsecureSkipVerify\s*:\s*true|--insecure)/gi,
+    name:"SSL/TLS Verification Disabled",severity:"high",category:"Transport Security",cvss:7.5,cwe:"CWE-295",owasp:"A02:2021 – Cryptographic Failures",
+    description:"SSL/TLS certificate verification is disabled, making connections vulnerable to MITM.",
+    impact:"Man-in-the-middle attacks, data interception, credential theft, impersonation.",
+    remediation:["Enable SSL verification in all environments","Use trusted CA certificates","Implement certificate pinning for critical services","Never disable verification in production","Use proper certificate management"],
+    fix:m=>m.replace(/false|False|0/g,'true /* FIXED: SSL verification re-enabled */').replace(/--insecure/g,'/* FIXED: removed --insecure flag */')
+  }
+];
+
+// ── State (scoped with sp2_ prefix, no conflicts with existing page) ──
+let sp2File=null, sp2Content="", sp2Fixed="", sp2Vulns=[], sp2Filter="all", sp2Sel=null, sp2Inited=false;
+
+const sp2SevC=s=>({critical:"#e05555",high:"#cc8844",medium:"#ccaa55",low:"#888888"}[s]||"#666");
+const sp2SevB=s=>({critical:"rgba(220,80,80,.12)",high:"rgba(200,130,60,.12)",medium:"rgba(200,170,80,.10)",low:"rgba(180,180,180,.08)"}[s]||"rgba(100,100,100,.08)");
+
+// ── Called by switchView once HTML is injected ──
+function initSentinelPro() {
+  if (!document.getElementById('sp2Zone')) return;
+  if (sp2Inited) { sp2RefreshState(); return; }
+  sp2Inited = true;
+
+  const zone = document.getElementById('sp2Zone');
+  const inp  = document.getElementById('sp2FileInput');
+
+  zone.addEventListener('click', () => inp.click());
+  inp.addEventListener('change', e => { if (e.target.files[0]) sp2LoadFile(e.target.files[0]); });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) sp2LoadFile(e.dataTransfer.files[0]);
+  });
+}
+
+// Re-apply current state if user navigates away and back
+function sp2RefreshState() {
+  if (sp2Vulns.length > 0 || sp2File) {
+    document.getElementById('sp2UploadScreen').classList.add('sp2-hidden');
+    document.getElementById('sp2ScanScreen').classList.add('sp2-hidden');
+    document.getElementById('sp2Dashboard').classList.remove('sp2-hidden');
+    document.getElementById('sp2BtnNew').classList.remove('sp2-hidden');
+    if (sp2Vulns.length > 0) document.getElementById('sp2BtnDownload').classList.remove('sp2-hidden');
+    sp2RenderStats(); sp2RenderFixBar(); sp2RenderFilters(); sp2RenderList(); sp2RenderDetail();
+  }
+  // re-bind upload listeners
+  const zone = document.getElementById('sp2Zone');
+  const inp  = document.getElementById('sp2FileInput');
+  if (zone && inp) {
+    const z2 = zone.cloneNode(true); zone.parentNode.replaceChild(z2, zone);
+    const i2 = document.getElementById('sp2FileInput');
+    z2.addEventListener('click', () => i2.click());
+    i2.addEventListener('change', e => { if (e.target.files[0]) sp2LoadFile(e.target.files[0]); });
+    z2.addEventListener('dragover', e => { e.preventDefault(); z2.classList.add('dragover'); });
+    z2.addEventListener('dragleave', () => z2.classList.remove('dragover'));
+    z2.addEventListener('drop', e => {
+      e.preventDefault(); z2.classList.remove('dragover');
+      if (e.dataTransfer.files[0]) sp2LoadFile(e.dataTransfer.files[0]);
+    });
+  }
+}
+
+function sp2LoadFile(file) {
+  sp2File = file; sp2Inited = false;
+  const r = new FileReader();
+  r.onload  = e => { sp2Content = e.target.result; sp2Fixed = sp2Content; sp2StartScan(); };
+  r.onerror = ()  => { sp2Content = ""; sp2Fixed = ""; sp2StartScan(); };
+  r.readAsText(file);
+}
+
+// ── SCAN ──
+function sp2StartScan() {
+  document.getElementById('sp2UploadScreen').classList.add('sp2-hidden');
+  document.getElementById('sp2ScanScreen').classList.remove('sp2-hidden');
+  document.getElementById('sp2ScanFname').textContent = 'SCANNING: ' + sp2File.name;
+  document.getElementById('sp2ScanFtype').textContent = (sp2File.size/1024).toFixed(1) + ' KB';
+
+  const phases = ['Reading file content...','Analyzing code patterns...','Checking for hardcoded secrets...',
+    'Scanning for injection vectors...','Detecting XSS vulnerabilities...','Checking transport security...',
+    'Analyzing cryptographic usage...','Reviewing file permissions...','Checking debug configurations...','Generating report...'];
+  let p=0;
+  const circ=document.getElementById('sp2RingFg'), txt=document.getElementById('sp2RingPct'), ph=document.getElementById('sp2ScanPhase');
+  const iv = setInterval(()=>{
+    p += Math.floor(Math.random()*4)+1;
+    if (p>100) p=100;
+    circ.setAttribute('stroke-dasharray', `${p*4.4} 440`);
+    txt.textContent = p+'%';
+    ph.textContent = phases[Math.min(Math.floor(p/10), phases.length-1)];
+    if (p>=100) { clearInterval(iv); setTimeout(()=>{ sp2RunScan(); sp2ShowDash(); }, 500); }
+  }, 80);
+}
+
+function sp2RunScan() {
+  sp2Vulns = [];
+  if (!sp2Content) return;
+  const lines = sp2Content.split('\n');
+  SP2_PATTERNS.forEach(pat => {
+    const re = new RegExp(pat.regex.source, pat.regex.flags);
+    let m; const matches=[];
+    while ((m = re.exec(sp2Content)) !== null) {
+      const ln = sp2Content.substring(0, m.index).split('\n').length;
+      matches.push({ full:m[0], index:m.index, lineNum:ln, lineText:(lines[ln-1]||'').trim() });
+      if (m[0].length===0) re.lastIndex++;
+    }
+    if (matches.length > 0) sp2Vulns.push({ pattern:pat, matches, fixed:false });
+  });
+}
+
+// ── DASHBOARD ──
+function sp2ShowDash() {
+  document.getElementById('sp2ScanScreen').classList.add('sp2-hidden');
+  document.getElementById('sp2Dashboard').classList.remove('sp2-hidden');
+  document.getElementById('sp2BtnNew').classList.remove('sp2-hidden');
+  if (sp2Vulns.length>0) document.getElementById('sp2BtnDownload').classList.remove('sp2-hidden');
+  sp2RenderStats(); sp2RenderFixBar(); sp2RenderFilters(); sp2RenderList(); sp2RenderDetail();
+}
+
+function sp2RenderStats() {
+  const c = sp2Counts();
+  const risk = sp2Vulns.length===0 ? 100 : Math.max(0, 100 - sp2Vulns.reduce((a,v)=>a+v.pattern.cvss*v.matches.length*2, 0));
+  const rlbl = risk>70?'Low Risk':risk>40?'Medium Risk':'High Risk';
+  const rcol = risk>70?'#aaa':risk>40?'#cc9900':'#ee4444';
+  const fx   = sp2Vulns.filter(v=>v.fixed).length;
+  document.getElementById('sp2Stats').innerHTML =
+    sp2Stat('File', sp2File.name, (sp2File.size/1024).toFixed(1)+' KB', '#999') +
+    sp2Stat('Risk Score', Math.round(risk)+'/100', rlbl, rcol) +
+    sp2Stat('Issues Found', sp2Vulns.reduce((a,v)=>a+v.matches.length,0), 'In '+sp2Vulns.length+' categories', '#333') +
+    sp2Stat('Critical', c.critical, 'Immediate Action', '#cc3333') +
+    sp2Stat('Fixed', fx+'/'+sp2Vulns.length, 'Categories', fx===sp2Vulns.length&&sp2Vulns.length>0?'#aaa':'#999');
+}
+
+function sp2Stat(l,v,s,c){return`<div class="sp2-stat"><div class="sp2-stat-lbl">${l}</div><div class="sp2-stat-val" style="color:${c}">${v}</div><div class="sp2-stat-sub">${s}</div></div>`}
+
+function sp2Counts(){
+  return {all:sp2Vulns.length,
+    critical:sp2Vulns.filter(v=>v.pattern.severity==='critical').length,
+    high:sp2Vulns.filter(v=>v.pattern.severity==='high').length,
+    medium:sp2Vulns.filter(v=>v.pattern.severity==='medium').length,
+    low:sp2Vulns.filter(v=>v.pattern.severity==='low').length};
+}
+
+function sp2RenderFixBar() {
+  const u = sp2Vulns.filter(v=>!v.fixed).length;
+  document.getElementById('sp2FixBar').innerHTML = sp2Vulns.length===0
+    ? '<p>✅ <strong>No vulnerabilities detected!</strong> Your file passed all security checks.</p>'
+    : u>0
+    ? `<p><strong>${u}</strong> unfixed vulnerability categories — auto-fix applies secure code replacements</p><button class="sp2-btn sp2-btn-primary" onclick="sp2FixAll()">⚡ FIX ALL (${u})</button>`
+    : '<p>✅ <strong>All vulnerabilities fixed!</strong> Download your patched file below.</p>';
+}
+
+function sp2RenderFilters() {
+  const c = sp2Counts();
+  document.getElementById('sp2Filters').innerHTML = ['all','critical','high','medium','low'].map(f =>
+    `<button class="sp2-fbtn ${sp2Filter===f?'active':''}" onclick="sp2SetFilter('${f}')">${f}${c[f]>0?' ('+c[f]+')':''}</button>`
+  ).join('');
+}
+
+function sp2SetFilter(f) { sp2Filter=f; sp2Sel=null; sp2RenderFilters(); sp2RenderList(); sp2RenderDetail(); }
+
+function sp2RenderList() {
+  const filtered = sp2Filter==='all' ? sp2Vulns : sp2Vulns.filter(v=>v.pattern.severity===sp2Filter);
+  const el = document.getElementById('sp2VulnList');
+  if (!filtered.length) { el.innerHTML='<div class="sp2-no-v">No vulnerabilities in this category</div>'; return; }
+  el.innerHTML = filtered.map(v => {
+    const gi=sp2Vulns.indexOf(v), p=v.pattern, fm=v.matches[0];
+    return `<div class="sp2-vc ${sp2Sel===gi?'sel':''} ${v.fixed?'fixed':''}" style="border-left-color:${sp2SevC(p.severity)}" onclick="sp2Select(${gi})">
+      <div class="sp2-vc-top">
+        <span class="sp2-sev" style="color:${sp2SevC(p.severity)};background:${sp2SevB(p.severity)}">${p.severity}</span>
+        <span class="sp2-vc-cvss">CVSS ${p.cvss} · ${v.matches.length} match${v.matches.length>1?'es':''}</span>
+      </div>
+      <div class="sp2-vc-name">${p.name}<span class="sp2-vc-tag">${p.category}</span></div>
+      <div class="sp2-vc-meta">Line ${fm.lineNum}${v.matches.length>1?' + '+(v.matches.length-1)+' more':''}</div>
+      <div class="sp2-vc-prev">${sp2Esc(fm.lineText.substring(0,120))}</div>
+    </div>`;
+  }).join('');
+}
+
+function sp2Select(i) { sp2Sel=i; sp2RenderList(); sp2RenderDetail(); }
+
+function sp2RenderDetail() {
+  const panel = document.getElementById('sp2Detail');
+  if (sp2Sel===null||!sp2Vulns[sp2Sel]) {
+    panel.innerHTML='<div class="sp2-dempty"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg><div style="margin-top:14px;font-size:13px;color:#999;font-weight:500">Select a vulnerability to view details &amp; fix</div></div>';
+    return;
+  }
+  const v=sp2Vulns[sp2Sel], p=v.pattern, sc=sp2SevC(p.severity);
+  let diff='';
+  if (v.matches.length>0) {
+    const fm=v.matches[0];
+    diff=`<div class="sp2-code-block">
+      <div class="sp2-code-hdr" style="color:#cc3333"><span>BEFORE (vulnerable)</span><span>Line ${fm.lineNum}</span></div>
+      <div class="sp2-code-body"><span class="sp2-line-old">${sp2Esc(fm.full.substring(0,300))}</span></div>
+    </div><div class="sp2-code-block" style="margin-top:6px">
+      <div class="sp2-code-hdr" style="color:#228822"><span>AFTER (fixed)</span><span>Auto-fix</span></div>
+      <div class="sp2-code-body"><span class="sp2-line-new">${sp2Esc(p.fix(fm.full).substring(0,300))}</span></div>
+    </div>`;
+  }
+  const linesHtml=v.matches.map(m=>`<div style="display:flex;gap:8px;align-items:baseline;margin-bottom:4px">
+    <span class="sp2-loc">Line ${m.lineNum}</span>
+    <span style="font-size:11px;color:#4a6a8a;font-family:'JetBrains Mono',monospace;word-break:break-all">${sp2Esc(m.lineText.substring(0,80))}</span>
+  </div>`).join('');
+  panel.innerHTML=`<div class="sp2-dcontent">
+    <div class="sp2-dhead">
+      <div class="sp2-dicon" style="background:${sp2SevB(p.severity)};border:1px solid ${sc}33">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${sc}" stroke-width="1.5"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div><div class="sp2-dtitle">${p.name}</div><div class="sp2-did">${v.matches.length} occurrence${v.matches.length>1?'s':''} ${v.fixed?'<span style="color:#888;margin-left:6px">✓ FIXED</span>':''}</div></div>
+    </div>
+    <div class="sp2-mgrid">
+      <div class="sp2-mbox"><div class="sp2-mlbl">Severity</div><div class="sp2-mval" style="color:${sc}">${p.severity.toUpperCase()}</div></div>
+      <div class="sp2-mbox"><div class="sp2-mlbl">CVSS Score</div><div class="sp2-mval" style="color:${sc}">${p.cvss}</div></div>
+      <div class="sp2-mbox"><div class="sp2-mlbl">Category</div><div class="sp2-mval" style="color:#555">${p.category}</div></div>
+    </div>
+    <div class="sp2-sec"><div class="sp2-sec-t" style="color:#aaa">Affected Locations</div>${linesHtml}</div>
+    <div class="sp2-sec"><div class="sp2-sec-t" style="color:#aaa">Description</div><p class="sp2-sec-p">${p.description}</p></div>
+    <div class="sp2-sec"><div class="sp2-sec-t" style="color:#aa6622">Impact</div><p class="sp2-sec-p">${p.impact}</p></div>
+    <div class="sp2-sec"><div class="sp2-sec-t" style="color:#666">Auto-Fix Preview</div>${diff}</div>
+    <div class="sp2-sec"><div class="sp2-sec-t" style="color:#666">Remediation Steps</div>
+      ${p.remediation.map((s,i)=>`<div class="sp2-rstep"><span class="sp2-rnum">${i+1}</span><span class="sp2-rtxt">${s}</span></div>`).join('')}
+    </div>
+    <div class="sp2-sec"><div class="sp2-sec-t" style="color:#aaa">References</div>
+      <span class="sp2-rtag">${p.cwe}</span><span class="sp2-rtag">${p.owasp}</span>
+    </div>
+    ${!v.fixed
+      ? `<button class="sp2-btn sp2-btn-primary" style="width:100%;margin-top:14px" onclick="sp2FixOne(${sp2Sel})">🛠️ AUTO-FIX THIS VULNERABILITY</button>`
+      : '<div style="text-align:center;padding:12px;color:#555;font-weight:600;font-size:13px">✅ This vulnerability has been fixed</div>'}
+  </div>`;
+}
+
+// ── FIX ENGINE ──
+function sp2FixOne(idx) {
+  const v=sp2Vulns[idx]; if(v.fixed) return;
+  const re=new RegExp(v.pattern.regex.source, v.pattern.regex.flags);
+  sp2Fixed = sp2Fixed.replace(re, m=>v.pattern.fix(m));
+  v.fixed=true;
+  sp2Toast('✓ Fixed: '+v.pattern.name);
+  sp2RenderStats(); sp2RenderFixBar(); sp2RenderList(); sp2RenderDetail();
+}
+
+function sp2FixAll() {
+  sp2Vulns.forEach(v=>{ if(!v.fixed){ const re=new RegExp(v.pattern.regex.source,v.pattern.regex.flags); sp2Fixed=sp2Fixed.replace(re,m=>v.pattern.fix(m)); v.fixed=true; } });
+  sp2Toast('✓ All vulnerabilities fixed!');
+  sp2RenderStats(); sp2RenderFixBar(); sp2RenderList(); sp2RenderDetail();
+}
+
+function sp2DownloadFixed() {
+  const blob=new Blob([sp2Fixed],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const n=sp2File.name, dot=n.lastIndexOf('.');
+  a.download = dot>0 ? n.substring(0,dot)+'_fixed'+n.substring(dot) : n+'_fixed';
+  a.href=url; a.click(); URL.revokeObjectURL(url);
+  sp2Toast('⬇ Fixed file downloaded!');
+}
+
+// ── HELPERS ──
+function sp2Esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function sp2Toast(msg) {
+  const t=document.createElement('div'); t.className='sp2-toast'; t.textContent=msg;
+  (document.getElementById('sp2ToastArea')||document.body).appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+function sp2Reset() {
+  sp2File=null; sp2Content=""; sp2Fixed=""; sp2Vulns=[]; sp2Filter="all"; sp2Sel=null; sp2Inited=false;
+  document.getElementById('sp2Dashboard').classList.add('sp2-hidden');
+  document.getElementById('sp2ScanScreen').classList.add('sp2-hidden');
+  document.getElementById('sp2UploadScreen').classList.remove('sp2-hidden');
+  document.getElementById('sp2BtnNew').classList.add('sp2-hidden');
+  document.getElementById('sp2BtnDownload').classList.add('sp2-hidden');
+  const fg=document.getElementById('sp2RingFg');
+  if(fg) fg.setAttribute('stroke-dasharray','0 440');
+  const pt=document.getElementById('sp2RingPct');
+  if(pt) pt.textContent='0%';
+  const fi=document.getElementById('sp2FileInput');
+  if(fi) fi.value='';
+  sp2Inited=false;
+  initSentinelPro();
+}
+</script>
+</body>
+</html>

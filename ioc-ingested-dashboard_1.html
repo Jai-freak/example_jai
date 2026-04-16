@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>IOC Ingested — Intelligence Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f7f5;--surface:#ffffff;--border:#e8e8e4;--border-strong:#d0d0cb;
+  --text:#0f0f0e;--muted:#6e6e6a;--hint:#a0a09c;
+  --red:#c0392b;--red-bg:#fdf0ef;--orange:#c0650a;--orange-bg:#fdf4eb;
+  --green:#1e7a4a;--green-bg:#edf7f2;--blue:#1250a0;--blue-bg:#eef3fb;
+  --purple:#5a35a0;--purple-bg:#f3f0fb;--teal:#0e7a70;--teal-bg:#eaf6f5;
+  --gold:#9a6800;--gold-bg:#fdf8ec;
+  --mono:'IBM Plex Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;min-height:100vh}
+.nav{background:var(--surface);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-brand-text{font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.nav-divider{width:1px;height:18px;background:var(--border-strong)}
+.nav-page{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em}
+.nav-right{display:flex;align-items:center;gap:18px}
+.live-ind{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#1e7a4a;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.clock{font-family:var(--mono);font-size:11px;color:var(--hint)}
+.header{padding:28px 28px 0}
+.breadcrumb{font-family:var(--mono);font-size:11px;color:var(--hint);letter-spacing:.07em;text-transform:uppercase;margin-bottom:20px}
+.breadcrumb b{color:var(--text);font-weight:500}
+.hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;margin-bottom:28px}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';display:inline-block;width:20px;height:1px;background:var(--muted)}
+.hero-num{font-size:80px;font-weight:700;line-height:.95;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.hero-sub{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px}
+.hero-stats{display:flex;gap:24px}
+.hstat{text-align:right}
+.hstat-n{font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hstat-l{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.grid{padding:0 28px 28px;display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.g3{grid-column:span 3}.g4{grid-column:span 4}.g5{grid-column:span 5}
+.g6{grid-column:span 6}.g7{grid-column:span 7}.g8{grid-column:span 8}.g12{grid-column:span 12}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:18px 20px;position:relative;overflow:hidden}
+.ca{position:absolute;top:0;left:0;right:0;height:2px}
+.cl{font-family:var(--mono);font-size:10px;color:var(--hint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.cl span{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px}
+.mv{font-size:32px;font-weight:600;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.ml{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:5px}
+.mc{font-family:var(--mono);font-size:11px;margin-top:8px;display:flex;align-items:center;gap:4px}
+.up{color:var(--green)}.dn{color:var(--red)}
+.tr{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.tr:last-child{border-bottom:none}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tn{font-size:12px;flex:0 0 96px;font-weight:500}
+.tbg{flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden}
+.tf{height:100%;border-radius:99px;width:0;transition:width 1.1s cubic-bezier(.16,1,.3,1)}
+.tp{font-family:var(--mono);font-size:11px;color:var(--muted);flex:0 0 36px;text-align:right}
+.tc{font-family:var(--mono);font-size:11px;color:var(--text);flex:0 0 48px;text-align:right;font-weight:500}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:var(--mono);font-size:10px;color:var(--hint);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:0 0 10px;border-bottom:1px solid var(--border)}
+.tbl td{font-size:12px;padding:10px 0;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.fw{font-weight:600}.mono{font-family:var(--mono)}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;font-weight:500}
+.pg{background:var(--green-bg);color:var(--green)}.po{background:var(--orange-bg);color:var(--orange)}.pr{background:var(--red-bg);color:var(--red)}
+.mb{display:flex;align-items:center;gap:7px}
+.mbb{flex:0 0 60px;height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.mbf{height:100%;border-radius:99px}
+.rn{font-size:52px;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.ru{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.en{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.el{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.eb{height:2px;border-radius:99px;margin-top:8px;background:var(--border);overflow:hidden}
+.ebf{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+footer{border-top:1px solid var(--border);padding:12px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--hint)}
+@media(max-width:900px){
+  .g3,.g4,.g5,.g6,.g7,.g8{grid-column:span 12}
+  .hero{grid-template-columns:1fr}.hero-num{font-size:56px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <span class="nav-brand-text">Dashboard</span>
+    <div class="nav-divider"></div>
+    <span class="nav-page">ioc_ingested</span>
+  </div>
+  <div class="nav-right">
+    <span class="live-ind"><span class="live-dot"></span>Live feeds active</span>
+    <span class="clock" id="clock">--:--:--</span>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="breadcrumb">Dashboard / Home / <b>IOC Ingested</b></div>
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">IOCs Ingested — Today</div>
+      <div class="hero-num" id="heroNum">0</div>
+      <div class="hero-sub">Indicators processed &amp; enriched in the last 24 hours across all feeds</div>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-n" style="color:var(--green)" id="heroNew">0</div><div class="hstat-l">New</div></div>
+      <div class="hstat"><div class="hstat-n" style="color:var(--orange)" id="heroUpd">0</div><div class="hstat-l">Updated</div></div>
+      <div class="hstat"><div class="hstat-n" style="color:var(--red)" id="heroExp">0</div><div class="hstat-l">Expired</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <div class="metric g3">
+    <div class="ml">24h ingest rate</div>
+    <div class="mv" style="color:var(--blue)">103<span style="font-size:16px;font-weight:400;color:var(--muted)">/hr</span></div>
+    <div class="mc up">▲ 14% vs yesterday</div>
+  </div>
+  <div class="metric g3">
+    <div class="ml">Avg enrichment time</div>
+    <div class="mv">1.4<span style="font-size:16px;font-weight:400;color:var(--muted)">s</span></div>
+    <div class="mc dn">▼ 0.2s slower today</div>
+  </div>
+  <div class="metric g3">
+    <div class="ml">Deduplication rate</div>
+    <div class="mv" style="color:var(--teal)">18<span style="font-size:16px;font-weight:400;color:var(--muted)">%</span></div>
+    <div class="mc" style="color:var(--hint)">441 duplicates removed</div>
+  </div>
+  <div class="metric g3">
+    <div class="ml">Confidence score avg</div>
+    <div class="mv" style="color:var(--purple)">82<span style="font-size:16px;font-weight:400;color:var(--muted)">%</span></div>
+    <div class="mc up">▲ High confidence batch</div>
+  </div>
+
+  <div class="card g8">
+    <div class="ca" style="background:var(--blue)"></div>
+    <div class="cl">IOC Volume — Last 7 Days <span id="weekTotal"></span></div>
+    <div style="position:relative;height:160px"><canvas id="barChart" role="img" aria-label="Bar chart of IOC volume over last 7 days">Daily IOC ingestion over the past week.</canvas></div>
+  </div>
+
+  <div class="card g4">
+    <div class="ca" style="background:var(--green)"></div>
+    <div class="cl">Live Ingest Rate</div>
+    <div class="rn" id="rateNum">—</div>
+    <div class="ru">indicators / hour</div>
+    <div style="position:relative;height:60px;margin-top:14px"><canvas id="sparkChart" role="img" aria-label="Sparkline of ingest rate">Recent ingest rate trend.</canvas></div>
+  </div>
+
+  <div class="card g5">
+    <div class="ca" style="background:var(--purple)"></div>
+    <div class="cl">Type Breakdown <span id="typeTotal"></span></div>
+    <div id="typeList"></div>
+  </div>
+
+  <div class="card g7">
+    <div class="ca" style="background:var(--teal)"></div>
+    <div class="cl">Hourly Ingest — Today <span id="peakInfo"></span></div>
+    <div style="position:relative;height:120px"><canvas id="hourChart" role="img" aria-label="Hourly IOC ingest for today">Hourly ingest from midnight to now.</canvas></div>
+  </div>
+
+  <div class="card g7">
+    <div class="ca" style="background:#333"></div>
+    <div class="cl">Feed Sources <span>Last 24h contribution</span></div>
+    <table class="tbl">
+      <thead><tr><th>Source</th><th>IOCs</th><th>Share</th><th>Quality</th><th>Status</th></tr></thead>
+      <tbody id="srcBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card g5">
+    <div class="ca" style="background:var(--orange)"></div>
+    <div class="cl">Enrichment Coverage</div>
+    <div class="eg" id="enrichGrid"></div>
+  </div>
+
+  <div class="card g4">
+    <div class="ca" style="background:var(--gold)"></div>
+    <div class="cl">Source Split</div>
+    <div style="position:relative;height:140px"><canvas id="donutChart" role="img" aria-label="Donut chart: MISP 41%, AlienVault 30%, Shodan 16%, AbuseCH 8%, URLhaus 5%">IOC source distribution.</canvas></div>
+    <div id="donutLegend" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"></div>
+  </div>
+
+  <div class="card g8">
+    <div class="ca" style="background:var(--red)"></div>
+    <div class="cl">7-Day Threat-Type Trend <span>Malware · Phishing · Ransomware</span></div>
+    <div style="position:relative;height:120px"><canvas id="lineChart" role="img" aria-label="Line chart: 7-day trend for malware, phishing, ransomware">7-day IOC trend by threat type.</canvas></div>
+    <div id="lineLegend" style="display:flex;gap:16px;margin-top:8px"></div>
+  </div>
+
+</div>
+
+<footer>
+  <span>IOC Ingested Dashboard — auto-refresh every 30s</span>
+  <span id="footerTs"></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DAYS=[`Mon`,`Tue`,`Wed`,`Thu`,`Fri`,`Sat`,`Sun`];
+const DVOL=[1823,2104,1677,2390,2015,1245,2487];
+const DTOT=DVOL.reduce((a,b)=>a+b,0);
+const TYPES=[
+  {name:`IP Address`,count:892, color:`#1250a0`},
+  {name:`Domain`,    count:643, color:`#c0650a`},
+  {name:`URL`,       count:421, color:`#5a35a0`},
+  {name:`File Hash`, count:318, color:`#c0392b`},
+  {name:`Email`,     count:134, color:`#0e7a70`},
+  {name:`Cert`,      count: 79, color:`#9a6800`},
+];
+const TTOT=TYPES.reduce((a,b)=>a+b.count,0);
+const SOURCES=[
+  {name:`MISP`,           iocs:1021,share:41,q:99,s:`high`},
+  {name:`AlienVault OTX`, iocs: 742,share:30,q:91,s:`high`},
+  {name:`Shodan`,         iocs: 391,share:16,q:87,s:`med`},
+  {name:`AbuseCH`,        iocs: 198,share: 8,q:83,s:`med`},
+  {name:`URLhaus`,        iocs: 135,share: 5,q:78,s:`low`},
+];
+const ENRICH=[
+  {label:`GeoIP Tagged`,  val:91,color:`#1250a0`},
+  {label:`ASN Resolved`,  val:87,color:`#1e7a4a`},
+  {label:`Threat Scored`, val:74,color:`#c0650a`},
+  {label:`WHOIS Enriched`,val:63,color:`#5a35a0`},
+];
+const DONUT=[
+  {label:`MISP`,           val:41,color:`#1250a0`},
+  {label:`AlienVault OTX`, val:30,color:`#c0650a`},
+  {label:`Shodan`,         val:16,color:`#5a35a0`},
+  {label:`AbuseCH`,        val: 8,color:`#0e7a70`},
+  {label:`URLhaus`,        val: 5,color:`#9a6800`},
+];
+
+function tick(){
+  const n=new Date(),p=v=>String(v).padStart(2,`0`);
+  document.getElementById(`clock`).textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())} UTC`;
+  document.getElementById(`footerTs`).textContent=`Last updated: ${n.toLocaleString(`en-GB`,{hour12:false}).replace(`,`,``)}`;
+}
+setInterval(tick,1000);tick();
+
+function countUp(el,target,dur=1300){
+  const s=performance.now();
+  (function step(t){
+    const p=Math.min((t-s)/dur,1),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(e*target).toLocaleString();
+    if(p<1)requestAnimationFrame(step);
+  })(s);
+}
+
+window.addEventListener(`DOMContentLoaded`,()=>{
+  setTimeout(()=>countUp(document.getElementById(`heroNum`),2487),100);
+  setTimeout(()=>countUp(document.getElementById(`heroNew`),1389),200);
+  setTimeout(()=>countUp(document.getElementById(`heroUpd`),863),350);
+  setTimeout(()=>countUp(document.getElementById(`heroExp`),235),500);
+  document.getElementById(`weekTotal`).textContent=`7-day: ${DTOT.toLocaleString()}`;
+  document.getElementById(`typeTotal`).textContent=`total: ${TTOT.toLocaleString()}`;
+  buildBar();buildSpark();buildTypes();buildHour();buildSrc();buildEnrich();buildDonut();buildLine();startRate();
+});
+
+function buildBar(){
+  new Chart(document.getElementById(`barChart`),{
+    type:`bar`,
+    data:{labels:DAYS,datasets:[{data:DVOL,backgroundColor:DVOL.map((_,i)=>i===6?`#1250a0`:`#d4d4d0`),borderRadius:3,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` `+c.raw.toLocaleString()+` IOCs`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{family:`IBM Plex Mono`,size:10},color:`#a0a09c`}},
+              y:{grid:{color:`#f0f0ec`},ticks:{font:{family:`IBM Plex Mono`,size:10},color:`#a0a09c`,callback:v=>v>=1000?(v/1000)+`k`:v}}}}
+  });
+}
+
+let sparkData=Array.from({length:20},()=>Math.round(85+Math.random()*55)),sparkInst;
+function buildSpark(){
+  sparkInst=new Chart(document.getElementById(`sparkChart`),{
+    type:`line`,
+    data:{labels:sparkData.map((_,i)=>i),datasets:[{data:sparkData,borderColor:`#1e7a4a`,borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:`rgba(30,122,74,.07)`,tension:.4}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}}}
+  });
+}
+function startRate(){
+  const el=document.getElementById(`rateNum`);
+  el.textContent=Math.round(90+Math.random()*50);
+  setInterval(()=>{
+    const r=Math.round(85+Math.random()*60);el.textContent=r;
+    sparkData.push(r);if(sparkData.length>20)sparkData.shift();
+    sparkInst.data.datasets[0].data=[...sparkData];sparkInst.update(`none`);
+  },2000);
+}
+
+function buildTypes(){
+  const list=document.getElementById(`typeList`);
+  TYPES.forEach((t,i)=>{
+    const pct=((t.count/TTOT)*100).toFixed(1);
+    const row=document.createElement(`div`);row.className=`tr`;
+    row.innerHTML=`<span class="tdot" style="background:${t.color}"></span><span class="tn">${t.name}</span><div class="tbg"><div class="tf" style="background:${t.color}" data-w="${pct}"></div></div><span class="tp">${pct}%</span><span class="tc">${t.count.toLocaleString()}</span>`;
+    list.appendChild(row);
+    setTimeout(()=>{row.querySelector(`.tf`).style.width=pct+`%`;},200+i*70);
+  });
+}
+
+function buildHour(){
+  const h=new Date().getHours(),labels=[],data=[];
+  for(let i=0;i<=h;i++){labels.push(String(i).padStart(2,`0`));data.push(Math.round(60+Math.sin(i/3.5)*25+Math.random()*45));}
+  const peak=Math.max(...data),peakH=labels[data.indexOf(peak)];
+  document.getElementById(`peakInfo`).textContent=`peak ${peak} at ${peakH}:00`;
+  new Chart(document.getElementById(`hourChart`),{
+    type:`bar`,
+    data:{labels,datasets:[{data,backgroundColor:data.map((v,i)=>v===peak?`#c0392b`:i===data.length-1?`#1250a0`:`#d4d4d0`),borderRadius:2,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` `+c.raw+` IOCs`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{family:`IBM Plex Mono`,size:9},color:`#a0a09c`,maxTicksLimit:13}},
+              y:{grid:{color:`#f0f0ec`},ticks:{font:{family:`IBM Plex Mono`,size:9},color:`#a0a09c`}}}}
+  });
+}
+
+function buildSrc(){
+  const body=document.getElementById(`srcBody`);
+  SOURCES.forEach(s=>{
+    const tr=document.createElement(`tr`);
+    const bc=s.s===`high`?`pg`:s.s===`med`?`po`:`pr`;
+    const bt=s.s===`high`?`ACTIVE`:s.s===`med`?`DEGRADED`:`SLOW`;
+    const qc=s.q>=90?`#1e7a4a`:s.q>=80?`#c0650a`:`#c0392b`;
+    tr.innerHTML=`<td class="fw">${s.name}</td><td class="mono">${s.iocs.toLocaleString()}</td><td class="mono">${s.share}%</td>
+      <td><div class="mb"><div class="mbb"><div class="mbf" style="width:${s.q}%;background:${qc}"></div></div><span class="mono" style="font-size:11px">${s.q}%</span></div></td>
+      <td><span class="pill ${bc}">${bt}</span></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function buildEnrich(){
+  const grid=document.getElementById(`enrichGrid`);
+  ENRICH.forEach((e,i)=>{
+    const d=document.createElement(`div`);
+    d.innerHTML=`<div class="en" style="color:${e.color}">${e.val}<span style="font-size:14px;font-weight:400;color:var(--muted)">%</span></div><div class="el">${e.label}</div><div class="eb"><div class="ebf" style="background:${e.color}" data-w="${e.val}"></div></div>`;
+    grid.appendChild(d);
+    setTimeout(()=>{d.querySelector(`.ebf`).style.width=e.val+`%`;},300+i*80);
+  });
+}
+
+function buildDonut(){
+  new Chart(document.getElementById(`donutChart`),{
+    type:`doughnut`,
+    data:{labels:DONUT.map(d=>d.label),datasets:[{data:DONUT.map(d=>d.val),backgroundColor:DONUT.map(d=>d.color),borderWidth:2,borderColor:`#fff`,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:`68%`,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}%`}}}},
+    plugins:[{id:`ctr`,afterDraw(chart){
+      const{ctx,chartArea:{top,bottom,left,right}}=chart,cx=(left+right)/2,cy=(top+bottom)/2;
+      ctx.save();ctx.font=`700 18px Space Grotesk,sans-serif`;ctx.fillStyle=`#0f0f0e`;ctx.textAlign=`center`;ctx.textBaseline=`middle`;ctx.fillText(`2,487`,cx,cy-7);
+      ctx.font=`400 10px IBM Plex Mono,monospace`;ctx.fillStyle=`#a0a09c`;ctx.fillText(`TOTAL IOCs`,cx,cy+10);ctx.restore();
+    }}]
+  });
+  const leg=document.getElementById(`donutLegend`);
+  DONUT.forEach(d=>{
+    const row=document.createElement(`div`);
+    row.style.cssText=`display:flex;align-items:center;gap:7px;font-size:12px`;
+    row.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${d.color};flex-shrink:0"></span><span style="flex:1;color:var(--muted)">${d.label}</span><span style="font-family:var(--mono);font-size:11px;font-weight:500">${d.val}%</span>`;
+    leg.appendChild(row);
+  });
+}
+
+function buildLine(){
+  const malware =[412,521,388,610,495,320,612];
+  const phishing=[284,310,245,389,305,198,390];
+  const ransom  =[127,173,144,241,215, 97,241];
+  new Chart(document.getElementById(`lineChart`),{
+    type:`line`,
+    data:{labels:DAYS,datasets:[
+      {label:`Malware`, data:malware, borderColor:`#c0392b`,borderWidth:1.5,pointRadius:3,pointBackgroundColor:`#c0392b`,fill:false,tension:.4},
+      {label:`Phishing`,data:phishing,borderColor:`#1250a0`,borderWidth:1.5,pointRadius:3,pointBackgroundColor:`#1250a0`,fill:false,tension:.4,borderDash:[4,3]},
+      {label:`Ransomware`,data:ransom,borderColor:`#9a6800`,borderWidth:1.5,pointRadius:3,pointBackgroundColor:`#9a6800`,fill:false,tension:.4,borderDash:[2,4]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw.toLocaleString()}`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{family:`IBM Plex Mono`,size:10},color:`#a0a09c`}},y:{grid:{color:`#f0f0ec`},ticks:{font:{family:`IBM Plex Mono`,size:10},color:`#a0a09c`}}}}
+  });
+  const leg=document.getElementById(`lineLegend`);
+  [{label:`Malware`,color:`#c0392b`,d:``},{label:`Phishing`,color:`#1250a0`,d:`dashed`},{label:`Ransomware`,color:`#9a6800`,d:`dotted`}].forEach(item=>{
+    const s=document.createElement(`span`);
+    s.style.cssText=`display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--muted)`;
+    s.innerHTML=`<span style="width:18px;height:0;border-top:2px ${item.d||`solid`} ${item.color};display:inline-block"></span>${item.label}`;
+    leg.appendChild(s);
+  });
+}
+</script>
+</body>
+</html>

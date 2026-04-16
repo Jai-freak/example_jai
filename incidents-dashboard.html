@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Incidents Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --border: #e0e0e0;
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --text-muted: #999999;
+    --accent-red: #e63946;
+    --accent-orange: #f4a261;
+    --accent-yellow: #e9c46a;
+    --accent-green: #2a9d8f;
+    --accent-blue: #457b9d;
+    --accent-purple: #8b5cf6;
+    --accent-cyan: #06b6d4;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--sans);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .hamburger { cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+  .hamburger span { display: block; width: 20px; height: 2px; background: var(--text-primary); }
+  .logo { font-family: var(--sans); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .breadcrumb { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb span { color: var(--text-muted); }
+
+  .search-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 14px;
+    width: 320px;
+    font-size: 13px; color: var(--text-muted);
+    font-family: var(--sans);
+  }
+  .search-bar input { border: none; background: transparent; outline: none; font-size: 13px; color: var(--text-primary); width: 100%; font-family: var(--sans); }
+  .search-bar svg { flex-shrink: 0; }
+
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .icon-btn { position: relative; background: none; border: none; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; transition: background .15s; }
+  .icon-btn:hover { background: var(--bg); }
+  .badge { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: var(--accent-red); border-radius: 50%; }
+  .avatar { width: 34px; height: 34px; background: #111; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: .04em; cursor: pointer; }
+
+  /* ── SUBHEADER ── */
+  .subheader {
+    background: var(--bg);
+    padding: 10px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; font-family: var(--mono); color: var(--text-muted); letter-spacing: .06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .breadcrumb-trail { display: flex; align-items: center; gap: 6px; }
+  .live-indicator { display: flex; align-items: center; gap: 6px; }
+  .live-dot { width: 7px; height: 7px; background: var(--accent-green); border-radius: 50%; animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── LAYOUT ── */
+  main { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── STAT CARDS ROW ── */
+  .stat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    transition: box-shadow .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+
+  .ring-wrap { position: relative; width: 80px; height: 80px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+  .ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1); }
+  .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-number { font-size: 18px; font-weight: 700; line-height: 1; }
+  .ring-sub { font-size: 9px; font-family: var(--mono); letter-spacing: .06em; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+  .stat-title { font-size: 10px; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+  .stat-desc { font-size: 11px; color: var(--text-secondary); text-align: center; line-height: 1.5; }
+
+  .red    { color: var(--accent-red); }
+  .orange { color: var(--accent-orange); }
+  .yellow { color: var(--accent-yellow); }
+  .green  { color: var(--accent-green); }
+  .blue   { color: var(--accent-blue); }
+
+  .ring-red    { stroke: var(--accent-red); }
+  .ring-orange { stroke: var(--accent-orange); }
+  .ring-yellow { stroke: var(--accent-yellow); }
+  .ring-green  { stroke: var(--accent-green); }
+  .ring-blue   { stroke: var(--accent-blue); }
+
+  /* ── MIDDLE ROW ── */
+  .mid-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── TABLE CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 11px; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+  .card-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 20px;
+    font-size: 10px; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-muted); text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: #fafafa;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  tbody td { padding: 12px 20px; font-size: 12.5px; }
+
+  .severity-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 3px;
+    font-size: 10px; font-family: var(--mono); font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .sev-critical { background: #fee2e2; color: #dc2626; }
+  .sev-high     { background: #ffedd5; color: #ea580c; }
+  .sev-medium   { background: #fef9c3; color: #ca8a04; }
+  .sev-low      { background: #dcfce7; color: #16a34a; }
+
+  .status-badge {
+    display: inline-block; padding: 3px 8px; border-radius: 3px;
+    font-size: 10px; font-family: var(--mono); font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .st-open       { background: #fee2e2; color: #dc2626; }
+  .st-active     { background: #fef3c7; color: #d97706; }
+  .st-contained  { background: #dbeafe; color: #2563eb; }
+  .st-resolved   { background: #dcfce7; color: #16a34a; }
+
+  .id-cell { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+  .type-tag { font-family: var(--mono); font-size: 11px; }
+
+  /* ── TIMELINE & MINI PANELS ── */
+  .timeline-list { padding: 0 20px; }
+  .tl-item {
+    display: flex; gap: 12px; padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .tl-content { flex: 1; }
+  .tl-title { font-size: 12.5px; font-weight: 500; margin-bottom: 3px; }
+  .tl-meta { font-size: 11px; font-family: var(--mono); color: var(--text-muted); }
+
+  /* ── DONUT / MINI CHARTS ── */
+  .donut-wrap { padding: 20px; display: flex; align-items: center; gap: 24px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .legend-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { display: flex; align-items: center; gap: 7px; color: var(--text-secondary); }
+  .legend-val  { font-family: var(--mono); font-size: 11px; font-weight: 600; }
+
+  /* ── BOTTOM ROW ── */
+  .bot-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+
+  /* ── BAR CHART ── */
+  .bar-chart { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { font-size: 11px; font-family: var(--mono); color: var(--text-secondary); width: 90px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .9s cubic-bezier(.4,0,.2,1); }
+  .bar-val   { font-size: 11px; font-family: var(--mono); font-weight: 600; width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* ── SPARKLINE ── */
+  .sparkline-area { padding: 16px 20px 20px; }
+  canvas { display: block; }
+
+  /* ── KPI MINI CARDS ── */
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .kpi-cell {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  .kpi-cell:nth-child(2n) { border-right: none; }
+  .kpi-cell:nth-last-child(-n+2) { border-bottom: none; }
+  .kpi-num { font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  .kpi-label { font-size: 10px; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+  .kpi-delta { font-size: 11px; font-family: var(--mono); margin-top: 6px; }
+  .delta-up   { color: var(--accent-red); }
+  .delta-down { color: var(--accent-green); }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 20px 14px;
+  }
+  .filter-btn {
+    padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border);
+    font-size: 11px; font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase;
+    cursor: pointer; background: var(--surface); color: var(--text-secondary);
+    transition: all .15s;
+  }
+  .filter-btn.active, .filter-btn:hover { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1200px) {
+    .stat-row { grid-template-columns: repeat(3, 1fr); }
+    .mid-row  { grid-template-columns: 1fr 1fr; }
+    .bot-row  { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .mid-row  { grid-template-columns: 1fr; }
+    main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-left">
+    <div class="hamburger" onclick="void(0)">
+      <span></span><span></span><span></span>
+    </div>
+    <span class="logo">Dashboard</span>
+    <span class="breadcrumb">/ <span>INCIDENTS</span></span>
+  </div>
+
+  <div class="search-bar">
+    <svg width="14" height="14" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="Search incidents, IDs, threats…"/>
+  </div>
+
+  <div class="header-right">
+    <button class="icon-btn">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge"></span>
+    </button>
+    <button class="icon-btn">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <span class="badge" style="background:var(--accent-orange)"></span>
+    </button>
+    <button class="icon-btn">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </button>
+    <div class="avatar">JA</div>
+  </div>
+</header>
+
+<!-- ── SUBHEADER ── -->
+<div class="subheader">
+  <div class="breadcrumb-trail">DASHBOARD / INCIDENTS</div>
+  <div class="live-indicator">
+    <span class="live-dot"></span>
+    LIVE FEEDS ACTIVE — UPDATING…
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- STAT CARDS -->
+  <div class="stat-row">
+
+    <!-- Total Open -->
+    <div class="stat-card">
+      <div class="ring-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="33"/>
+          <circle class="ring-fill ring-red" cx="40" cy="40" r="33" id="ring-open"
+            stroke-dasharray="207.3" stroke-dashoffset="52"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-number">27</span>
+          <span class="ring-sub">Open</span>
+        </div>
+      </div>
+      <span class="stat-title red">Open Incidents</span>
+      <span class="stat-desc">Awaiting triage or investigation</span>
+    </div>
+
+    <!-- Critical -->
+    <div class="stat-card">
+      <div class="ring-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="33"/>
+          <circle class="ring-fill ring-red" cx="40" cy="40" r="33" id="ring-crit"
+            stroke-dasharray="207.3" stroke-dashoffset="156"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-number">8</span>
+          <span class="ring-sub">Crit</span>
+        </div>
+      </div>
+      <span class="stat-title red">Critical</span>
+      <span class="stat-desc">Immediate response required</span>
+    </div>
+
+    <!-- In-Progress -->
+    <div class="stat-card">
+      <div class="ring-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="33"/>
+          <circle class="ring-fill ring-orange" cx="40" cy="40" r="33" id="ring-prog"
+            stroke-dasharray="207.3" stroke-dashoffset="124"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-number">13</span>
+          <span class="ring-sub">Active</span>
+        </div>
+      </div>
+      <span class="stat-title orange">In Progress</span>
+      <span class="stat-desc">Under active investigation</span>
+    </div>
+
+    <!-- Resolved Today -->
+    <div class="stat-card">
+      <div class="ring-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="33"/>
+          <circle class="ring-fill ring-green" cx="40" cy="40" r="33" id="ring-res"
+            stroke-dasharray="207.3" stroke-dashoffset="62"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-number">19</span>
+          <span class="ring-sub">Today</span>
+        </div>
+      </div>
+      <span class="stat-title green">Resolved</span>
+      <span class="stat-desc">Closed and verified today</span>
+    </div>
+
+    <!-- MTTR -->
+    <div class="stat-card">
+      <div class="ring-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="33"/>
+          <circle class="ring-fill ring-blue" cx="40" cy="40" r="33" id="ring-mttr"
+            stroke-dasharray="207.3" stroke-dashoffset="104"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-number" style="font-size:15px">2.4h</span>
+          <span class="ring-sub">MTTR</span>
+        </div>
+      </div>
+      <span class="stat-title blue">Avg. Resolution</span>
+      <span class="stat-desc">Mean time to resolve</span>
+    </div>
+
+  </div>
+
+  <!-- MIDDLE ROW: Table + Timeline + Donut -->
+  <div class="mid-row" style="grid-template-columns: 2fr 1fr 1fr;">
+
+    <!-- Incidents Table -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Active Incidents</div>
+          <div class="card-sub">Sorted by severity · 27 open</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="filter-btn active" onclick="filterTable('all', this)">All</button>
+          <button class="filter-btn" onclick="filterTable('critical', this)">Critical</button>
+          <button class="filter-btn" onclick="filterTable('high', this)">High</button>
+          <button class="filter-btn" onclick="filterTable('medium', this)">Med</button>
+        </div>
+      </div>
+      <table id="incident-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Assigned</th>
+            <th>Age</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-sev="critical">
+            <td class="id-cell">INC-0041</td>
+            <td class="type-tag">Ransomware</td>
+            <td><span class="severity-badge sev-critical">● Critical</span></td>
+            <td><span class="status-badge st-open">Open</span></td>
+            <td>@s.chen</td>
+            <td class="id-cell">3h 12m</td>
+          </tr>
+          <tr data-sev="critical">
+            <td class="id-cell">INC-0039</td>
+            <td class="type-tag">Data Exfil</td>
+            <td><span class="severity-badge sev-critical">● Critical</span></td>
+            <td><span class="status-badge st-active">Active</span></td>
+            <td>@m.patel</td>
+            <td class="id-cell">5h 44m</td>
+          </tr>
+          <tr data-sev="high">
+            <td class="id-cell">INC-0038</td>
+            <td class="type-tag">Phishing</td>
+            <td><span class="severity-badge sev-high">● High</span></td>
+            <td><span class="status-badge st-active">Active</span></td>
+            <td>@r.jones</td>
+            <td class="id-cell">7h 02m</td>
+          </tr>
+          <tr data-sev="high">
+            <td class="id-cell">INC-0036</td>
+            <td class="type-tag">C2 Beacon</td>
+            <td><span class="severity-badge sev-high">● High</span></td>
+            <td><span class="status-badge st-contained">Contained</span></td>
+            <td>@a.kim</td>
+            <td class="id-cell">11h 55m</td>
+          </tr>
+          <tr data-sev="medium">
+            <td class="id-cell">INC-0034</td>
+            <td class="type-tag">Brute Force</td>
+            <td><span class="severity-badge sev-medium">● Medium</span></td>
+            <td><span class="status-badge st-open">Open</span></td>
+            <td>@t.nguyen</td>
+            <td class="id-cell">14h 20m</td>
+          </tr>
+          <tr data-sev="medium">
+            <td class="id-cell">INC-0033</td>
+            <td class="type-tag">Malware</td>
+            <td><span class="severity-badge sev-medium">● Medium</span></td>
+            <td><span class="status-badge st-active">Active</span></td>
+            <td>@s.chen</td>
+            <td class="id-cell">16h 08m</td>
+          </tr>
+          <tr data-sev="critical">
+            <td class="id-cell">INC-0031</td>
+            <td class="type-tag">Lateral Move</td>
+            <td><span class="severity-badge sev-critical">● Critical</span></td>
+            <td><span class="status-badge st-open">Open</span></td>
+            <td>@m.patel</td>
+            <td class="id-cell">20h 33m</td>
+          </tr>
+          <tr data-sev="high">
+            <td class="id-cell">INC-0029</td>
+            <td class="type-tag">Insider Threat</td>
+            <td><span class="severity-badge sev-high">● High</span></td>
+            <td><span class="status-badge st-open">Open</span></td>
+            <td>@r.jones</td>
+            <td class="id-cell">22h 47m</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Activity Timeline</div>
+          <div class="card-sub">Latest updates</div>
+        </div>
+      </div>
+      <div class="timeline-list">
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent-red)"></div>
+          <div class="tl-content">
+            <div class="tl-title">INC-0041 escalated to Critical</div>
+            <div class="tl-meta">3 min ago · Auto-escalation</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent-green)"></div>
+          <div class="tl-content">
+            <div class="tl-title">INC-0030 resolved by @a.kim</div>
+            <div class="tl-meta">18 min ago · Manual close</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent-orange)"></div>
+          <div class="tl-content">
+            <div class="tl-title">INC-0039 IOCs matched MISP</div>
+            <div class="tl-meta">34 min ago · Feed correlation</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent-blue)"></div>
+          <div class="tl-content">
+            <div class="tl-title">INC-0036 contained — quarantined host</div>
+            <div class="tl-meta">1h 02m ago · Endpoint action</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent-red)"></div>
+          <div class="tl-content">
+            <div class="tl-title">INC-0031 new C2 domain detected</div>
+            <div class="tl-meta">1h 29m ago · Threat intel</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent-green)"></div>
+          <div class="tl-content">
+            <div class="tl-title">INC-0027 closed — false positive</div>
+            <div class="tl-meta">2h 11m ago · @t.nguyen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incident Types Donut -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">By Type</div>
+          <div class="card-sub">Distribution across categories</div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0">
+          <!-- Donut segments via stroke-dasharray trick -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#f3f4f6" stroke-width="14"/>
+          <!-- Ransomware 29% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent-red)" stroke-width="14"
+            stroke-dasharray="69.3 169.3" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+          <!-- Phishing 24% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent-orange)" stroke-width="14"
+            stroke-dasharray="57.4 181.2" stroke-dashoffset="-69.3" transform="rotate(-90 50 50)"/>
+          <!-- Malware 19% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent-yellow)" stroke-width="14"
+            stroke-dasharray="45.5 193.1" stroke-dashoffset="-126.7" transform="rotate(-90 50 50)"/>
+          <!-- C2 Beacon 16% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent-blue)" stroke-width="14"
+            stroke-dasharray="38.3 200.3" stroke-dashoffset="-172.2" transform="rotate(-90 50 50)"/>
+          <!-- Other 12% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#d1d5db" stroke-width="14"
+            stroke-dasharray="28.8 209.8" stroke-dashoffset="-210.5" transform="rotate(-90 50 50)"/>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-row">
+            <span class="legend-name"><span class="legend-dot" style="background:var(--accent-red)"></span>Ransomware</span>
+            <span class="legend-val">29%</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><span class="legend-dot" style="background:var(--accent-orange)"></span>Phishing</span>
+            <span class="legend-val">24%</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><span class="legend-dot" style="background:var(--accent-yellow)"></span>Malware</span>
+            <span class="legend-val">19%</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><span class="legend-dot" style="background:var(--accent-blue)"></span>C2 Beacon</span>
+            <span class="legend-val">16%</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><span class="legend-dot" style="background:#d1d5db"></span>Other</span>
+            <span class="legend-val">12%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bot-row">
+
+    <!-- 7-Day Bar Chart -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Incidents — Last 7 Days</div>
+          <div class="card-sub">Volume by severity per day</div>
+        </div>
+      </div>
+      <div class="bar-chart">
+
+        <div style="display:flex;gap:16px;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+          <span style="font-size:10px;font-family:var(--mono);color:var(--text-muted);display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent-red);display:inline-block"></span>Critical</span>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--text-muted);display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent-orange);display:inline-block"></span>High</span>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--text-muted);display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent-yellow);display:inline-block"></span>Medium</span>
+        </div>
+
+        <div id="bar-chart-rows"></div>
+      </div>
+    </div>
+
+    <!-- KPI Mini Grid -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Key Metrics</div>
+          <div class="card-sub">Rolling 30-day performance</div>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-cell">
+          <div class="kpi-num red">342</div>
+          <div class="kpi-label">Total Incidents</div>
+          <div class="kpi-delta delta-up">↑ 14% vs last month</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-num" style="color:var(--accent-green)">94%</div>
+          <div class="kpi-label">Resolution Rate</div>
+          <div class="kpi-delta delta-down">↑ 3% improvement</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-num" style="color:var(--accent-blue)">2.4h</div>
+          <div class="kpi-label">Avg. MTTR</div>
+          <div class="kpi-delta delta-down">↓ 0.6h faster</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-num" style="color:var(--accent-orange)">4.7%</div>
+          <div class="kpi-label">False Positive</div>
+          <div class="kpi-delta delta-down">↓ 1.2% reduced</div>
+        </div>
+      </div>
+      <!-- Sparkline -->
+      <div class="sparkline-area">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Daily volume — 14 days</div>
+        <canvas id="sparkline" width="260" height="50"></canvas>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ── BAR CHART DATA ──
+const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const barData = [
+  { day:'Mon', crit:3, high:5, med:4 },
+  { day:'Tue', crit:5, high:7, med:6 },
+  { day:'Wed', crit:2, high:4, med:8 },
+  { day:'Thu', crit:6, high:9, med:5 },
+  { day:'Fri', crit:8, high:11,med:7 },
+  { day:'Sat', crit:4, high:6, med:3 },
+  { day:'Sun', crit:3, high:5, med:4 },
+];
+
+const maxTotal = Math.max(...barData.map(d => d.crit + d.high + d.med));
+
+const chartEl = document.getElementById('bar-chart-rows');
+barData.forEach(d => {
+  const total = d.crit + d.high + d.med;
+  const pct = (total / maxTotal) * 100;
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <span class="bar-label">${d.day}</span>
+    <div class="bar-track" style="position:relative;height:20px;border-radius:4px;background:#f3f4f6;">
+      <div style="position:absolute;inset:0;border-radius:4px;display:flex;overflow:hidden;width:${pct}%;transition:width .9s ease;">
+        <div style="flex:${d.crit};background:var(--accent-red);"></div>
+        <div style="flex:${d.high};background:var(--accent-orange);"></div>
+        <div style="flex:${d.med};background:var(--accent-yellow);"></div>
+      </div>
+    </div>
+    <span class="bar-val">${total}</span>
+  `;
+  chartEl.appendChild(row);
+});
+
+// ── SPARKLINE ──
+const spark = document.getElementById('sparkline');
+const ctx = spark.getContext('2d');
+const sparkData = [12,15,9,18,22,14,11,17,25,19,16,21,27,23];
+const sw = spark.width, sh = spark.height;
+const sMin = Math.min(...sparkData), sMax = Math.max(...sparkData);
+const sx = i => (i / (sparkData.length - 1)) * sw;
+const sy = v => sh - ((v - sMin) / (sMax - sMin)) * (sh - 8) - 4;
+
+// Fill
+const grad = ctx.createLinearGradient(0, 0, 0, sh);
+grad.addColorStop(0, 'rgba(230,57,70,.18)');
+grad.addColorStop(1, 'rgba(230,57,70,.01)');
+ctx.beginPath();
+ctx.moveTo(sx(0), sy(sparkData[0]));
+sparkData.forEach((v,i) => { if(i) ctx.lineTo(sx(i), sy(v)); });
+ctx.lineTo(sw, sh); ctx.lineTo(0, sh); ctx.closePath();
+ctx.fillStyle = grad; ctx.fill();
+
+// Line
+ctx.beginPath();
+ctx.moveTo(sx(0), sy(sparkData[0]));
+sparkData.forEach((v,i) => { if(i) ctx.lineTo(sx(i), sy(v)); });
+ctx.strokeStyle = 'var(--accent-red)';
+ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+
+// Dots
+sparkData.forEach((v,i) => {
+  ctx.beginPath();
+  ctx.arc(sx(i), sy(v), 2.5, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = 'var(--accent-red)'; ctx.lineWidth = 1.5;
+  ctx.fill(); ctx.stroke();
+});
+
+// ── TABLE FILTER ──
+function filterTable(sev, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#incident-table tbody tr').forEach(row => {
+    row.style.display = (sev === 'all' || row.dataset.sev === sev) ? '' : 'none';
+  });
+}
+
+// ── ANIMATE RINGS ON LOAD ──
+window.addEventListener('load', () => {
+  const rings = [
+    { id:'ring-open', pct:0.75 },
+    { id:'ring-crit', pct:0.29 },
+    { id:'ring-prog', pct:0.4 },
+    { id:'ring-res',  pct:0.7 },
+    { id:'ring-mttr', pct:0.5 },
+  ];
+  const circ = 2 * Math.PI * 33;
+  rings.forEach(r => {
+    const el = document.getElementById(r.id);
+    const offset = circ * (1 - r.pct);
+    el.style.strokeDashoffset = offset;
+  });
+});
+</script>
+</body>
+</html>
